@@ -1,0 +1,422 @@
+{
+ "1965": {
+  "co2": 11310.603,
+  "cement_co2": 216.431,
+  "flaring_co2": 130.443,
+  "other_industry_co2": 34.532,
+  "land_use_change_co2": 6385.424
+ },
+ "1966": {
+  "co2": 11862.625,
+  "cement_co2": 233.008,
+  "flaring_co2": 144.566,
+  "other_industry_co2": 36.221,
+  "land_use_change_co2": 5917.141
+ },
+ "1967": {
+  "co2": 12237.371,
+  "cement_co2": 239.881,
+  "flaring_co2": 190.783,
+  "other_industry_co2": 37.2,
+  "land_use_change_co2": 6250.528
+ },
+ "1968": {
+  "co2": 12905.273,
+  "cement_co2": 255.273,
+  "flaring_co2": 203.8,
+  "other_industry_co2": 38.593,
+  "land_use_change_co2": 6327.129
+ },
+ "1969": {
+  "co2": 13761.798,
+  "cement_co2": 270.599,
+  "flaring_co2": 244.035,
+  "other_industry_co2": 41.708,
+  "land_use_change_co2": 6940.544
+ },
+ "1970": {
+  "co2": 14899.139,
+  "cement_co2": 288.231,
+  "flaring_co2": 277.747,
+  "other_industry_co2": 44.35,
+  "land_use_change_co2": 6689.67
+ },
+ "1971": {
+  "co2": 15503.862,
+  "cement_co2": 303.058,
+  "flaring_co2": 321.473,
+  "other_industry_co2": 44.661,
+  "land_use_change_co2": 6139.398
+ },
+ "1972": {
+  "co2": 16224.579,
+  "cement_co2": 321.256,
+  "flaring_co2": 346.914,
+  "other_industry_co2": 48.072,
+  "land_use_change_co2": 6438.088
+ },
+ "1973": {
+  "co2": 17077.285,
+  "cement_co2": 340.161,
+  "flaring_co2": 402.186,
+  "other_industry_co2": 51.627,
+  "land_use_change_co2": 6254.265
+ },
+ "1974": {
+  "co2": 16997.912,
+  "cement_co2": 340.611,
+  "flaring_co2": 391.389,
+  "other_industry_co2": 52.388,
+  "land_use_change_co2": 6312.999
+ },
+ "1975": {
+  "co2": 16988.477,
+  "cement_co2": 339.876,
+  "flaring_co2": 336.728,
+  "other_industry_co2": 47.169,
+  "land_use_change_co2": 6123.497
+ },
+ "1976": {
+  "co2": 17862.492,
+  "cement_co2": 356.053,
+  "flaring_co2": 395.431,
+  "other_industry_co2": 50.017,
+  "land_use_change_co2": 6060.281
+ },
+ "1977": {
+  "co2": 18358.039,
+  "cement_co2": 372.71,
+  "flaring_co2": 381.487,
+  "other_industry_co2": 49.692,
+  "land_use_change_co2": 6620.091
+ },
+ "1978": {
+  "co2": 19024.742,
+  "cement_co2": 397.889,
+  "flaring_co2": 390.189,
+  "other_industry_co2": 51.076,
+  "land_use_change_co2": 6563.897
+ },
+ "1979": {
+  "co2": 19508.59,
+  "cement_co2": 403.703,
+  "flaring_co2": 360.159,
+  "other_industry_co2": 52.464,
+  "land_use_change_co2": 5855.829
+ },
+ "1980": {
+  "co2": 19409.793,
+  "cement_co2": 406.156,
+  "flaring_co2": 316.456,
+  "other_industry_co2": 48.202,
+  "land_use_change_co2": 6001.314
+ },
+ "1981": {
+  "co2": 18879.756,
+  "cement_co2": 406.189,
+  "flaring_co2": 237.177,
+  "other_industry_co2": 46.672,
+  "land_use_change_co2": 5836.581
+ },
+ "1982": {
+  "co2": 18729.742,
+  "cement_co2": 404.047,
+  "flaring_co2": 235.583,
+  "other_industry_co2": 45.361,
+  "land_use_change_co2": 5531.553
+ },
+ "1983": {
+  "co2": 18901.775,
+  "cement_co2": 413.275,
+  "flaring_co2": 212.848,
+  "other_industry_co2": 48.6,
+  "land_use_change_co2": 5839.854
+ },
+ "1984": {
+  "co2": 19457.25,
+  "cement_co2": 421.117,
+  "flaring_co2": 186.753,
+  "other_industry_co2": 52.532,
+  "land_use_change_co2": 6424.799
+ },
+ "1985": {
+  "co2": 20144.863,
+  "cement_co2": 425.741,
+  "flaring_co2": 181.449,
+  "other_industry_co2": 55.537,
+  "land_use_change_co2": 6787.743
+ },
+ "1986": {
+  "co2": 20438.045,
+  "cement_co2": 441.784,
+  "flaring_co2": 169.67,
+  "other_industry_co2": 59.925,
+  "land_use_change_co2": 6943.316
+ },
+ "1987": {
+  "co2": 21106.189,
+  "cement_co2": 458.382,
+  "flaring_co2": 163.009,
+  "other_industry_co2": 74.67,
+  "land_use_change_co2": 6497.945
+ },
+ "1988": {
+  "co2": 21918.756,
+  "cement_co2": 481.928,
+  "flaring_co2": 185.629,
+  "other_industry_co2": 89.452,
+  "land_use_change_co2": 6156.68
+ },
+ "1989": {
+  "co2": 22200.213,
+  "cement_co2": 492.073,
+  "flaring_co2": 150.973,
+  "other_industry_co2": 87.024,
+  "land_use_change_co2": 5980.82
+ },
+ "1990": {
+  "co2": 22732.145,
+  "cement_co2": 492.522,
+  "flaring_co2": 256.788,
+  "other_industry_co2": 336.425,
+  "land_use_change_co2": 5829.07
+ },
+ "1991": {
+  "co2": 23205.592,
+  "cement_co2": 504.694,
+  "flaring_co2": 272.16,
+  "other_industry_co2": 346.639,
+  "land_use_change_co2": 5720.298
+ },
+ "1992": {
+  "co2": 22520.424,
+  "cement_co2": 525.922,
+  "flaring_co2": 239.794,
+  "other_industry_co2": 337.513,
+  "land_use_change_co2": 5967.898
+ },
+ "1993": {
+  "co2": 22749.873,
+  "cement_co2": 549.567,
+  "flaring_co2": 232.44,
+  "other_industry_co2": 317.711,
+  "land_use_change_co2": 5733.292
+ },
+ "1994": {
+  "co2": 22974.598,
+  "cement_co2": 586.744,
+  "flaring_co2": 312.927,
+  "other_industry_co2": 324.772,
+  "land_use_change_co2": 6668.908
+ },
+ "1995": {
+  "co2": 23516.639,
+  "cement_co2": 620.204,
+  "flaring_co2": 324.364,
+  "other_industry_co2": 332.879,
+  "land_use_change_co2": 6278.081
+ },
+ "1996": {
+  "co2": 24233.477,
+  "cement_co2": 633.559,
+  "flaring_co2": 348.548,
+  "other_industry_co2": 330.67,
+  "land_use_change_co2": 6541.828
+ },
+ "1997": {
+  "co2": 24380.322,
+  "cement_co2": 658.829,
+  "flaring_co2": 350.78,
+  "other_industry_co2": 346.144,
+  "land_use_change_co2": 8019.617
+ },
+ "1998": {
+  "co2": 24295.713,
+  "cement_co2": 656.596,
+  "flaring_co2": 334.982,
+  "other_industry_co2": 349.655,
+  "land_use_change_co2": 6792.238
+ },
+ "1999": {
+  "co2": 24837.771,
+  "cement_co2": 688.047,
+  "flaring_co2": 328.418,
+  "other_industry_co2": 361.859,
+  "land_use_change_co2": 6561.857
+ },
+ "2000": {
+  "co2": 25511.482,
+  "cement_co2": 718.165,
+  "flaring_co2": 345.576,
+  "other_industry_co2": 351.657,
+  "land_use_change_co2": 6145.762
+ },
+ "2001": {
+  "co2": 25692.994,
+  "cement_co2": 750.748,
+  "flaring_co2": 334.076,
+  "other_industry_co2": 344.456,
+  "land_use_change_co2": 5460.704
+ },
+ "2002": {
+  "co2": 26265.332,
+  "cement_co2": 779.004,
+  "flaring_co2": 323.111,
+  "other_industry_co2": 350.03,
+  "land_use_change_co2": 6093.696
+ },
+ "2003": {
+  "co2": 27652.691,
+  "cement_co2": 857.435,
+  "flaring_co2": 343.439,
+  "other_industry_co2": 348.206,
+  "land_use_change_co2": 7321.209
+ },
+ "2004": {
+  "co2": 28610.023,
+  "cement_co2": 895.93,
+  "flaring_co2": 341.454,
+  "other_industry_co2": 377.004,
+  "land_use_change_co2": 6443.865
+ },
+ "2005": {
+  "co2": 29598.951,
+  "cement_co2": 966.776,
+  "flaring_co2": 346.552,
+  "other_industry_co2": 380.529,
+  "land_use_change_co2": 5931.112
+ },
+ "2006": {
+  "co2": 30594.152,
+  "cement_co2": 1047.294,
+  "flaring_co2": 346.573,
+  "other_industry_co2": 390.113,
+  "land_use_change_co2": 6033.741
+ },
+ "2007": {
+  "co2": 31499.256,
+  "cement_co2": 1126.199,
+  "flaring_co2": 342.25,
+  "other_industry_co2": 385.405,
+  "land_use_change_co2": 5593.206
+ },
+ "2008": {
+  "co2": 32049.66,
+  "cement_co2": 1137.397,
+  "flaring_co2": 333.686,
+  "other_industry_co2": 380.068,
+  "land_use_change_co2": 5951.02
+ },
+ "2009": {
+  "co2": 31513.014,
+  "cement_co2": 1170.606,
+  "flaring_co2": 328.636,
+  "other_industry_co2": 345.319,
+  "land_use_change_co2": 6534.817
+ },
+ "2010": {
+  "co2": 33317.672,
+  "cement_co2": 1251.813,
+  "flaring_co2": 339.741,
+  "other_industry_co2": 348.421,
+  "land_use_change_co2": 6517.829
+ },
+ "2011": {
+  "co2": 34479.988,
+  "cement_co2": 1344.747,
+  "flaring_co2": 356.251,
+  "other_industry_co2": 375.29,
+  "land_use_change_co2": 6392.556
+ },
+ "2012": {
+  "co2": 34954.734,
+  "cement_co2": 1377.354,
+  "flaring_co2": 374.059,
+  "other_industry_co2": 379.661,
+  "land_use_change_co2": 6682.122
+ },
+ "2013": {
+  "co2": 35275.82,
+  "cement_co2": 1441.334,
+  "flaring_co2": 382.017,
+  "other_industry_co2": 409.574,
+  "land_use_change_co2": 6319.521
+ },
+ "2014": {
+  "co2": 35465.695,
+  "cement_co2": 1492.451,
+  "flaring_co2": 383.772,
+  "other_industry_co2": 407.78,
+  "land_use_change_co2": 6409.911
+ },
+ "2015": {
+  "co2": 35403.527,
+  "cement_co2": 1440.666,
+  "flaring_co2": 381.194,
+  "other_industry_co2": 427.64,
+  "land_use_change_co2": 6512.625
+ },
+ "2016": {
+  "co2": 35392.832,
+  "cement_co2": 1476.147,
+  "flaring_co2": 371.508,
+  "other_industry_co2": 407.072,
+  "land_use_change_co2": 5376.553
+ },
+ "2017": {
+  "co2": 35974.609,
+  "cement_co2": 1499.947,
+  "flaring_co2": 384.212,
+  "other_industry_co2": 426.376,
+  "land_use_change_co2": 5307.768
+ },
+ "2018": {
+  "co2": 36734.004,
+  "cement_co2": 1546.849,
+  "flaring_co2": 404.041,
+  "other_industry_co2": 458.178,
+  "land_use_change_co2": 4882.023
+ },
+ "2019": {
+  "co2": 37086.566,
+  "cement_co2": 1615.727,
+  "flaring_co2": 432.392,
+  "other_industry_co2": 435.527,
+  "land_use_change_co2": 4887.178
+ },
+ "2020": {
+  "co2": 35158.23,
+  "cement_co2": 1624.052,
+  "flaring_co2": 400.001,
+  "other_industry_co2": 413.979,
+  "land_use_change_co2": 4516.54
+ },
+ "2021": {
+  "co2": 36866.863,
+  "cement_co2": 1666.885,
+  "flaring_co2": 402.216,
+  "other_industry_co2": 436.649,
+  "land_use_change_co2": 4657.103
+ },
+ "2022": {
+  "co2": 37527.773,
+  "cement_co2": 1578.739,
+  "flaring_co2": 398.871,
+  "other_industry_co2": 427.327,
+  "land_use_change_co2": 4785.392
+ },
+ "2023": {
+  "co2": 38094.039,
+  "cement_co2": 1540.286,
+  "flaring_co2": 411.343,
+  "other_industry_co2": 424.955,
+  "land_use_change_co2": 4745.551
+ },
+ "2024": {
+  "co2": 38598.578,
+  "cement_co2": 1472.818,
+  "flaring_co2": 415.708,
+  "other_industry_co2": 424.376,
+  "land_use_change_co2": 4585.508
+ }
+}

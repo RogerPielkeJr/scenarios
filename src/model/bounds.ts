@@ -13,6 +13,8 @@ export interface Preset {
     tolerance_gt: number;
     tolerance_c: number;
     source: string;
+    /** What the brief stated before the base-year recalibration, where it did. */
+    brief_stated?: { cumulative_gt: number; warming_c: number };
   };
 }
 

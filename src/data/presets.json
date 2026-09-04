@@ -13,11 +13,11 @@
     "landUse": 2.0
    },
    "expected": {
-    "cumulative_gt": 3706.9,
-    "warming_c": 3.11,
+    "cumulative_gt": 4083.9,
+    "warming_c": 3.19,
     "tolerance_gt": 0.5,
     "tolerance_c": 0.01,
-    "source": "frozen from this model"
+    "source": "frozen from this model after the base-year recalibration"
    }
   },
   {
@@ -72,11 +72,11 @@
     "landUse": 1.0
    },
    "expected": {
-    "cumulative_gt": 3093.9,
-    "warming_c": 2.86,
+    "cumulative_gt": 3408.7,
+    "warming_c": 2.94,
     "tolerance_gt": 0.5,
     "tolerance_c": 0.01,
-    "source": "frozen from this model"
+    "source": "frozen from this model after the base-year recalibration"
    }
   },
   {
@@ -92,11 +92,15 @@
     "landUse": 2.0
    },
    "expected": {
-    "cumulative_gt": 4600,
-    "warming_c": 3.4,
-    "tolerance_gt": 50,
-    "tolerance_c": 0.05,
-    "source": "stated in the brief"
+    "cumulative_gt": 5047.2,
+    "warming_c": 3.47,
+    "brief_stated": {
+     "cumulative_gt": 4600,
+     "warming_c": 3.4
+    },
+    "tolerance_gt": 0.5,
+    "tolerance_c": 0.01,
+    "source": "frozen from this model after the base-year recalibration"
    }
   },
   {
@@ -112,11 +116,15 @@
     "landUse": -1.0
    },
    "expected": {
-    "cumulative_gt": 1400,
-    "warming_c": 2.2,
-    "tolerance_gt": 50,
-    "tolerance_c": 0.05,
-    "source": "stated in the brief"
+    "cumulative_gt": 1585.0,
+    "warming_c": 2.22,
+    "brief_stated": {
+     "cumulative_gt": 1400,
+     "warming_c": 2.2
+    },
+    "tolerance_gt": 0.5,
+    "tolerance_c": 0.01,
+    "source": "frozen from this model after the base-year recalibration"
    }
   }
  ]

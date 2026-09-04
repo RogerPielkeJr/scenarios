@@ -1,3 +1,4 @@
+import baseJson from '../data/base.json';
 import configJson from '../data/config.json';
 import type { InputId, ScenarioInputs } from './types.js';
 
@@ -19,7 +20,16 @@ export interface InputSpec {
 
 export const BASE_YEAR = configJson.baseYear;
 export const END_YEAR = configJson.endYear;
-export const BASE = configJson.base;
+/**
+ * The base-year state, from src/data/base.json.
+ *
+ * CO2 per unit of energy covers fossil and industrial CO2, cement included,
+ * so the four Kaya terms count the same emissions the CMIP7 markers count.
+ * See DATA.md and METHODS.md.
+ */
+export const BASE = baseJson.base;
+export const BASE_META = baseJson.meta;
+export const BASE_BASIS = baseJson.basis;
 export const OBSERVED_RATES = configJson.observedRates;
 export const INPUT_SPECS = configJson.inputs as readonly InputSpec[];
 

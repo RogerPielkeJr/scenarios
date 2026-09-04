@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BASE, BASE_YEAR, END_YEAR, defaultInputs } from '../src/model/config.js';
 import { computePath } from '../src/model/kaya.js';
+import { MARKERS } from '../src/model/markers.js';
 import { populationAt } from '../src/model/population.js';
 import { at } from '../src/model/types.js';
 
@@ -48,6 +49,23 @@ describe('computePath', () => {
   it('sums cumulative CO2 over every year of the path', () => {
     const summed = path.points.reduce((total, p) => total + p.co2Gt, 0);
     expect(path.cumulativeGt).toBeCloseTo(summed, 6);
+  });
+
+  // The whole chart is the reader's line against the seven marker lines, so
+  // the base year has to put it among them rather than below them all. This
+  // is what the 2026-09-04 recalibration bought, and what guards it.
+  it('starts inside the range the markers start in', () => {
+    const starts = MARKERS.map((m) => at(m.co2Gt, 0, `${m.id} 2025`));
+    const start = at(path.points, 0).co2Gt;
+    expect(start).toBeGreaterThanOrEqual(Math.min(...starts) - 0.1);
+    expect(start).toBeLessThanOrEqual(Math.max(...starts) + 0.1);
+  });
+
+  it('counts the industrial CO2 the markers count', () => {
+    // Cement and other process CO2 push base CO2 per unit of energy well
+    // above EI's energy-only 60.5 kg/GJ. See src/data/base.json.
+    expect(BASE.co2PerEnergyKgGj).toBeGreaterThan(64);
+    expect(BASE.co2PerEnergyKgGj).toBeLessThan(66);
   });
 
   it('reports CO2 per dollar consistent with the two technology terms', () => {

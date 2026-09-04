@@ -35,27 +35,28 @@ SCENARIOS = [
 ]
 
 # The four presets the brief documents, and the cumulative CO2 / warming
-# each is expected to reproduce.
+# each is expected to reproduce. All four are frozen from this model: a
+# change in any of them means the model moved, and the test says so.
 #
-# The last two carry the figures stated in the brief ("lands near 4,600
-# GtCO2 and 3.4 degC", "near 1,400 and 2.2"), with a tolerance wide enough
-# to cover that rounding. The first two had no stated target, so they carry
-# what the model computes, frozen here as regression values: a change in
-# either one means the model moved, and the test says so.
+# These are NOT the figures the brief states for the two technology bounds.
+# Recalibrating the base year on 2026-09-04, so that the Kaya terms cover
+# cement and other industrial CO2 the way the CMIP7 markers do, raised every
+# cumulative total by 10 to 13 per cent. The brief's originals are kept in
+# brief_stated so the size of that shift stays visible. Warming moved far
+# less, because the emulator is logarithmic in cumulative CO2: the slow
+# bound went from 3.4 to 3.47 degC and the fast bound from 2.2 to 2.22.
 DOCUMENTED = {
-    'Kaya at observed rates':     {'cumulative_gt': 3706.9, 'warming_c': 3.11,
-                                   'tolerance_gt': 0.5, 'tolerance_c': 0.01,
-                                   'source': 'frozen from this model'},
-    'Trend continues':            {'cumulative_gt': 3093.9, 'warming_c': 2.86,
-                                   'tolerance_gt': 0.5, 'tolerance_c': 0.01,
-                                   'source': 'frozen from this model'},
-    'Slowest technical progress': {'cumulative_gt': 4600, 'warming_c': 3.4,
-                                   'tolerance_gt': 50, 'tolerance_c': 0.05,
-                                   'source': 'stated in the brief'},
-    'Ausubel methane economy':    {'cumulative_gt': 1400, 'warming_c': 2.2,
-                                   'tolerance_gt': 50, 'tolerance_c': 0.05,
-                                   'source': 'stated in the brief'},
+    'Kaya at observed rates':     {'cumulative_gt': 4083.9, 'warming_c': 3.19},
+    'Trend continues':            {'cumulative_gt': 3408.7, 'warming_c': 2.94},
+    'Slowest technical progress': {'cumulative_gt': 5047.2, 'warming_c': 3.47,
+                                   'brief_stated': {'cumulative_gt': 4600, 'warming_c': 3.4}},
+    'Ausubel methane economy':    {'cumulative_gt': 1585.0, 'warming_c': 2.22,
+                                   'brief_stated': {'cumulative_gt': 1400, 'warming_c': 2.2}},
 }
+for _entry in DOCUMENTED.values():
+    _entry.setdefault('tolerance_gt', 0.5)
+    _entry.setdefault('tolerance_c', 0.01)
+    _entry.setdefault('source', 'frozen from this model after the base-year recalibration')
 
 INPUT_META = {
     'pop':    ('population',       'level', 'billion people in 2100'),
@@ -94,7 +95,10 @@ def main() -> None:
     config = {
         'meta': {'generated_by': 'scripts/build_carried_data.py', 'provenance': provenance},
         'baseYear': BASE['year'], 'endYear': D['popyears'][-1],
-        'base': {
+        # The live base-year state is src/data/base.json, written from
+        # primary sources by scripts/build_data.py. This copy is what the
+        # prototype used, kept so the two can be diffed.
+        'prototypeBase': {
             'populationBn': BASE['pop'],
             'gdpPerPersonUsd': BASE['gdppc'],
             'energyPerDollarMj': BASE['ei'],

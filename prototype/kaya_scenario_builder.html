@@ -19,13 +19,13 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:Spectral,Geor
 header{border-bottom:2px solid var(--navy);padding-bottom:20px;margin-bottom:26px;display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:34px;align-items:end}
 @media (max-width:860px){header{grid-template-columns:1fr;gap:12px;align-items:start}}
 h1{font-size:clamp(27px,3.4vw,40px);line-height:1.1;margin:0;font-weight:600;letter-spacing:-.015em;text-wrap:balance}
-.sub{font-size:16.5px;color:var(--dim);margin:0;max-width:70ch}
+.sub{font-size:16.5px;color:var(--dim);margin:0}
 .grid{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:34px;align-items:start}
 @media (max-width:860px){.grid{grid-template-columns:1fr}}
 .ctrl{border-top:1px solid var(--rule);padding:18px 0 20px}
 .ctrl:first-child{border-top:none;padding-top:16px}
 .ctrl h3{font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:15px;font-weight:600;margin:0 0 2px}
-.ctrl .why{font-size:14px;color:var(--dim);margin:0 0 14px;max-width:46ch}
+.ctrl .why{font-size:14px;color:var(--dim);margin:0 0 14px}
 .readout{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:25px;font-weight:500;letter-spacing:-.02em;color:var(--navy)}
 .verdict{font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;margin-top:5px;min-height:1.3em}
 input[type=range]{width:100%;margin:14px 0 0;accent-color:var(--navy);height:22px}
@@ -64,8 +64,8 @@ button.p:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
 .kaya tr:last-child td{border-bottom:none}
 .share{margin-top:16px;display:flex;align-items:center;gap:10px}
 #shmsg{font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--dim)}
-.note{font-size:14px;color:var(--dim);margin-top:26px;max-width:74ch;border-top:1px solid var(--rule);padding-top:16px}
-.note p{margin:0 0 9px}
+.note{font-size:14px;color:var(--dim);margin-top:26px;border-top:1px solid var(--rule);padding-top:16px}
+.note p{margin:0 0 9px;overflow-wrap:break-word}
 b.you{color:var(--you)}
 @media (prefers-reduced-motion:no-preference){.pathline{transition:d .18s ease-out}}
 </style></head><body>

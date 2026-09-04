@@ -5,7 +5,7 @@
  },
  "baseYear": 2025,
  "endYear": 2100,
- "base": {
+ "prototypeBase": {
   "populationBn": 8.2,
   "gdpPerPersonUsd": 20800,
   "energyPerDollarMj": 3.4,

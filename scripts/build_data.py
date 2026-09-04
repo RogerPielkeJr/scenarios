@@ -30,6 +30,10 @@ ROOT = Path(__file__).resolve().parent.parent
 WORKBOOK = Path('/home/rpielke/EI-Stats-Review-2026.xlsx')
 OUT = ROOT / 'src' / 'data'
 CACHE = ROOT / 'scripts' / '_worldbank_cache.json'
+GCB_CACHE = ROOT / 'scripts' / '_gcb_cache.json'
+GCB_URL = 'https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv'
+GCB_FIELDS = ('co2', 'cement_co2', 'flaring_co2', 'other_industry_co2',
+              'land_use_change_co2')
 
 FIRST_YEAR, LAST_YEAR = 1965, 2024   # EI coverage we keep (the 2026 edition
                                      # carries a 2025 estimate; excluded)
@@ -108,6 +112,33 @@ def fetch_worldbank(isos: list[str]) -> dict:
               file=sys.stderr)
     CACHE.write_text(json.dumps(data, indent=1))
     return data
+
+
+def fetch_gcb() -> dict[str, dict[str, float]]:
+    """World CO2 by component from the Global Carbon Budget, as redistributed
+    by Our World in Data.
+
+    Needed because the Energy Institute workbook covers CO2 from energy and
+    flaring but not cement or other industrial process CO2, while the CMIP7
+    markers count all of it. Reading the base year off EI alone starts the
+    reader's path about 4 GtCO2 below every marker line it is drawn against.
+    """
+    if GCB_CACHE.exists() and '--refresh' not in sys.argv:
+        return json.loads(GCB_CACHE.read_text())
+    import csv
+    import io
+    with urllib.request.urlopen(GCB_URL, timeout=300) as resp:
+        text = resp.read().decode('utf-8')
+    out: dict[str, dict[str, float]] = {}
+    for row in csv.DictReader(io.StringIO(text)):
+        if row.get('country') != 'World':
+            continue
+        year = row.get('year', '')
+        if not year.isdigit() or not (1965 <= int(year) <= LAST_YEAR):
+            continue
+        out[year] = {f: float(row[f]) for f in GCB_FIELDS if row.get(f)}
+    GCB_CACHE.write_text(json.dumps(out, indent=1))
+    return out
 
 
 def cagr(series: dict[int, float], a: int, b: int) -> float:
@@ -222,6 +253,66 @@ def main() -> None:
         },
     }
 
+    # --- base-year state ----------------------------------------------------
+    # Recalibrated 2026-09-04. The four Kaya terms have to cover the same
+    # emissions the CMIP7 markers count, or the reader's line starts below
+    # every line it is compared against. CO2 per unit of energy is therefore
+    # set from Global Carbon Budget fossil-and-industry CO2 (which includes
+    # cement and other process emissions) over EI total energy supply, not
+    # from EI's energy-only CO2. Land use stays at the value the brief gives.
+    gcb = fetch_gcb()
+    gcb_base = gcb[str(LAST_YEAR)]
+    fossil_industry_mt = gcb_base['co2']
+    energy_ej = w_tes[LAST_YEAR]
+    base_state = {
+        'populationBn': round(world_pop[LAST_YEAR] / 1e9, 4),
+        'gdpPerPersonUsd': round(gdppc[LAST_YEAR], 1),
+        'energyPerDollarMj': round(energy_per_dollar[LAST_YEAR], 4),
+        'co2PerEnergyKgGj': round(fossil_industry_mt / energy_ej, 3),
+        'landUseGt': 3.83,
+        'methaneMt': 380.0,
+    }
+    base = {
+        'meta': {
+            'generated_by': 'scripts/build_data.py',
+            'baseYear': 2025,
+            'observedYear': LAST_YEAR,
+            'note': (f'The base-year state is the observed {LAST_YEAR} world, applied at '
+                     '2025. 2025 is not complete in every source, so the first year of '
+                     'the path carries the last full year forward rather than projecting '
+                     'it.'),
+            'sources': {
+                'populationBn': 'World Bank SP.POP.TOTL, WLD',
+                'gdpPerPersonUsd': 'World Bank NY.GDP.MKTP.PP.KD over SP.POP.TOTL, WLD, constant 2021 international $',
+                'energyPerDollarMj': 'EI Statistical Review 2026 total energy supply over World Bank PPP GDP',
+                'co2PerEnergyKgGj': 'Global Carbon Budget fossil and industry CO2 (via Our World in Data) over EI total energy supply',
+                'landUseGt': 'stated in the brief; the Global Carbon Budget figure for the same year is '
+                             f'{gcb_base["land_use_change_co2"] / 1000:.2f} Gt',
+                'methaneMt': 'stated in the brief',
+            },
+        },
+        'base': base_state,
+        'basis': {
+            'fossilAndIndustryGt': round(fossil_industry_mt / 1000, 3),
+            'ofWhichCementGt': round(gcb_base['cement_co2'] / 1000, 3),
+            'ofWhichFlaringGt': round(gcb_base['flaring_co2'] / 1000, 3),
+            'ofWhichOtherIndustryGt': round(gcb_base['other_industry_co2'] / 1000, 3),
+            'energySupplyEj': round(energy_ej, 3),
+            'landUseChangeGt': round(gcb_base['land_use_change_co2'] / 1000, 3),
+            'totalCo2Gt': round((fossil_industry_mt + gcb_base['land_use_change_co2']) / 1000, 3),
+            'note': 'totalCo2Gt is the basis the CMIP7 marker paths are on',
+        },
+        'superseded': {
+            'co2PerEnergyKgGj': 60.5,
+            'gdpPerPersonUsd': 20800,
+            'populationBn': 8.20,
+            'why': ('The prototype set CO2 per unit of energy from EI CO2 from energy plus '
+                    'flaring, which leaves out cement and other industrial process CO2. '
+                    'That started every path about 4.4 GtCO2 below all seven markers.'),
+        },
+    }
+    (OUT / 'base.json').write_text(json.dumps(base, indent=1, ensure_ascii=False) + '\n')
+
     # --- country analogues --------------------------------------------------
     rows, dropped = [], []
     for name, series in co2.items():
@@ -272,6 +363,11 @@ def main() -> None:
               f"min {ex['min']['value']:+.2f} ({ex['min']['window']})  "
               f"[{ex['count']} windows]")
     print(f"  base year {LAST_YEAR}: {observed['base_year_check']}")
+    print('base.json')
+    print(f"  {base_state}")
+    print(f"  fossil+industry {base['basis']['fossilAndIndustryGt']} Gt over "
+          f"{base['basis']['energySupplyEj']} EJ = {base_state['co2PerEnergyKgGj']} kg/GJ "
+          f"(was {base['superseded']['co2PerEnergyKgGj']})")
     print(f'analogues.json  {len(rows)} countries')
     if dropped:
         print(f'  DROPPED at the join: {dropped}')

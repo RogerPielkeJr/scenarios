@@ -1,0 +1,40 @@
+{
+ "meta": {
+  "generated_by": "scripts/build_data.py",
+  "baseYear": 2025,
+  "observedYear": 2024,
+  "note": "The base-year state is the observed 2024 world, applied at 2025. 2025 is not complete in every source, so the first year of the path carries the last full year forward rather than projecting it.",
+  "sources": {
+   "populationBn": "World Bank SP.POP.TOTL, WLD",
+   "gdpPerPersonUsd": "World Bank NY.GDP.MKTP.PP.KD over SP.POP.TOTL, WLD, constant 2021 international $",
+   "energyPerDollarMj": "EI Statistical Review 2026 total energy supply over World Bank PPP GDP",
+   "co2PerEnergyKgGj": "Global Carbon Budget fossil and industry CO2 (via Our World in Data) over EI total energy supply",
+   "landUseGt": "stated in the brief; the Global Carbon Budget figure for the same year is 4.59 Gt",
+   "methaneMt": "stated in the brief"
+  }
+ },
+ "base": {
+  "populationBn": 8.1409,
+  "gdpPerPersonUsd": 21393.2,
+  "energyPerDollarMj": 3.4002,
+  "co2PerEnergyKgGj": 65.181,
+  "landUseGt": 3.83,
+  "methaneMt": 380.0
+ },
+ "basis": {
+  "fossilAndIndustryGt": 38.599,
+  "ofWhichCementGt": 1.473,
+  "ofWhichFlaringGt": 0.416,
+  "ofWhichOtherIndustryGt": 0.424,
+  "energySupplyEj": 592.179,
+  "landUseChangeGt": 4.586,
+  "totalCo2Gt": 43.184,
+  "note": "totalCo2Gt is the basis the CMIP7 marker paths are on"
+ },
+ "superseded": {
+  "co2PerEnergyKgGj": 60.5,
+  "gdpPerPersonUsd": 20800,
+  "populationBn": 8.2,
+  "why": "The prototype set CO2 per unit of energy from EI CO2 from energy plus flaring, which leaves out cement and other industrial process CO2. That started every path about 4.4 GtCO2 below all seven markers."
+ }
+}

@@ -66,17 +66,35 @@ describe('presets', () => {
   // goes net negative after 2050. Pinned so the size of each gap is visible.
   // See METHODS.md, "What the tool does not represent".
   it.each([
-    ['CMIP7 HIGH', 'H', 300],
-    ['CMIP7 MEDIUM', 'M', 60],
-    ['CMIP7 VERY LOW', 'VL', 950],
-  ])('reproduces %s to within %i Gt of its marker', (label, markerId, toleranceGt) => {
-    const preset = PRESETS.find((p) => p.label === label);
-    expect(preset).toBeDefined();
-    if (!preset) return;
-    const marker = MARKER_BY_ID[markerId];
-    expect(marker).toBeDefined();
-    const path = computePath(preset.inputs);
-    expect(Math.abs(path.cumulativeGt - (marker?.cumulativeGt ?? 0)))
-      .toBeLessThanOrEqual(Number(toleranceGt));
+    { label: 'CMIP7 HIGH', markerId: 'H', toleranceGt: 70 },
+    { label: 'CMIP7 MEDIUM', markerId: 'M', toleranceGt: 330 },
+    { label: 'CMIP7 VERY LOW', markerId: 'VL', toleranceGt: 1050 },
+  ])('reproduces $label to within $toleranceGt Gt of its marker',
+    ({ label, markerId, toleranceGt }) => {
+      const preset = PRESETS.find((p) => p.label === label);
+      expect(preset).toBeDefined();
+      if (!preset) return;
+      const marker = MARKER_BY_ID[markerId];
+      expect(marker).toBeDefined();
+      const path = computePath(preset.inputs);
+      expect(Math.abs(path.cumulativeGt - (marker?.cumulativeGt ?? 0)))
+        .toBeLessThanOrEqual(toleranceGt);
+    });
+
+  // The brief states 4,600 Gt and 3.4 degC for the slow bound and 1,400 and
+  // 2.2 for the fast one. Recalibrating the base year moved the totals but
+  // barely moved the warming, because the emulator is logarithmic in
+  // cumulative CO2. Pinned so the gap against the published figures stays
+  // visible rather than being quietly absorbed.
+  it('moves cumulative CO2 away from the figures the brief states, but not warming', () => {
+    for (const preset of DOCUMENTED_PRESETS) {
+      const stated = preset.expected?.brief_stated;
+      if (!stated || !preset.expected) continue;
+      const path = computePath(preset.inputs);
+      const t = warming(path.cumulativeGt, preset.inputs.methane);
+      expect(path.cumulativeGt / stated.cumulative_gt).toBeGreaterThan(1.09);
+      expect(path.cumulativeGt / stated.cumulative_gt).toBeLessThan(1.14);
+      expect(Math.abs(t - stated.warming_c)).toBeLessThan(0.08);
+    }
   });
 });
