@@ -1,0 +1,138 @@
+{
+ "meta": {
+  "generated_by": "scripts/build_carried_data.py",
+  "provenance": "carried over from prototype/kaya_scenario_builder.html; no primary source on this machine (see DATA.md)"
+ },
+ "baseYear": 2025,
+ "endYear": 2100,
+ "base": {
+  "populationBn": 8.2,
+  "gdpPerPersonUsd": 20800,
+  "energyPerDollarMj": 3.4,
+  "co2PerEnergyKgGj": 60.5,
+  "landUseGt": 3.83,
+  "methaneMt": 380.0
+ },
+ "observedRates": {
+  "income": 1.91,
+  "energyPerDollar": -1.43,
+  "co2PerEnergy": -0.21,
+  "population": 0.99
+ },
+ "inputs": [
+  {
+   "id": "population",
+   "legacyId": "pop",
+   "kind": "level",
+   "label": "People in 2100",
+   "help": "The UN projects 10.2 billion, with a 95% range of about 9 to 11.4.",
+   "min": 6,
+   "max": 14,
+   "step": 0.1,
+   "default": 10.2,
+   "decimals": 1,
+   "unitSuffix": " billion",
+   "units": "billion people in 2100",
+   "signed": false,
+   "reference": {
+    "value": 10.2,
+    "label": "UN median"
+   }
+  },
+  {
+   "id": "income",
+   "legacyId": "gdppc",
+   "kind": "rate",
+   "label": "Income growth per person",
+   "help": "The world managed 1.91% a year from 1990 to 2024.",
+   "min": -0.5,
+   "max": 3.5,
+   "step": 0.01,
+   "default": 1.91,
+   "decimals": 2,
+   "unitSuffix": "%/yr",
+   "units": "%/yr",
+   "signed": true,
+   "reference": {
+    "value": 1.91,
+    "label": "observed"
+   }
+  },
+  {
+   "id": "energyPerDollar",
+   "legacyId": "ei",
+   "kind": "rate",
+   "label": "Energy needed per dollar",
+   "help": "Efficiency improved 1.43% a year since 1990 and has done nearly all the decarbonising.",
+   "min": -4,
+   "max": 0.5,
+   "step": 0.01,
+   "default": -1.43,
+   "decimals": 2,
+   "unitSuffix": "%/yr",
+   "units": "%/yr",
+   "signed": true,
+   "reference": {
+    "value": -1.43,
+    "label": "observed"
+   }
+  },
+  {
+   "id": "co2PerEnergy",
+   "legacyId": "ci",
+   "kind": "rate",
+   "label": "Carbon per unit of energy",
+   "help": "The fuel mix improved only 0.21% a year since 1990, and 0.48% over the past decade.",
+   "min": -4,
+   "max": 0.5,
+   "step": 0.01,
+   "default": -0.21,
+   "decimals": 2,
+   "unitSuffix": "%/yr",
+   "units": "%/yr",
+   "signed": true,
+   "reference": {
+    "value": -0.21,
+    "label": "observed"
+   }
+  },
+  {
+   "id": "landUse",
+   "legacyId": "lu",
+   "kind": "level",
+   "label": "Land use CO2 in 2100",
+   "help": "Forests and farming release about 3.8 Gt a year now. CMIP7 spans a sink of 8.8 Gt to a source of 1.9.",
+   "min": -10,
+   "max": 5,
+   "step": 0.1,
+   "default": 0,
+   "decimals": 1,
+   "unitSuffix": " Gt/yr",
+   "units": "GtCO2/yr in 2100",
+   "signed": false,
+   "reference": {
+    "value": 3.8,
+    "label": "today"
+   }
+  },
+  {
+   "id": "methane",
+   "legacyId": "ch4",
+   "kind": "level",
+   "label": "Methane in 2100",
+   "help": "The world emits about 380 Mt a year now. CMIP7 spans 94 in VERY LOW to 533 in HIGH.",
+   "min": 80,
+   "max": 600,
+   "step": 1,
+   "default": 380,
+   "decimals": 0,
+   "unitSuffix": " Mt/yr",
+   "units": "Mt/yr in 2100",
+   "signed": false,
+   "reference": {
+    "value": 380,
+    "label": "today"
+   }
+  }
+ ]
+}

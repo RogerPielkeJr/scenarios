@@ -1,0 +1,123 @@
+{
+ "presets": [
+  {
+   "id": "kaya-at-observed-rates",
+   "label": "Kaya at observed rates",
+   "documented": true,
+   "inputs": {
+    "population": 10.2,
+    "income": 1.91,
+    "energyPerDollar": -1.43,
+    "co2PerEnergy": -0.21,
+    "methane": 380,
+    "landUse": 2.0
+   },
+   "expected": {
+    "cumulative_gt": 3706.9,
+    "warming_c": 3.11,
+    "tolerance_gt": 0.5,
+    "tolerance_c": 0.01,
+    "source": "frozen from this model"
+   }
+  },
+  {
+   "id": "cmip7-high",
+   "label": "CMIP7 HIGH",
+   "documented": false,
+   "inputs": {
+    "population": 12.98,
+    "income": 0.57,
+    "energyPerDollar": -0.66,
+    "co2PerEnergy": -0.08,
+    "methane": 533,
+    "landUse": 1.9
+   }
+  },
+  {
+   "id": "cmip7-medium",
+   "label": "CMIP7 MEDIUM",
+   "documented": false,
+   "inputs": {
+    "population": 9.89,
+    "income": 1.73,
+    "energyPerDollar": -1.32,
+    "co2PerEnergy": -0.87,
+    "methane": 436,
+    "landUse": 1.5
+   }
+  },
+  {
+   "id": "cmip7-very-low",
+   "label": "CMIP7 VERY LOW",
+   "documented": false,
+   "inputs": {
+    "population": 8.09,
+    "income": 1.97,
+    "energyPerDollar": -2.11,
+    "co2PerEnergy": -2.6,
+    "methane": 94,
+    "landUse": -4.7
+   }
+  },
+  {
+   "id": "trend-continues",
+   "label": "Trend continues",
+   "documented": true,
+   "inputs": {
+    "population": 10.2,
+    "income": 1.91,
+    "energyPerDollar": -1.62,
+    "co2PerEnergy": -0.48,
+    "methane": 300,
+    "landUse": 1.0
+   },
+   "expected": {
+    "cumulative_gt": 3093.9,
+    "warming_c": 2.86,
+    "tolerance_gt": 0.5,
+    "tolerance_c": 0.01,
+    "source": "frozen from this model"
+   }
+  },
+  {
+   "id": "slowest-technical-progress",
+   "label": "Slowest technical progress",
+   "documented": true,
+   "inputs": {
+    "population": 11.4,
+    "income": 2.23,
+    "energyPerDollar": -1.36,
+    "co2PerEnergy": -0.17,
+    "methane": 450,
+    "landUse": 2.0
+   },
+   "expected": {
+    "cumulative_gt": 4600,
+    "warming_c": 3.4,
+    "tolerance_gt": 50,
+    "tolerance_c": 0.05,
+    "source": "stated in the brief"
+   }
+  },
+  {
+   "id": "ausubel-methane-economy",
+   "label": "Ausubel methane economy",
+   "documented": true,
+   "inputs": {
+    "population": 9.0,
+    "income": 1.91,
+    "energyPerDollar": -1.57,
+    "co2PerEnergy": -2.79,
+    "methane": 150,
+    "landUse": -1.0
+   },
+   "expected": {
+    "cumulative_gt": 1400,
+    "warming_c": 2.2,
+    "tolerance_gt": 50,
+    "tolerance_c": 0.05,
+    "source": "stated in the brief"
+   }
+  }
+ ]
+}

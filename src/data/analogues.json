@@ -1,0 +1,483 @@
+{
+ "meta": {
+  "generated_by": "scripts/build_data.py",
+  "year": 2024,
+  "thresholds": {
+   "min_co2_mt": 25.0,
+   "min_gdp_bn_usd": 40.0
+  },
+  "count": 66,
+  "excluded_no_gdp_series": [
+   "Taiwan",
+   "USSR"
+  ],
+  "sources": {
+   "co2": "Energy Institute Statistical Review 2026, sheet \"CO2 from Energy\", 2024, Mt CO2",
+   "gdp": "World Bank NY.GDP.MKTP.PP.KD, 2024, constant 2021 international $"
+  }
+ },
+ "countries": [
+  {
+   "name": "Switzerland",
+   "iso3": "CHE",
+   "co2_mt": 33.28,
+   "gdp_ppp_bn_usd": 769.5,
+   "kg_co2_per_usd": 0.0433
+  },
+  {
+   "name": "Ireland",
+   "iso3": "IRL",
+   "co2_mt": 33.42,
+   "gdp_ppp_bn_usd": 641.2,
+   "kg_co2_per_usd": 0.0521
+  },
+  {
+   "name": "Norway",
+   "iso3": "NOR",
+   "co2_mt": 30.4,
+   "gdp_ppp_bn_usd": 528.3,
+   "kg_co2_per_usd": 0.0576
+  },
+  {
+   "name": "Sweden",
+   "iso3": "SWE",
+   "co2_mt": 39.87,
+   "gdp_ppp_bn_usd": 661.2,
+   "kg_co2_per_usd": 0.0603
+  },
+  {
+   "name": "Denmark",
+   "iso3": "DNK",
+   "co2_mt": 26.22,
+   "gdp_ppp_bn_usd": 424.6,
+   "kg_co2_per_usd": 0.0617
+  },
+  {
+   "name": "France",
+   "iso3": "FRA",
+   "co2_mt": 252.72,
+   "gdp_ppp_bn_usd": 3756.6,
+   "kg_co2_per_usd": 0.0673
+  },
+  {
+   "name": "Romania",
+   "iso3": "ROU",
+   "co2_mt": 62.11,
+   "gdp_ppp_bn_usd": 771.7,
+   "kg_co2_per_usd": 0.0805
+  },
+  {
+   "name": "Bangladesh",
+   "iso3": "BGD",
+   "co2_mt": 121.43,
+   "gdp_ppp_bn_usd": 1473.0,
+   "kg_co2_per_usd": 0.0824
+  },
+  {
+   "name": "United Kingdom",
+   "iso3": "GBR",
+   "co2_mt": 318.52,
+   "gdp_ppp_bn_usd": 3700.4,
+   "kg_co2_per_usd": 0.0861
+  },
+  {
+   "name": "Portugal",
+   "iso3": "PRT",
+   "co2_mt": 38.95,
+   "gdp_ppp_bn_usd": 451.6,
+   "kg_co2_per_usd": 0.0862
+  },
+  {
+   "name": "Austria",
+   "iso3": "AUT",
+   "co2_mt": 52.28,
+   "gdp_ppp_bn_usd": 585.4,
+   "kg_co2_per_usd": 0.0893
+  },
+  {
+   "name": "Italy",
+   "iso3": "ITA",
+   "co2_mt": 295.51,
+   "gdp_ppp_bn_usd": 3141.3,
+   "kg_co2_per_usd": 0.0941
+  },
+  {
+   "name": "Finland",
+   "iso3": "FIN",
+   "co2_mt": 30.85,
+   "gdp_ppp_bn_usd": 314.2,
+   "kg_co2_per_usd": 0.0982
+  },
+  {
+   "name": "Hungary",
+   "iso3": "HUN",
+   "co2_mt": 38.53,
+   "gdp_ppp_bn_usd": 389.6,
+   "kg_co2_per_usd": 0.0989
+  },
+  {
+   "name": "Spain",
+   "iso3": "ESP",
+   "co2_mt": 248.92,
+   "gdp_ppp_bn_usd": 2367.2,
+   "kg_co2_per_usd": 0.1052
+  },
+  {
+   "name": "Germany",
+   "iso3": "DEU",
+   "co2_mt": 566.07,
+   "gdp_ppp_bn_usd": 5232.7,
+   "kg_co2_per_usd": 0.1082
+  },
+  {
+   "name": "Brazil",
+   "iso3": "BRA",
+   "co2_mt": 454.79,
+   "gdp_ppp_bn_usd": 4166.3,
+   "kg_co2_per_usd": 0.1092
+  },
+  {
+   "name": "Colombia",
+   "iso3": "COL",
+   "co2_mt": 110.08,
+   "gdp_ppp_bn_usd": 977.4,
+   "kg_co2_per_usd": 0.1126
+  },
+  {
+   "name": "Egypt",
+   "iso3": "EGY",
+   "co2_mt": 225.03,
+   "gdp_ppp_bn_usd": 1957.6,
+   "kg_co2_per_usd": 0.115
+  },
+  {
+   "name": "Peru",
+   "iso3": "PER",
+   "co2_mt": 62.39,
+   "gdp_ppp_bn_usd": 537.5,
+   "kg_co2_per_usd": 0.1161
+  },
+  {
+   "name": "Pakistan",
+   "iso3": "PAK",
+   "co2_mt": 161.8,
+   "gdp_ppp_bn_usd": 1382.5,
+   "kg_co2_per_usd": 0.117
+  },
+  {
+   "name": "Slovakia",
+   "iso3": "SVK",
+   "co2_mt": 25.95,
+   "gdp_ppp_bn_usd": 218.5,
+   "kg_co2_per_usd": 0.1187
+  },
+  {
+   "name": "Netherlands",
+   "iso3": "NLD",
+   "co2_mt": 157.73,
+   "gdp_ppp_bn_usd": 1268.4,
+   "kg_co2_per_usd": 0.1244
+  },
+  {
+   "name": "New Zealand",
+   "iso3": "NZL",
+   "co2_mt": 32.22,
+   "gdp_ppp_bn_usd": 255.6,
+   "kg_co2_per_usd": 0.126
+  },
+  {
+   "name": "Israel",
+   "iso3": "ISR",
+   "co2_mt": 62.67,
+   "gdp_ppp_bn_usd": 474.0,
+   "kg_co2_per_usd": 0.1322
+  },
+  {
+   "name": "Chile",
+   "iso3": "CHL",
+   "co2_mt": 82.96,
+   "gdp_ppp_bn_usd": 598.2,
+   "kg_co2_per_usd": 0.1387
+  },
+  {
+   "name": "Belgium",
+   "iso3": "BEL",
+   "co2_mt": 104.34,
+   "gdp_ppp_bn_usd": 750.8,
+   "kg_co2_per_usd": 0.139
+  },
+  {
+   "name": "Argentina",
+   "iso3": "ARG",
+   "co2_mt": 171.21,
+   "gdp_ppp_bn_usd": 1223.4,
+   "kg_co2_per_usd": 0.1399
+  },
+  {
+   "name": "Türkiye",
+   "iso3": "TUR",
+   "co2_mt": 434.21,
+   "gdp_ppp_bn_usd": 3091.9,
+   "kg_co2_per_usd": 0.1404
+  },
+  {
+   "name": "China Hong Kong SAR",
+   "iso3": "HKG",
+   "co2_mt": 70.7,
+   "gdp_ppp_bn_usd": 498.0,
+   "kg_co2_per_usd": 0.142
+  },
+  {
+   "name": "Philippines",
+   "iso3": "PHL",
+   "co2_mt": 170.86,
+   "gdp_ppp_bn_usd": 1202.2,
+   "kg_co2_per_usd": 0.1421
+  },
+  {
+   "name": "Czech Republic",
+   "iso3": "CZE",
+   "co2_mt": 75.45,
+   "gdp_ppp_bn_usd": 523.1,
+   "kg_co2_per_usd": 0.1442
+  },
+  {
+   "name": "Bulgaria",
+   "iso3": "BGR",
+   "co2_mt": 33.2,
+   "gdp_ppp_bn_usd": 220.4,
+   "kg_co2_per_usd": 0.1506
+  },
+  {
+   "name": "Poland",
+   "iso3": "POL",
+   "co2_mt": 258.16,
+   "gdp_ppp_bn_usd": 1650.8,
+   "kg_co2_per_usd": 0.1564
+  },
+  {
+   "name": "Greece",
+   "iso3": "GRC",
+   "co2_mt": 61.6,
+   "gdp_ppp_bn_usd": 389.9,
+   "kg_co2_per_usd": 0.158
+  },
+  {
+   "name": "Mexico",
+   "iso3": "MEX",
+   "co2_mt": 464.45,
+   "gdp_ppp_bn_usd": 2875.1,
+   "kg_co2_per_usd": 0.1615
+  },
+  {
+   "name": "Japan",
+   "iso3": "JPN",
+   "co2_mt": 1002.6,
+   "gdp_ppp_bn_usd": 5886.3,
+   "kg_co2_per_usd": 0.1703
+  },
+  {
+   "name": "Ecuador",
+   "iso3": "ECU",
+   "co2_mt": 43.07,
+   "gdp_ppp_bn_usd": 252.5,
+   "kg_co2_per_usd": 0.1706
+  },
+  {
+   "name": "Azerbaijan",
+   "iso3": "AZE",
+   "co2_mt": 39.08,
+   "gdp_ppp_bn_usd": 225.4,
+   "kg_co2_per_usd": 0.1734
+  },
+  {
+   "name": "Thailand",
+   "iso3": "THA",
+   "co2_mt": 273.5,
+   "gdp_ppp_bn_usd": 1568.3,
+   "kg_co2_per_usd": 0.1744
+  },
+  {
+   "name": "US",
+   "iso3": "USA",
+   "co2_mt": 4625.9,
+   "gdp_ppp_bn_usd": 25737.7,
+   "kg_co2_per_usd": 0.1797
+  },
+  {
+   "name": "Indonesia",
+   "iso3": "IDN",
+   "co2_mt": 750.27,
+   "gdp_ppp_bn_usd": 4102.3,
+   "kg_co2_per_usd": 0.1829
+  },
+  {
+   "name": "Ukraine",
+   "iso3": "UKR",
+   "co2_mt": 108.77,
+   "gdp_ppp_bn_usd": 579.5,
+   "kg_co2_per_usd": 0.1877
+  },
+  {
+   "name": "Morocco",
+   "iso3": "MAR",
+   "co2_mt": 69.27,
+   "gdp_ppp_bn_usd": 354.3,
+   "kg_co2_per_usd": 0.1955
+  },
+  {
+   "name": "Belarus",
+   "iso3": "BLR",
+   "co2_mt": 52.63,
+   "gdp_ppp_bn_usd": 266.1,
+   "kg_co2_per_usd": 0.1978
+  },
+  {
+   "name": "South Korea",
+   "iso3": "KOR",
+   "co2_mt": 596.7,
+   "gdp_ppp_bn_usd": 2850.0,
+   "kg_co2_per_usd": 0.2094
+  },
+  {
+   "name": "India",
+   "iso3": "IND",
+   "co2_mt": 2953.27,
+   "gdp_ppp_bn_usd": 13662.1,
+   "kg_co2_per_usd": 0.2162
+  },
+  {
+   "name": "Canada",
+   "iso3": "CAN",
+   "co2_mt": 522.51,
+   "gdp_ppp_bn_usd": 2374.0,
+   "kg_co2_per_usd": 0.2201
+  },
+  {
+   "name": "Algeria",
+   "iso3": "DZA",
+   "co2_mt": 160.85,
+   "gdp_ppp_bn_usd": 725.7,
+   "kg_co2_per_usd": 0.2216
+  },
+  {
+   "name": "Australia",
+   "iso3": "AUS",
+   "co2_mt": 379.84,
+   "gdp_ppp_bn_usd": 1640.1,
+   "kg_co2_per_usd": 0.2316
+  },
+  {
+   "name": "Vietnam",
+   "iso3": "VNM",
+   "co2_mt": 336.77,
+   "gdp_ppp_bn_usd": 1453.9,
+   "kg_co2_per_usd": 0.2316
+  },
+  {
+   "name": "Malaysia",
+   "iso3": "MYS",
+   "co2_mt": 300.78,
+   "gdp_ppp_bn_usd": 1213.1,
+   "kg_co2_per_usd": 0.2479
+  },
+  {
+   "name": "Russian Federation",
+   "iso3": "RUS",
+   "co2_mt": 1663.34,
+   "gdp_ppp_bn_usd": 6121.8,
+   "kg_co2_per_usd": 0.2717
+  },
+  {
+   "name": "Iraq",
+   "iso3": "IRQ",
+   "co2_mt": 162.48,
+   "gdp_ppp_bn_usd": 585.9,
+   "kg_co2_per_usd": 0.2773
+  },
+  {
+   "name": "Saudi Arabia",
+   "iso3": "SAU",
+   "co2_mt": 649.75,
+   "gdp_ppp_bn_usd": 2230.8,
+   "kg_co2_per_usd": 0.2913
+  },
+  {
+   "name": "Uzbekistan",
+   "iso3": "UZB",
+   "co2_mt": 118.54,
+   "gdp_ppp_bn_usd": 399.9,
+   "kg_co2_per_usd": 0.2964
+  },
+  {
+   "name": "Singapore",
+   "iso3": "SGP",
+   "co2_mt": 241.99,
+   "gdp_ppp_bn_usd": 812.3,
+   "kg_co2_per_usd": 0.2979
+  },
+  {
+   "name": "Kazakhstan",
+   "iso3": "KAZ",
+   "co2_mt": 233.5,
+   "gdp_ppp_bn_usd": 740.8,
+   "kg_co2_per_usd": 0.3152
+  },
+  {
+   "name": "China",
+   "iso3": "CHN",
+   "co2_mt": 11169.34,
+   "gdp_ppp_bn_usd": 33592.0,
+   "kg_co2_per_usd": 0.3325
+  },
+  {
+   "name": "United Arab Emirates",
+   "iso3": "ARE",
+   "co2_mt": 277.15,
+   "gdp_ppp_bn_usd": 765.8,
+   "kg_co2_per_usd": 0.3619
+  },
+  {
+   "name": "Qatar",
+   "iso3": "QAT",
+   "co2_mt": 134.99,
+   "gdp_ppp_bn_usd": 318.1,
+   "kg_co2_per_usd": 0.4244
+  },
+  {
+   "name": "Iran",
+   "iso3": "IRN",
+   "co2_mt": 731.99,
+   "gdp_ppp_bn_usd": 1601.0,
+   "kg_co2_per_usd": 0.4572
+  },
+  {
+   "name": "Oman",
+   "iso3": "OMN",
+   "co2_mt": 89.23,
+   "gdp_ppp_bn_usd": 193.9,
+   "kg_co2_per_usd": 0.4601
+  },
+  {
+   "name": "Kuwait",
+   "iso3": "KWT",
+   "co2_mt": 106.81,
+   "gdp_ppp_bn_usd": 228.5,
+   "kg_co2_per_usd": 0.4674
+  },
+  {
+   "name": "South Africa",
+   "iso3": "ZAF",
+   "co2_mt": 451.07,
+   "gdp_ppp_bn_usd": 870.3,
+   "kg_co2_per_usd": 0.5183
+  },
+  {
+   "name": "Turkmenistan",
+   "iso3": "TKM",
+   "co2_mt": 81.81,
+   "gdp_ppp_bn_usd": 138.4,
+   "kg_co2_per_usd": 0.591
+  }
+ ]
+}

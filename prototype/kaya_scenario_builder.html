@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build Your Own Emissions Scenario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f6f7f9; --ink:#16243a; --navy:#1f3a5f; --rule:#c9d4e0; --dim:#5a6c82;
+  --hi:#d1332e; --hl:#b8860b; --med:#e08214; --ml:#7b3fa0; --lo:#2b8cbe; --ln:#5ab4ac; --vl:#1a7f37;
+  --you:#0b1a2e; --panel:#ffffff;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f1620; --ink:#e6ecf3; --navy:#8fb4d9; --rule:#2a3746; --dim:#93a3b8; --panel:#151d29; --you:#e6ecf3;}}
+:root[data-theme="dark"]{--paper:#0f1620;--ink:#e6ecf3;--navy:#8fb4d9;--rule:#2a3746;--dim:#93a3b8;--panel:#151d29;--you:#e6ecf3;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Spectral,Georgia,serif;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:30px clamp(16px,3vw,26px) 64px}
+header{border-bottom:2px solid var(--navy);padding-bottom:20px;margin-bottom:26px;display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:34px;align-items:end}
+@media (max-width:860px){header{grid-template-columns:1fr;gap:12px;align-items:start}}
+h1{font-size:clamp(27px,3.4vw,40px);line-height:1.1;margin:0;font-weight:600;letter-spacing:-.015em;text-wrap:balance}
+.sub{font-size:16.5px;color:var(--dim);margin:0;max-width:70ch}
+.grid{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:34px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.ctrl{border-top:1px solid var(--rule);padding:18px 0 20px}
+.ctrl:first-child{border-top:none;padding-top:16px}
+.ctrl h3{font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:15px;font-weight:600;margin:0 0 2px}
+.ctrl .why{font-size:14px;color:var(--dim);margin:0 0 14px;max-width:46ch}
+.readout{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:25px;font-weight:500;letter-spacing:-.02em;color:var(--navy)}
+.verdict{font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;margin-top:5px;min-height:1.3em}
+input[type=range]{width:100%;margin:14px 0 0;accent-color:var(--navy);height:22px}
+input[type=range]:focus-visible{outline:2px solid var(--navy);outline-offset:3px}
+.scale{position:relative;height:56px;margin-top:2px}
+.scale .axis{position:absolute;left:0;right:0;top:27px;height:1px;background:var(--rule)}
+.scale .mark{position:absolute;width:2px;border-radius:1px}
+.scale .lbl{position:absolute;font-family:'IBM Plex Sans',sans-serif;font-size:11px;line-height:1;color:var(--dim);transform:translateX(-50%);white-space:nowrap}
+.out{background:var(--panel);border:1px solid var(--rule);padding:clamp(16px,2.2vw,24px)}
+figure{margin:0}
+svg{width:100%;height:auto;display:block;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:5px 16px;margin:0 0 20px;padding:13px 14px;background:var(--panel);border:1px solid var(--rule)}
+.legend div{display:flex;align-items:baseline;gap:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--dim)}
+.legend b{font-weight:600;font-size:12px;letter-spacing:.02em}
+.legend i{width:15px;height:3px;border-radius:2px;flex:none;align-self:center;font-style:normal}
+.legend .me i{height:4px}
+.legend .me{color:var(--ink)}
+.lead-sliders{font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);margin:0 0 6px;padding-bottom:14px;border-bottom:2px solid var(--navy)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:22px}
+@media (max-width:560px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--panel);padding:15px 16px}
+.stat .k{font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+.stat .v{font-family:'IBM Plex Mono',monospace;font-size:clamp(22px,2.4vw,27px);font-weight:500;letter-spacing:-.02em;overflow-wrap:anywhere}
+.stat .n{font-size:13px;color:var(--dim);margin-top:3px}
+.presets{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 24px}
+.preslab{font-family:'IBM Plex Sans',sans-serif;font-size:12px;color:var(--dim);width:100%;margin:0 0 3px}
+button.p{font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:7px 12px;background:transparent;
+  border:1px solid var(--rule);color:var(--ink);cursor:pointer;border-radius:2px;transition:border-color .12s,background .12s}
+button.p:hover{border-color:var(--navy);background:rgba(31,58,95,.06)}
+button.p:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.kaya{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}
+.kaya th{font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;color:var(--dim);text-align:right;padding:6px 8px;border-bottom:1px solid var(--rule)}
+.kaya th:first-child{text-align:left}
+.kaya td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--rule);font-family:'IBM Plex Mono',monospace}
+.kaya td:first-child{text-align:left;font-family:Spectral,Georgia,serif}
+.kaya tr:last-child td{border-bottom:none}
+.share{margin-top:16px;display:flex;align-items:center;gap:10px}
+#shmsg{font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--dim)}
+.note{font-size:14px;color:var(--dim);margin-top:26px;max-width:74ch;border-top:1px solid var(--rule);padding-top:16px}
+.note p{margin:0 0 9px}
+b.you{color:var(--you)}
+@media (prefers-reduced-motion:no-preference){.pathline{transition:d .18s ease-out}}
+</style></head><body>
+<div class="wrap">
+<header>
+<h1>Build your own emissions scenario</h1>
+<p class="sub">Six assumptions decide any emissions future: how many people, how rich, how much energy per dollar, how much carbon per unit of energy, plus land use and methane. Marks under each slider show what the world has done and what the seven CMIP7 scenarios assume, using the abbreviations in the key. Move them and watch where the century lands.</p>
+</header>
+<div class="grid">
+<div>
+<div class="presets" id="presets"><p class="preslab">Start from a published scenario.</p></div>
+<div class="legend" id="legend"></div>
+<p class="lead-sliders">Then move the sliders to create your own bespoke scenario.</p>
+<div id="controls"></div>
+</div>
+<div class="out">
+<figure><svg id="chart" viewBox="0 0 620 400" role="img" aria-label="Emissions paths to 2100"></svg></figure>
+<div class="stats">
+<div class="stat"><div class="k">Cumulative CO2, 2025 to 2100</div><div class="v" id="s-cum">—</div><div class="n" id="s-cumn"></div></div>
+<div class="stat"><div class="k">Warming in 2100</div><div class="v" id="s-t">—</div><div class="n" id="s-tn">above 1850&ndash;1900</div></div>
+<div class="stat"><div class="k">Added warming from now</div><div class="v" id="s-t2">—</div><div class="n">above the 2015&ndash;2024 average of 1.24 &deg;C</div></div>
+<div class="stat"><div class="k">Your 2100 world looks like</div><div class="v" id="s-c" style="font-size:21px">—</div><div class="n" id="s-cn"></div></div>
+</div>
+<table class="kaya" id="kaya"></table>
+<div class="share"><button class="p" id="sh">Copy link to this scenario</button><span id="shmsg"></span></div>
+<div class="note" id="notes"></div>
+</div>
+</div>
+</div>
+<script>
+const D={"years":[2025,2030,2035,2040,2045,2050,2055,2060,2065,2070,2075,2080,2085,2090,2095,2100],"markers":{"VL":[42.42,37.21,22.5,10.47,2.84,-1.19,-2.56,-3.44,-3.85,-4.26,-4.7,-5.15,-5.3,-5.46,-5.62,-5.77],"LN":[43.76,39.79,40.58,28.31,22.18,16.73,11.1,5.86,-0.51,-5.33,-11.74,-13.74,-20.45,-25.04,-24.62,-24.5],"L":[42.73,35.88,30.47,24.87,19.15,13.32,8.28,4.18,0.87,-2.44,-4.34,-6.23,-6.95,-7.66,-8.52,-9.38],"ML":[43.67,43.54,41.19,39.82,37.53,35.14,31.46,27.85,22.93,18.07,14.19,10.28,4.85,-0.59,-4.91,-9.23],"M":[43.83,42.62,40.84,39.48,37.77,36.14,35.63,35.13,34.75,34.37,34.19,34.01,33.99,33.98,34.21,34.44],"HL":[42.43,42.92,42.85,43.53,45.56,47.28,48.51,49.88,51.64,44.12,27.52,16.81,11.77,5.39,1.93,-0.64],"H":[42.7,44.91,46.27,46.78,47.09,47.14,49.34,50.58,50.4,50.73,51.33,51.97,52.67,53.35,54.21,55.04]},"cum":{"VL":268.0,"LN":373.0,"L":605.0,"ML":1710.0,"M":2770.0,"HL":2524.0,"H":3777.0},"emu":[1.727431,1.309975,1989.743897],"ch4":{"VL":94.0,"LN":216.0,"L":150.8,"ML":203.4,"M":436.2,"HL":132.8,"H":533.1},"ch4k":0.0012,"ch4ref":380.0,"afolu":{"VL":-4.71,"LN":-1.31,"L":-5.67,"ML":-8.79,"M":1.53,"HL":-3.93,"H":1.91},"afolu0":3.83,"popcurves":{"SSP1":[8.15,8.451,8.697,8.897,9.067,9.196,9.271,9.29,9.262,9.193,9.09,8.954,8.783,8.579,8.348,8.092],"SSP2":[8.15,8.496,8.816,9.11,9.37,9.593,9.773,9.915,10.018,10.088,10.126,10.13,10.104,10.054,9.981,9.887],"SSP3":[8.15,8.54,8.935,9.334,9.705,10.052,10.384,10.715,11.035,11.345,11.639,11.917,12.187,12.454,12.718,12.977]},"popyears":[2025,2030,2035,2040,2045,2050,2055,2060,2065,2070,2075,2080,2085,2090,2095,2100],"countries":[["Switzerland",0.0433],["Ireland",0.0521],["Norway",0.0576],["Sweden",0.0603],["Denmark",0.0617],["France",0.0673],["Romania",0.0805],["Bangladesh",0.0824],["United Kingdom",0.0861],["Portugal",0.0862],["Austria",0.0893],["Italy",0.0941],["Finland",0.0982],["Hungary",0.0989],["Spain",0.1052],["Germany",0.1082],["Brazil",0.1092],["Colombia",0.1126],["Egypt",0.115],["Peru",0.1161],["Pakistan",0.117],["Slovakia",0.1187],["Netherlands",0.1244],["New Zealand",0.126],["Israel",0.1322],["Chile",0.1387],["Belgium",0.139],["Argentina",0.1399],["T\u00fcrkiye",0.1404],["China Hong Kong SAR",0.142],["Philippines",0.1421],["Czech Republic",0.1442],["Bulgaria",0.1506],["Poland",0.1564],["Greece",0.158],["Mexico",0.1615],["Japan",0.1703],["Ecuador",0.1706],["Azerbaijan",0.1734],["Thailand",0.1744],["US",0.1797],["Indonesia",0.1829],["Ukraine",0.1877],["Morocco",0.1955],["Belarus",0.1978],["South Korea",0.2094],["India",0.2162],["Canada",0.2201],["Algeria",0.2216],["Australia",0.2316],["Vietnam",0.2316],["Malaysia",0.2479],["Russian Federation",0.2717],["Iraq",0.2773],["Saudi Arabia",0.2913],["Uzbekistan",0.2964],["Singapore",0.2979],["Kazakhstan",0.3152],["China",0.3325],["United Arab Emirates",0.3619],["Qatar",0.4244],["Iran",0.4572],["Oman",0.4601],["Kuwait",0.4674],["South Africa",0.5183],["Turkmenistan",0.591]]};
+const BASE={pop:8.20,gdppc:20800,ei:3.40,ci:60.5,year:2025};
+const OBS={pop:0.99,gdppc:1.91,ei:-1.43,ci:-0.21};
+const MK=[["VL","var(--vl)"],["LN","var(--ln)"],["L","var(--lo)"],["ML","var(--ml)"],["M","var(--med)"],["HL","var(--hl)"],["H","var(--hi)"]];
+const MKPOP={VL:8.09,LN:9.89,L:9.89,ML:9.89,M:9.89,HL:8.12,H:12.98};
+const MKRATE={VL:{gdppc:1.97,ei:-2.11,ci:null},LN:{gdppc:1.60,ei:-1.28,ci:null},L:{gdppc:1.71,ei:-1.65,ci:null},
+ ML:{gdppc:1.24,ei:-0.89,ci:-3.06},M:{gdppc:1.73,ei:-1.32,ci:-0.87},HL:{gdppc:2.63,ei:-2.29,ci:-2.78},H:{gdppc:0.57,ei:-0.66,ci:-0.08}};
+Object.keys(MKRATE).forEach(k=>{MKRATE[k].ch4=D.ch4[k];MKRATE[k].lu=D.afolu[k];});
+const CTRL=[
+ {id:"pop",h:"People in 2100",why:"The UN projects 10.2 billion, with a 95% range of about 9 to 11.4.",min:6,max:14,step:.1,val:10.2,unit:" billion",dec:1,hist:10.2,histL:"UN median"},
+ {id:"gdppc",h:"Income growth per person",why:"The world managed 1.91% a year from 1990 to 2024.",min:-0.5,max:3.5,step:.01,val:1.91,unit:"%/yr",dec:2,hist:1.91,histL:"observed"},
+ {id:"ei",h:"Energy needed per dollar",why:"Efficiency improved 1.43% a year since 1990 and has done nearly all the decarbonising.",min:-4,max:0.5,step:.01,val:-1.43,unit:"%/yr",dec:2,hist:-1.43,histL:"observed"},
+ {id:"ci",h:"Carbon per unit of energy",why:"The fuel mix improved only 0.21% a year since 1990, and 0.48% over the past decade.",min:-4,max:0.5,step:.01,val:-0.21,unit:"%/yr",dec:2,hist:-0.21,histL:"observed"},
+ {id:"lu",h:"Land use CO2 in 2100",why:"Forests and farming release about 3.8 Gt a year now. CMIP7 spans a sink of 8.8 Gt to a source of 1.9.",min:-10,max:5,step:.1,val:0,unit:" Gt/yr",dec:1,hist:3.8,histL:"today"},
+ {id:"ch4",h:"Methane in 2100",why:"The world emits about 380 Mt a year now. CMIP7 spans 94 in VERY LOW to 533 in HIGH.",min:80,max:600,step:1,val:380,unit:" Mt/yr",dec:0,hist:380,histL:"today"}];
+const PRE=[["Kaya at observed rates",{pop:10.2,gdppc:1.91,ei:-1.43,ci:-0.21,ch4:380,lu:2.0}],
+ ["CMIP7 HIGH",{pop:12.98,gdppc:0.57,ei:-0.66,ci:-0.08,ch4:533,lu:1.9}],
+ ["CMIP7 MEDIUM",{pop:9.89,gdppc:1.73,ei:-1.32,ci:-0.87,ch4:436,lu:1.5}],
+ ["CMIP7 VERY LOW",{pop:8.09,gdppc:1.97,ei:-2.11,ci:-2.60,ch4:94,lu:-4.7}],
+ ["Trend continues",{pop:10.2,gdppc:1.91,ei:-1.62,ci:-0.48,ch4:300,lu:1.0}],
+ ["Slowest technical progress",{pop:11.4,gdppc:2.23,ei:-1.36,ci:-0.17,ch4:450,lu:2.0}],
+ ["Ausubel methane economy",{pop:9.0,gdppc:1.91,ei:-1.57,ci:-2.79,ch4:150,lu:-1.0}]];
+const S={}; CTRL.forEach(c=>S[c.id]=c.val);
+const YRS=[]; for(let y=2025;y<=2100;y++)YRS.push(y);
+const PC=D.popcurves, PY=D.popyears;
+function interpC(c,y){for(let i=1;i<PY.length;i++){if(y<=PY[i]){const f=(y-PY[i-1])/(PY[i]-PY[i-1]);
+ return c[i-1]+(c[i]-c[i-1])*f;}}return c[c.length-1];}
+function popAt(y,target){
+ const e1=PC.SSP1[PC.SSP1.length-1],e2=PC.SSP2[PC.SSP2.length-1],e3=PC.SSP3[PC.SSP3.length-1];
+ const a=interpC(PC.SSP1,y),b=interpC(PC.SSP2,y),c=interpC(PC.SSP3,y);
+ if(target<=e1){return a*(target/e1);}
+ if(target<=e2){const f=(target-e1)/(e2-e1);return a+(b-a)*f;}
+ if(target<=e3){const f=(target-e2)/(e3-e2);return b+(c-b)*f;}
+ return c*(target/e3);}
+function path(){
+ const out=[];let cum=0;
+ for(const y of YRS){const t=y-2025;
+  const P=popAt(y,S.pop);
+  const A=BASE.gdppc*Math.pow(1+S.gdppc/100,t);
+  const E=BASE.ei*Math.pow(1+S.ei/100,t);
+  const C=BASE.ci*Math.pow(1+S.ci/100,t);
+  const gdp=P*1e9*A, en=gdp*E/1e12, ff=en*C/1000;
+  const lu=D.afolu0+(S.lu-D.afolu0)*(t/75);
+  const co2=ff+lu;
+  out.push({y,co2,ff,lu,en,P,A,ci:C*E/1000}); cum+=co2;}
+ return{out,cum};}
+function warm(c){const[a,b,e]=D.emu;return a+b*Math.log(1+Math.max(0,c)/e)+D.ch4k*(S.ch4-D.ch4ref);}
+function nearest(x){let best=null,bd=1e9;for(const[n,v]of D.countries){const d=Math.abs(v-x);if(d<bd){bd=d;best=[n,v];}}return[best,bd];}
+function el(t,a,h){const e=document.createElement(t);Object.assign(e,a||{});if(h!==undefined)e.innerHTML=h;return e;}
+const cw=document.getElementById("controls");
+CTRL.forEach(c=>{
+ const d=el("div",{className:"ctrl"});
+ d.appendChild(el("h3",{},c.h));
+ d.appendChild(el("p",{className:"why"},c.why));
+ d.appendChild(el("div",{className:"readout",id:"r-"+c.id}));
+ const r=el("input");r.type="range";r.min=c.min;r.max=c.max;r.step=c.step;r.value=c.val;r.id="i-"+c.id;
+ r.setAttribute("aria-label",c.h);
+ r.addEventListener("input",e=>{S[c.id]=parseFloat(e.target.value);draw();});
+ d.appendChild(r);
+ const sc=el("div",{className:"scale"});
+ sc.appendChild(el("div",{className:"axis"}));
+ const pos=v=>((v-c.min)/(c.max-c.min))*100;
+ const marks=[[c.hist,c.histL,"var(--navy)"]];
+ MK.forEach(([k,col])=>{const v=c.id==="pop"?MKPOP[k]:MKRATE[k][c.id];if(v!==null&&v!==undefined&&v>=c.min&&v<=c.max)marks.push([v,k,col]);});
+ marks.sort((a,b)=>a[0]-b[0]);
+ const lastX=[-999,-999];
+ marks.forEach(([v,l,col])=>{
+  const x=pos(v);
+  const wpct=(l.length*6.3+9)/380*100;
+  let row=-1;
+  if(x-lastX[0]>=wpct)row=0; else if(x-lastX[1]>=wpct)row=1;
+  const m=el("div",{className:"mark"});
+  m.style.left=x+"%"; m.style.background=col;
+  if(row<0){m.style.top="20px";m.style.height="8px";m.style.opacity=".5";sc.appendChild(m);return;}
+  lastX[row]=x;
+  m.style.top=row?"12px":"20px";
+  m.style.height=row?"16px":"16px";
+  sc.appendChild(m);
+  const t=el("div",{className:"lbl"},l);
+  t.style.left=x+"%"; t.style.color=col;
+  t.style.top=row?"0px":"38px";
+  sc.appendChild(t);});
+ d.appendChild(sc); cw.appendChild(d);});
+const pw=document.getElementById("presets");
+PRE.forEach(([n,v])=>{const b=el("button",{className:"p"},n);
+ b.onclick=()=>{Object.assign(S,v);CTRL.forEach(c=>document.getElementById("i-"+c.id).value=S[c.id]);draw();};pw.appendChild(b);});
+function fmt(v,d){return v.toFixed(d)}
+function draw(){
+ CTRL.forEach(c=>{
+  const v=S[c.id];
+  document.getElementById("r-"+c.id).textContent=((c.id==="gdppc"||c.id==="ei"||c.id==="ci")&&v>0?"+":"")+fmt(v,c.dec)+c.unit;});
+ const{out,cum}=path();
+ const X0=54,X1=572,Y0=18,Y1=340,yMax=90,yMin=-30;
+ const sx=y=>X0+(y-2025)/75*(X1-X0), sy=v=>Y1-(v-yMin)/(yMax-yMin)*(Y1-Y0);
+ let s='';
+ for(let v=-30;v<=90;v+=15){s+=`<line x1="${X0}" x2="${X1}" y1="${sy(v)}" y2="${sy(v)}" stroke="var(--rule)" stroke-width="${v===0?1.6:0.7}"/>`;
+  s+=`<text x="${X0-9}" y="${sy(v)+4}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="11" fill="var(--dim)">${v}</text>`;}
+ [2025,2050,2075,2100].forEach((y,i)=>{const an=i===0?"start":(i===3?"end":"middle");
+  s+=`<text x="${sx(y)}" y="${Y1+20}" text-anchor="${an}" font-family="IBM Plex Sans,sans-serif" font-size="12" fill="var(--dim)">${y}</text>`;});
+ s+=`<text x="${X0-9}" y="${Y0-4}" text-anchor="end" font-family="IBM Plex Sans,sans-serif" font-size="11.5" fill="var(--dim)">GtCO2/yr</text>`;
+ const ends=[];
+ MK.forEach(([k,col])=>{let p="";D.years.forEach((y,i)=>{p+=(i?"L":"M")+sx(y)+","+sy(D.markers[k][i]);});
+  s+=`<path d="${p}" fill="none" stroke="${col}" stroke-width="1.6" opacity=".42"/>`;
+  ends.push({k,col,v:sy(D.markers[k][D.markers[k].length-1])});});
+ ends.sort((a,b)=>a.v-b.v);
+ let prev=-99;
+ ends.forEach(e=>{let y=e.v; if(y<prev+13)y=prev+13; prev=y;
+  if(Math.abs(y-e.v)>1.5)s+=`<line x1="${X1}" x2="${X1+7}" y1="${e.v}" y2="${y}" stroke="${e.col}" stroke-width="1" opacity=".5"/>`;
+  s+=`<text x="${X1+10}" y="${y+4}" font-family="IBM Plex Sans,sans-serif" font-size="11" font-weight="600" fill="${e.col}" opacity=".8">${e.k}</text>`;});
+ let p="";out.forEach((d,i)=>{if(i%2===0||i===out.length-1)p+=(p?"L":"M")+sx(d.y)+","+sy(Math.max(yMin,Math.min(yMax,d.co2)));});
+ s+=`<path class="pathline" d="${p}" fill="none" stroke="var(--you)" stroke-width="3.4" stroke-linejoin="round"/>`;
+ const lastv=out[out.length-1].co2;
+ s+=`<text x="${sx(2100)-6}" y="${sy(Math.max(yMin,Math.min(yMax,lastv)))-11}" text-anchor="end" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="var(--you)">yours</text>`;
+ document.getElementById("chart").innerHTML=s;
+
+ document.getElementById("s-cum").textContent=Math.round(cum).toLocaleString();
+ const hcum=D.cum.H;
+ document.getElementById("s-cumn").textContent="GtCO2 · CMIP7 HIGH is "+Math.round(hcum).toLocaleString();
+ const TW=warm(cum);
+ document.getElementById("s-t").textContent=TW.toFixed(2)+" \u00B0C";
+ document.getElementById("s-t2").textContent=(TW>=1.24?"+":"")+(TW-1.24).toFixed(2)+" \u00B0C";
+ const MT=[["VERY LOW",1.61],["LOW-to-NEG",1.68],["LOW",1.83],["MED-to-LOW",2.20],["HIGH-to-LOW",2.76],["MEDIUM",2.84],["HIGH",3.26]];
+ let ctx;
+ if(TW<MT[0][1]-0.02)ctx="below every CMIP7 scenario";
+ else if(TW>MT[MT.length-1][1]+0.02)ctx="above CMIP7 HIGH";
+ else{let lo=MT[0],hi=MT[MT.length-1];
+  for(let i=0;i<MT.length-1;i++){if(TW>=MT[i][1]&&TW<=MT[i+1][1]){lo=MT[i];hi=MT[i+1];break;}}
+  const nr=Math.abs(TW-lo[1])<Math.abs(TW-hi[1])?lo:hi;
+  ctx=Math.abs(TW-nr[1])<0.06?("about CMIP7 "+nr[0]):("between CMIP7 "+lo[0]+" and "+hi[0]);}
+ document.getElementById("s-tn").textContent=ctx;
+ const ci2100=out[out.length-1].ci;
+ if(ci2100<=0.005){document.getElementById("s-c").textContent="no economy today";
+  document.getElementById("s-cn").textContent="cleaner than anywhere on earth";}
+ else{const[[n,v]]=[nearest(ci2100)];
+  document.getElementById("s-c").textContent=n[0];
+  document.getElementById("s-cn").textContent=ci2100.toFixed(3)+" kg CO2 per $ · "+n[0]+" is "+n[1].toFixed(3);}
+ const N=[];
+ const r=(v,o)=>Math.abs(o)<0.001?null:v/o;
+ const rei=r(S.ei,OBS.ei),rci=r(S.ci,OBS.ci),rg=r(S.gdppc,OBS.gdppc);
+ N.push("<p>You have set efficiency at <b class='you'>"+(rei>0?rei.toFixed(2)+"\u00D7":"the wrong sign for")+"</b> the observed rate, the fuel mix at <b class='you'>"+(rci>0?rci.toFixed(2)+"\u00D7":"the wrong sign for")+"</b> it, and income growth at <b class='you'>"+(rg>0?rg.toFixed(2)+"\u00D7":"a decline against")+"</b> it.</p>");
+ if(S.pop>11.4)N.push("<p>Your population sits above the top of the UN's 95% range. Only SSP3, which carries CMIP7 HIGH, goes there.</p>");
+ if(S.pop<9.0)N.push("<p>Your population sits below the bottom of the UN's 95% range, where SSP1, SSP5 and the Lancet forecast also sit.</p>");
+ if(rei!==null&&rei<0.7)N.push("<p>No sustained period on record shows efficiency improving this slowly. HIGH assumes 0.46\u00D7 the observed rate.</p>");
+ if(rci!==null&&rci>4)N.push("<p>The fuel mix has never changed this fast. MEDIUM assumes 4\u00D7 the observed rate and the low scenarios assume more.</p>");
+ if(cum>4307)N.push("<p>Above 4,307 GtCO2 you have passed the highest total reachable with every assumption at the pessimistic edge of the observed record.</p>");
+ N.push("<p>Emissions combine fossil and industrial CO2 from the four Kaya terms with land use CO2 from its own slider, matching the basis of the CMIP7 markers. Methane adds about 0.12 degC per 100 Mt/yr. Warming comes from a curve fitted to FaIR runs of the seven CMIP7 markers, so treat it as indicative rather than a model result. Country comparisons use 2024 Energy Institute CO2 over World Bank PPP GDP.</p>");
+ const inc=[];
+ if(S.ci<-1.2&&S.ei>-0.9)inc.push("a fuel mix changing faster than any scenario while efficiency barely improves");
+ if(S.ei<-2.0&&S.ci>-0.4)inc.push("efficiency improving faster than any scenario while the fuel mix stands still");
+ if(S.gdppc<0.8&&S.ei<-1.8)inc.push("a stagnant economy that nonetheless modernises its energy use faster than any scenario");
+ if(S.lu<-6&&S.ci>-0.5)inc.push("a large land sink alongside an unchanged fuel mix, which no marker pairs together");
+ if(inc.length)N.push("<p>Worth a second look: you have set "+inc.join(", and ")+". No CMIP7 marker combines these, which does not make it impossible, only unexamined.</p>");
+ N.push("<p><b>The two technology bounds.</b> Jesse Ausubel argued in 1995 that technological trajectories move at rates steady enough to bound the future, and that a scenario halting them describes technical regression rather than business as usual. These two presets take him at his word. <b>Slowest technical progress</b> holds every trajectory at the slowest sustained rate the world has recorded: efficiency at \u22121.36%/yr, the weakest 25-year window since 1990, and the fuel mix at \u22120.17%/yr, the weakest 30-year window since 1965. Income grows at the fastest observed rate and population reaches the top of the UN range, so emissions run as high as slow technology allows: about 4,600 GtCO2. <b>Ausubel methane economy</b> uses his own 1988 published trajectory, which squeezes carbon out of primary energy by 2100, reaching 0.06 tC per kilowatt-year. That implies the fuel mix improving 2.79%/yr, with efficiency at its fastest observed 25-year rate and income still growing at the historical pace: about 1,400 GtCO2. Neither bound assumes poverty, and neither assumes a technology stops working.</p>");
+ N.push("<p>Method: CO2 = population \u00D7 GDP per person \u00D7 energy per dollar \u00D7 CO2 per unit of energy. Analysis by Roger Pielke Jr., The Honest Broker.</p>");
+ document.getElementById("notes").innerHTML=N.join("");kayaTable();}
+function kayaTable(){
+ const rows=[["Population","pop",1,"bn in 2100"],["GDP per person","gdppc",2,"%/yr"],
+  ["Energy per dollar","ei",2,"%/yr"],["CO2 per unit energy","ci",2,"%/yr"],["Land use CO2","lu",1,"Gt/yr in 2100"],["Methane","ch4",0,"Mt/yr in 2100"]];
+ const obs={pop:10.2,gdppc:1.91,ei:-1.43,ci:-0.21,ch4:380,lu:2.0};
+ const hi={pop:12.98,gdppc:0.57,ei:-0.66,ci:-0.08,ch4:533,lu:1.9};
+ let s='<tr><th>Kaya factor</th><th>Yours</th><th>Observed</th><th>CMIP7 HIGH</th><th>Units</th></tr>';
+ rows.forEach(function(r){var l=r[0],k=r[1],dp=r[2],u=r[3];
+  var f=function(v){return (k==="gdppc"||k==="ei"||k==="ci")&&v>0?"+"+v.toFixed(dp):v.toFixed(dp);};
+  s+='<tr><td>'+l+'</td><td><b>'+f(S[k])+'</b></td><td>'+f(obs[k])+'</td><td>'+f(hi[k])+
+     '</td><td style="text-align:left;color:var(--dim);font-family:Spectral,serif">'+u+'</td></tr>';});
+ document.getElementById("kaya").innerHTML=s;}
+function encode(){return CTRL.map(function(c){return S[c.id];}).join("_");}
+function decode(){var q=location.hash.replace(/^#s=/,"");if(!q)return;
+ var v=q.split("_").map(parseFloat);if(v.length!==CTRL.length||v.some(isNaN))return;
+ CTRL.forEach(function(c,i){S[c.id]=Math.min(c.max,Math.max(c.min,v[i]));
+  var e=document.getElementById("i-"+c.id);if(e)e.value=S[c.id];});}
+document.getElementById("sh").onclick=function(){
+ var u=location.origin+location.pathname+"#s="+encode();
+ var m=document.getElementById("shmsg");
+ var done=function(){m.textContent="Link copied";setTimeout(function(){m.textContent="";},2600);};
+ history.replaceState(null,"","#s="+encode());
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(done).catch(function(){m.textContent=u;});}
+ else{m.textContent=u;}};
+(function(){
+ const NM={VL:"Very Low",LN:"Low-to-Negative",L:"Low",ML:"Medium-to-Low",M:"Medium",HL:"High-to-Low",H:"High"};
+ let lg='<div style="width:100%;color:var(--dim);margin-bottom:2px">The seven CMIP7 marker scenarios, shown throughout for comparison.</div>';
+ lg+='<div class="me"><i style="background:var(--you)"></i><b>Yours</b></div>';
+ MK.slice().reverse().forEach(function(a){var k=a[0],c=a[1];
+  lg+='<div><i style="background:'+c+'"></i><b>'+k+'</b> '+NM[k]+'</div>';});
+ document.getElementById("legend").innerHTML=lg;})();
+decode();
+draw();
+</script></body></html>

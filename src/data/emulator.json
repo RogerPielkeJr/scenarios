@@ -1,0 +1,30 @@
+{
+ "meta": {
+  "generated_by": "scripts/build_carried_data.py",
+  "provenance": "fitted to FaIR v2.2 runs of the seven CMIP7 markers using the fair-calibrate v1.4.1 constrained ensemble"
+ },
+ "form": "T = a + b*ln(1 + max(0, C)/c) + k*(CH4 - refMt)",
+ "coefficients": {
+  "a": 1.727431,
+  "b": 1.309975,
+  "c": 1989.743897
+ },
+ "methane": {
+  "k": 0.0012,
+  "refMt": 380.0
+ },
+ "anchors": {
+  "recentMeanC": 1.24,
+  "recentPeriod": "2015-2024",
+  "baseline": "1850-1900"
+ },
+ "markerWarmingC": {
+  "H": 3.26,
+  "HL": 2.76,
+  "M": 2.84,
+  "ML": 2.2,
+  "L": 1.83,
+  "LN": 1.68,
+  "VL": 1.61
+ }
+}
