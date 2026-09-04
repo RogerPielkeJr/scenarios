@@ -204,6 +204,16 @@ small or poorly measured economy cannot become the answer. It compares one ratio
 and nothing else: it does not say the world would resemble that country in any
 other respect.
 
+## The chart axis
+
+The vertical axis is not fixed. It is chosen for each render to cover the
+reader's path and all seven markers together, on round steps, with zero always
+on it. Two things follow. A scenario that runs far above the published range
+stays fully drawn rather than clipping at the top of a fixed axis. And the
+seven markers stay on the same axis as the reader's line, so the comparison
+holds however far the sliders are pushed, at the cost of the markers
+compressing when the reader's path dwarfs them.
+
 ## Rounding
 
 Warming is shown to two decimal places, never more. Cumulative CO2 is shown as a

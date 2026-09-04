@@ -15,6 +15,9 @@
 
   <header class="banded">
     <div class="band-left">
+      <a class="masthead" href="https://thehonestbroker.org">
+        <img src="/thb-logo.png" alt="The Honest Broker" width="216" height="216">
+      </a>
       <h1>Build your own emissions scenario</h1>
     </div>
     <div class="band-right">
@@ -24,9 +27,13 @@
         plus land use and methane. The marks under every slider show what the world has
         actually done and what each of the seven published CMIP7 scenarios assumes.
       </p>
-      <button type="button" id="theme-toggle" class="ghost" aria-pressed="false">
-        <span id="theme-label">Dark</span>
-      </button>
+      <nav class="toolbar" aria-label="Site">
+        <a class="ghost" href="https://thehonestbroker.org">The Honest Broker</a>
+        <a class="ghost" href="/bibliography.html">Bibliography</a>
+        <button type="button" id="theme-toggle" class="ghost" aria-pressed="false">
+          <span id="theme-label">Dark</span>
+        </button>
+      </nav>
     </div>
   </header>
 
@@ -91,7 +98,8 @@
 
         <div class="actions">
           <button type="button" class="ghost" id="share">Copy link to this scenario</button>
-          <button type="button" class="ghost" id="download">Download chart</button>
+          <button type="button" class="ghost" id="download-png">Download PNG</button>
+          <button type="button" class="ghost" id="download-pdf">Download PDF</button>
           <span class="action-message" id="action-message" role="status" aria-live="polite"></span>
         </div>
 

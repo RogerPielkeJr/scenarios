@@ -64,6 +64,26 @@ marker paths, the SSP population curves and the emulator fit. See DATA.md.
 Both the scripts and their outputs are committed. Run the scripts when a source
 is updated, then commit the changed JSON.
 
+## Pages
+
+`index.html` is the dashboard. `bibliography.html` lists the book, the
+peer-reviewed work on scenarios, the two Ausubel papers the technology bounds
+come from, and every data source. Both are Vite entry points, both carry the
+masthead and the toolbar, and `tests/pages.test.ts` checks they stay in step.
+
+## Sending someone a copy
+
+```sh
+python3 scripts/build_single_file.py                      # the dashboard
+python3 scripts/build_single_file.py --page bibliography  # the other page
+```
+
+Each run builds that page on its own and inlines the CSS, the JavaScript and
+the logo, writing `dist-single/standalone*.html`, which works straight off the
+filesystem with no server. Pass `--rewrite from=to` to repoint a link that will
+not exist beside a single file, for example
+`--rewrite /bibliography.html=https://example.com/bibliography`.
+
 ## Tests
 
 ```sh

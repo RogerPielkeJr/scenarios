@@ -95,6 +95,11 @@ header.banded {
   header.banded { align-items: start; }
 }
 
+.masthead { display: inline-block; line-height: 0; margin-bottom: 14px; }
+.masthead img { width: 44px; height: 44px; display: block; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
 h1 {
   font-size: clamp(27px, 3.4vw, 40px);
   line-height: 1.1;
@@ -139,7 +144,7 @@ h1 {
 }
 
 /* --- buttons ----------------------------------------------------------- */
-button.ghost {
+.ghost {
   font-family: var(--sans);
   font-size: 13px;
   padding: 7px 12px;
@@ -151,8 +156,9 @@ button.ghost {
   transition: border-color 0.12s, background 0.12s;
 }
 
-button.ghost:hover { border-color: var(--navy); background: color-mix(in srgb, var(--navy) 7%, transparent); }
-button.ghost[aria-pressed='true'] { border-color: var(--navy); background: color-mix(in srgb, var(--navy) 12%, transparent); }
+a.ghost { text-decoration: none; display: inline-block; }
+.ghost:hover { border-color: var(--navy); background: color-mix(in srgb, var(--navy) 7%, transparent); }
+.ghost[aria-pressed='true'] { border-color: var(--navy); background: color-mix(in srgb, var(--navy) 12%, transparent); }
 
 :focus-visible {
   outline: 2px solid var(--focus);
@@ -273,6 +279,27 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 }
 .notes p { margin: 0 0 9px; overflow-wrap: break-word; }
 .notes b.you { color: var(--you); }
+
+/* --- the bibliography page ---------------------------------------------- */
+.reading { max-width: 72ch; }
+.reading section { margin-bottom: 34px; }
+.reading h2 {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0 0 14px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: 0.01em;
+}
+.refs { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
+.refs > li { display: grid; gap: 4px; }
+.ref { margin: 0; font-size: 15.5px; }
+.ref cite { font-style: italic; }
+.ref a { color: var(--navy); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.gloss { margin: 0; font-size: 14px; color: var(--dim); }
+.footnote { margin: 18px 0 0; font-size: 13.5px; color: var(--dim); font-style: italic; }
 
 footer {
   margin-top: 40px;

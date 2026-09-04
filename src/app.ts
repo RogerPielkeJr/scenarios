@@ -6,7 +6,7 @@ import { defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import { ScenarioState, decodeInputs } from './state.js';
 import { renderChart } from './ui/chart.js';
-import { downloadChart } from './ui/export.js';
+import { downloadScenarioPdf, downloadScenarioPng } from './ui/export.js';
 import { renderNotes } from './ui/notes.js';
 import { renderSliders, type SliderPanel } from './ui/sliders.js';
 import { installShare, syncHash } from './ui/share.js';
@@ -80,7 +80,7 @@ function buildLegend(container: HTMLElement): void {
   container.appendChild(intro);
 
   const entries: Array<{ id: string; name: string; color: string; you: boolean }> = [
-    { id: 'Yours', name: '', color: 'var(--you)', you: true },
+    { id: 'Build your own', name: '', color: 'var(--you)', you: true },
     ...[...MARKERS].reverse().map((marker) => ({
       id: marker.id, name: marker.shortLabel, color: marker.color, you: false,
     })),
@@ -183,13 +183,27 @@ export function mountApp(root: Document = document): App {
     installShare(shareButton, actionMessage, () => state.get());
   }
 
-  const downloadButton = root.getElementById('download');
-  if (downloadButton !== null && actionMessage !== null) {
-    downloadButton.addEventListener('click', () => {
-      downloadChart(chart, 'emissions-scenario.png').catch((error: unknown) => {
-        actionMessage.textContent = 'Could not build the image';
-        console.error('[kaya] chart download failed:', error);
-      });
+  const downloads: Array<[string, string, (name: string) => Promise<void>]> = [
+    ['download-png', 'emissions-scenario.png',
+      (name) => downloadScenarioPng(chart, state.get(), computePath(state.get()), name)],
+    ['download-pdf', 'emissions-scenario.pdf',
+      (name) => downloadScenarioPdf(chart, state.get(), computePath(state.get()), name)],
+  ];
+  for (const [id, filename, run] of downloads) {
+    const button = root.getElementById(id);
+    if (button === null || actionMessage === null) continue;
+    button.addEventListener('click', () => {
+      actionMessage.textContent = 'Building your sheet...';
+      run(filename).then(
+        () => {
+          actionMessage.textContent = 'Downloaded';
+          window.setTimeout(() => { actionMessage.textContent = ''; }, 2600);
+        },
+        (error: unknown) => {
+          actionMessage.textContent = 'Could not build the file';
+          console.error(`[kaya] ${id} failed:`, error);
+        },
+      );
     });
   }
 

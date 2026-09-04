@@ -11,6 +11,8 @@ export interface InputSpec {
   max: number;
   step: number;
   default: number;
+  /** What the prototype opened on, kept for comparison. Not used. */
+  prototypeDefault: number;
   decimals: number;
   unitSuffix: string;
   units: string;
@@ -32,6 +34,8 @@ export const BASE_META = baseJson.meta;
 export const BASE_BASIS = baseJson.basis;
 export const OBSERVED_RATES = configJson.observedRates;
 export const INPUT_SPECS = configJson.inputs as readonly InputSpec[];
+/** The preset the page opens on, named in src/data/config.json. */
+export const DEFAULT_PRESET = configJson.defaultPreset;
 
 export const SPEC_BY_ID: Readonly<Record<InputId, InputSpec>> = Object.freeze(
   Object.fromEntries(INPUT_SPECS.map((spec) => [spec.id, spec])) as Record<InputId, InputSpec>,

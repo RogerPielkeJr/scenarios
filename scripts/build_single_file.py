@@ -17,11 +17,14 @@ in sandboxed hosts that block page-initiated downloads. Everything else,
 including the URL-hash sharing, works the same.
 """
 import base64
+import os
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DIST = ROOT / 'dist'
+DIST = ROOT / 'dist-single'
 
 
 def read(path: Path) -> str:
@@ -30,8 +33,34 @@ def read(path: Path) -> str:
     return path.read_text()
 
 
+def rewrites() -> dict[str, str]:
+    """`--rewrite from=to` swaps a URL in the packed copy.
+
+    The dashboard links to bibliography.html, which does not exist beside a
+    single file. Point it at wherever that page actually lives instead.
+    """
+    out = {}
+    for i, arg in enumerate(sys.argv):
+        if arg == '--rewrite' and i + 1 < len(sys.argv):
+            frm, _, to = sys.argv[i + 1].partition('=')
+            if not to:
+                raise SystemExit('--rewrite needs from=to')
+            out[frm] = to
+    return out
+
+
 def main() -> None:
-    html = read(DIST / 'index.html')
+    page = 'main'
+    for i, arg in enumerate(sys.argv):
+        if arg == '--page' and i + 1 < len(sys.argv):
+            page = sys.argv[i + 1]
+    source = {'main': 'index.html', 'bibliography': 'bibliography.html'}[page]
+
+    print(f'building {source} on its own...')
+    subprocess.run(['npx', 'vite', 'build'], cwd=ROOT, check=True,
+                   env={**os.environ, 'SINGLE_PAGE': page},
+                   stdout=subprocess.DEVNULL)
+    html = read(DIST / source)
 
     css_names = re.findall(r'<link rel="stylesheet"[^>]*href="/([^"]+\.css)"[^>]*>', html)
     js_names = re.findall(r'<script[^>]*src="/([^"]+\.js)"[^>]*></script>', html)
@@ -40,6 +69,8 @@ def main() -> None:
 
     logo = base64.b64encode((DIST / 'thb-logo.png').read_bytes()).decode('ascii')
     logo_uri = f'data:image/png;base64,{logo}'
+    # The logo is referenced from the markup as well as from the export code.
+    html = html.replace('"/thb-logo.png"', f'"{logo_uri}"')
 
     for name in css_names:
         css = read(DIST / name)
@@ -55,10 +86,18 @@ def main() -> None:
         html = re.sub(r'<script[^>]*src="/' + re.escape(name) + r'"[^>]*></script>',
                       lambda _: f'<script type="module">\n{js}\n</script>', html, count=1)
 
-    if 'src="/' in html or 'href="/assets' in html:
-        raise SystemExit('something still references an external file')
+    for frm, to in rewrites().items():
+        if frm not in html:
+            raise SystemExit(f'--rewrite target not found in the page: {frm}')
+        html = html.replace(f'"{frm}"', f'"{to}"')
 
-    standalone = DIST / 'standalone.html'
+    leftover = [m for m in re.findall(r'(?:src|href)="(/[^"]*)"', html)
+                if not m.startswith('/#')]
+    if leftover:
+        raise SystemExit(f'still references files that will not exist: {leftover}')
+
+    suffix = '' if page == 'main' else f'-{page}'
+    standalone = DIST / f'standalone{suffix}.html'
     standalone.write_text(html)
 
     # The wrapper-free version: everything the <head> carried that matters,
@@ -73,10 +112,11 @@ def main() -> None:
     scripts = ''.join(re.findall(r'<script[^>]*>.*?</script>', head, re.S))
     if '<script' not in scripts and '<script' not in body:
         raise SystemExit('no script survived into the wrapper-free version')
-    (DIST / 'artifact-body.html').write_text(keep + '\n' + body + '\n' + scripts)
+    (DIST / f'artifact-body{suffix}.html').write_text(keep + '\n' + body + '\n' + scripts)
 
-    print(f'dist/standalone.html      {standalone.stat().st_size / 1024:.0f} KB')
-    print(f'dist/artifact-body.html   {(DIST / "artifact-body.html").stat().st_size / 1024:.0f} KB')
+    body_file = DIST / f'artifact-body{suffix}.html'
+    print(f'{standalone.relative_to(ROOT)}  {standalone.stat().st_size / 1024:.0f} KB')
+    print(f'{body_file.relative_to(ROOT)}  {body_file.stat().st_size / 1024:.0f} KB')
 
 
 if __name__ == '__main__':

@@ -1,18 +1,28 @@
 /**
- * Downloads the chart as a PNG at 2x, with the THB logo and a credit line.
+ * Downloads the reader's scenario as a sheet: the chart, the six assumptions
+ * behind it and what they add up to, with the logo and the credit line.
  *
  * The chart is drawn with CSS custom properties so it follows the theme, and
  * canvas cannot resolve those, so every var() is replaced with the value the
- * live page computes before the SVG is serialised. The logo and the credit
- * are painted onto the canvas rather than embedded in the SVG, which keeps
- * the canvas clean of any cross-origin taint.
+ * live page computes before the SVG is serialised. The logo and the text are
+ * painted onto the canvas rather than embedded in the SVG, which keeps the
+ * canvas clean of any cross-origin taint.
  */
+import { INPUT_SPECS } from '../model/config.js';
+import { addedWarming, warming } from '../model/emulator.js';
+import { nearestAnalogue } from '../model/analogue.js';
+import { MARKER_BY_ID, placeAmongMarkers } from '../model/markers.js';
+import type { ScenarioInputs, ScenarioPath } from '../model/types.js';
+import { degrees, formatInput, signedDegrees, thousands } from '../format.js';
+import { jpegToPdf } from './pdf.js';
 
 const SCALE = 2;
-const CREDIT_BAND = 34;
+const SHEET = { width: 720, pad: 26 };
 const CREDIT = 'Source: analysis by Roger Pielke Jr., The Honest Broker';
 const LOGO_SRC = '/thb-logo.png';
-const LOGO_SIZE = 30;
+const SANS = "'IBM Plex Sans', system-ui, sans-serif";
+const MONO = "'IBM Plex Mono', ui-monospace, monospace";
+const SERIF = 'Spectral, Georgia, serif';
 
 function resolveVariables(markup: string, styles: CSSStyleDeclaration): string {
   return markup.replace(/var\(\s*(--[\w-]+)\s*\)/g, (whole, name: string) => {
@@ -40,59 +50,172 @@ function viewBoxOf(svg: SVGSVGElement): { width: number; height: number } {
   return { width: width as number, height: height as number };
 }
 
-export async function downloadChart(svg: SVGSVGElement, filename: string): Promise<void> {
-  const styles = window.getComputedStyle(document.documentElement);
-  const { width, height } = viewBoxOf(svg);
-  const paper = styles.getPropertyValue('--panel').trim() || '#ffffff';
-  const ink = styles.getPropertyValue('--dim').trim() || '#5a6c82';
+function summaryOf(inputs: ScenarioInputs, path: ScenarioPath): Array<[string, string, string]> {
+  const high = MARKER_BY_ID['H'];
+  const t = warming(path.cumulativeGt, inputs.methane);
+  const country = nearestAnalogue(path.final.kgCo2PerUsd);
+  return [
+    ['Cumulative CO2, 2025 to 2100', thousands(path.cumulativeGt),
+      high === undefined ? 'GtCO2' : `GtCO2 · CMIP7 HIGH is ${thousands(high.cumulativeGt)}`],
+    ['Warming in 2100', degrees(t), placeAmongMarkers(t)],
+    ['Added warming from now', signedDegrees(addedWarming(path.cumulativeGt, inputs.methane)),
+      'above the 2015-2024 average of 1.24 °C'],
+    ['Your 2100 world looks like', country === null ? 'no economy today' : country.name,
+      country === null ? 'cleaner than anywhere on earth'
+        : `${path.final.kgCo2PerUsd.toFixed(3)} kg CO2 per dollar`],
+  ];
+}
 
-  const markup = resolveVariables(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" `
-    + `viewBox="0 0 ${width} ${height}">${svg.innerHTML}</svg>`,
-    styles,
-  );
+/** Paints the whole sheet and hands back the canvas. */
+async function drawSheet(
+  svg: SVGSVGElement, inputs: ScenarioInputs, path: ScenarioPath,
+): Promise<HTMLCanvasElement> {
+  const styles = window.getComputedStyle(document.documentElement);
+  const paper = styles.getPropertyValue('--panel').trim() || '#ffffff';
+  const ink = styles.getPropertyValue('--ink').trim() || '#16243a';
+  const dim = styles.getPropertyValue('--dim').trim() || '#5a6c82';
+  const rule = styles.getPropertyValue('--rule').trim() || '#c9d4e0';
+  const navy = styles.getPropertyValue('--navy').trim() || '#1f3a5f';
+
+  const view = viewBoxOf(svg);
+  const chartWidth = SHEET.width - SHEET.pad * 2;
+  const chartHeight = (view.height / view.width) * chartWidth;
+  const summary = summaryOf(inputs, path);
+
+  const chartTop = 86;
+  const summaryTop = chartTop + chartHeight + 20;
+  const summaryHeight = 58;
+  const inputsTop = summaryTop + summaryHeight + 26;
+  const rowHeight = 22;
+  const height = inputsTop + INPUT_SPECS.length * rowHeight + 46;
 
   const canvas = document.createElement('canvas');
-  canvas.width = width * SCALE;
-  canvas.height = (height + CREDIT_BAND) * SCALE;
-  const context = canvas.getContext('2d');
-  if (context === null) throw new Error('no 2d canvas context');
-  context.scale(SCALE, SCALE);
-  context.fillStyle = paper;
-  context.fillRect(0, 0, width, height + CREDIT_BAND);
+  canvas.width = SHEET.width * SCALE;
+  canvas.height = height * SCALE;
+  const ctx = canvas.getContext('2d');
+  if (ctx === null) throw new Error('no 2d canvas context');
+  ctx.scale(SCALE, SCALE);
+  ctx.fillStyle = paper;
+  ctx.fillRect(0, 0, SHEET.width, height);
+  ctx.textBaseline = 'alphabetic';
 
-  const blob = new Blob([markup], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
+  ctx.fillStyle = ink;
+  ctx.font = `600 22px ${SERIF}`;
+  ctx.fillText('Build your own emissions scenario', SHEET.pad, 42);
+  ctx.fillStyle = dim;
+  ctx.font = `12px ${SANS}`;
+  ctx.fillText('Six assumptions, and where they put the century.', SHEET.pad, 62);
+
   try {
-    context.drawImage(await loadImage(url), 0, 0, width, height);
+    const logo = await loadImage(LOGO_SRC);
+    ctx.drawImage(logo, SHEET.width - SHEET.pad - 34, 20, 34, 34);
+  } catch {
+    // A missing logo should not cost the reader the sheet.
+  }
+
+  ctx.strokeStyle = navy;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(SHEET.pad, 74);
+  ctx.lineTo(SHEET.width - SHEET.pad, 74);
+  ctx.stroke();
+
+  const markup = resolveVariables(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${view.width}" height="${view.height}" `
+    + `viewBox="0 0 ${view.width} ${view.height}">${svg.innerHTML}</svg>`,
+    styles,
+  );
+  const url = URL.createObjectURL(new Blob([markup], { type: 'image/svg+xml;charset=utf-8' }));
+  try {
+    ctx.drawImage(await loadImage(url), SHEET.pad, chartTop, chartWidth, chartHeight);
   } finally {
     URL.revokeObjectURL(url);
   }
 
-  try {
-    const logo = await loadImage(LOGO_SRC);
-    context.drawImage(logo, width - LOGO_SIZE - 10, 6, LOGO_SIZE, LOGO_SIZE);
-  } catch {
-    // A missing logo should not cost the reader the chart.
-  }
-
-  context.fillStyle = ink;
-  context.font = "12px 'IBM Plex Sans', system-ui, sans-serif";
-  context.textBaseline = 'middle';
-  context.fillText(CREDIT, 10, height + CREDIT_BAND / 2);
-
-  await new Promise<void>((resolve) => {
-    canvas.toBlob((png) => {
-      if (png === null) { resolve(); return; }
-      const href = URL.createObjectURL(png);
-      const link = document.createElement('a');
-      link.href = href;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(href);
-      resolve();
-    }, 'image/png');
+  const columnWidth = chartWidth / summary.length;
+  summary.forEach(([label, value, note], index) => {
+    const x = SHEET.pad + index * columnWidth;
+    if (index > 0) {
+      ctx.strokeStyle = rule;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x - 8, summaryTop - 4);
+      ctx.lineTo(x - 8, summaryTop + summaryHeight - 12);
+      ctx.stroke();
+    }
+    ctx.fillStyle = dim;
+    ctx.font = `10.5px ${SANS}`;
+    ctx.fillText(label, x, summaryTop + 8, columnWidth - 14);
+    ctx.fillStyle = ink;
+    ctx.font = `500 19px ${MONO}`;
+    ctx.fillText(value, x, summaryTop + 32, columnWidth - 14);
+    ctx.fillStyle = dim;
+    ctx.font = `10.5px ${SANS}`;
+    ctx.fillText(note, x, summaryTop + 47, columnWidth - 14);
   });
+
+  ctx.fillStyle = dim;
+  ctx.font = `600 11px ${SANS}`;
+  ctx.fillText('YOUR ASSUMPTIONS', SHEET.pad, inputsTop - 10);
+
+  INPUT_SPECS.forEach((spec, index) => {
+    const y = inputsTop + index * rowHeight + 12;
+    ctx.strokeStyle = rule;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(SHEET.pad, y + 6);
+    ctx.lineTo(SHEET.width - SHEET.pad, y + 6);
+    ctx.stroke();
+    ctx.fillStyle = ink;
+    ctx.font = `13px ${SERIF}`;
+    ctx.fillText(spec.label, SHEET.pad, y);
+    ctx.font = `500 13px ${MONO}`;
+    ctx.textAlign = 'right';
+    ctx.fillText(formatInput(spec.id, inputs[spec.id]), SHEET.pad + 330, y);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = dim;
+    ctx.font = `11.5px ${SERIF}`;
+    ctx.fillText(spec.units, SHEET.pad + 344, y);
+  });
+
+  ctx.fillStyle = dim;
+  ctx.font = `11px ${SANS}`;
+  ctx.fillText(CREDIT, SHEET.pad, height - 16);
+
+  return canvas;
+}
+
+function save(blob: Blob, filename: string): void {
+  const href = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = href;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(href);
+}
+
+function toBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => (blob === null ? reject(new Error(`could not encode ${type}`)) : resolve(blob)),
+      type, quality,
+    );
+  });
+}
+
+export async function downloadScenarioPng(
+  svg: SVGSVGElement, inputs: ScenarioInputs, path: ScenarioPath, filename: string,
+): Promise<void> {
+  const canvas = await drawSheet(svg, inputs, path);
+  save(await toBlob(canvas, 'image/png'), filename);
+}
+
+export async function downloadScenarioPdf(
+  svg: SVGSVGElement, inputs: ScenarioInputs, path: ScenarioPath, filename: string,
+): Promise<void> {
+  const canvas = await drawSheet(svg, inputs, path);
+  const jpeg = new Uint8Array(await (await toBlob(canvas, 'image/jpeg', 0.92)).arrayBuffer());
+  save(jpegToPdf(jpeg, canvas.width, canvas.height), filename);
 }

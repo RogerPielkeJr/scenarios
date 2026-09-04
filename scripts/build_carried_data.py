@@ -76,6 +76,11 @@ NOTES_THRESHOLDS = {
     },
 }
 
+# The scenario the page opens on. The prototype opened on a set of values
+# that matched no preset (observed rates but with land use at zero), which
+# left the reader looking at a scenario with no name.
+DEFAULT_PRESET = 'Trend continues'
+
 INPUT_META = {
     'pop':    ('population',       'level', 'billion people in 2100'),
     'gdppc':  ('income',           'rate',  '%/yr'),
@@ -98,14 +103,20 @@ def main() -> None:
                   'no primary source on this machine (see DATA.md)')
 
     # --- config.json --------------------------------------------------------
+    default_values = dict(next(values for label, values in C['PRE'] if label == DEFAULT_PRESET))
+
     inputs = []
     for c in C['CTRL']:
         key, kind, units = INPUT_META[c['id']]
+        default = default_values[c['id']]
+        if not (c['min'] <= default <= c['max']):
+            raise SystemExit(f'{DEFAULT_PRESET} puts {key} outside its slider range')
         inputs.append({
             'id': key, 'legacyId': c['id'], 'kind': kind,
             'label': c['h'], 'help': c['why'],
             'min': c['min'], 'max': c['max'], 'step': c['step'],
-            'default': c['val'], 'decimals': c['dec'],
+            'default': default, 'decimals': c['dec'],
+            'prototypeDefault': c['val'],
             'unitSuffix': c['unit'], 'units': units,
             'signed': kind == 'rate',
             'reference': {'value': c['hist'], 'label': c['histL']},
@@ -113,6 +124,7 @@ def main() -> None:
     config = {
         'meta': {'generated_by': 'scripts/build_carried_data.py', 'provenance': provenance},
         'baseYear': BASE['year'], 'endYear': D['popyears'][-1],
+        'defaultPreset': DEFAULT_PRESET,
         # The live base-year state is src/data/base.json, written from
         # primary sources by scripts/build_data.py. This copy is what the
         # prototype used, kept so the two can be diffed.

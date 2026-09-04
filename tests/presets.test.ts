@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { DOCUMENTED_PRESETS, PRESETS } from '../src/model/bounds.js';
+import { DOCUMENTED_PRESETS, PRESETS, presetByLabel } from '../src/model/bounds.js';
 import { warming } from '../src/model/emulator.js';
 import { computePath } from '../src/model/kaya.js';
 import { INPUT_IDS } from '../src/model/types.js';
-import { SPEC_BY_ID } from '../src/model/config.js';
+import { DEFAULT_PRESET, SPEC_BY_ID, defaultInputs } from '../src/model/config.js';
 import { MARKER_BY_ID } from '../src/model/markers.js';
 
 describe('presets', () => {
@@ -14,6 +14,16 @@ describe('presets', () => {
       'Slowest technical progress',
       'Ausubel methane economy',
     ]);
+  });
+
+  // The page has to open on a scenario that has a name, so that the reader's
+  // first view is something they can look up rather than an unlabelled set of
+  // numbers. The prototype opened on observed rates but with land use at zero,
+  // which matched nothing.
+  it('opens on a named preset, with every slider defaulted to it', () => {
+    const preset = presetByLabel(DEFAULT_PRESET);
+    expect(preset, DEFAULT_PRESET).toBeDefined();
+    expect(defaultInputs()).toEqual(preset?.inputs);
   });
 
   it('sets all six inputs, each inside its slider range', () => {
