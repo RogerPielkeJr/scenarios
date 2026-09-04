@@ -58,6 +58,24 @@ for _entry in DOCUMENTED.values():
     _entry.setdefault('tolerance_c', 0.01)
     _entry.setdefault('source', 'frozen from this model after the base-year recalibration')
 
+# Thresholds the conditional notes fire on. Numbers only; the sentences
+# live in src/ui/notes.ts. Lifted from the prototype's notes engine, except
+# the two technology bounds, which the prototype hard-coded at 4,307 Gt.
+# That figure could not be reconstructed from any preset or window in the
+# record, so the bounds are now computed at run time from the two bound
+# presets themselves, which is what the brief describes them as.
+NOTES_THRESHOLDS = {
+    'efficiencySlowerThanRecordRatio': 0.7,
+    'fuelMixFasterThanAnyScenarioRatio': 4.0,
+    'highScenarioEfficiencyRatio': 0.46,
+    'coherence': {
+        'fastFuelMixSlowEfficiency': {'co2PerEnergyBelow': -1.2, 'energyPerDollarAbove': -0.9},
+        'fastEfficiencyStaticFuelMix': {'energyPerDollarBelow': -2.0, 'co2PerEnergyAbove': -0.4},
+        'stagnantEconomyFastEfficiency': {'incomeBelow': 0.8, 'energyPerDollarBelow': -1.8},
+        'largeSinkUnchangedFuelMix': {'landUseBelow': -6.0, 'co2PerEnergyAbove': -0.5},
+    },
+}
+
 INPUT_META = {
     'pop':    ('population',       'level', 'billion people in 2100'),
     'gdppc':  ('income',           'rate',  '%/yr'),
@@ -180,9 +198,15 @@ def main() -> None:
         presets.append(entry)
 
     OUT.mkdir(parents=True, exist_ok=True)
+    notes = {
+        'meta': {'generated_by': 'scripts/build_carried_data.py',
+                 'note': 'thresholds only; the wording lives in src/ui/notes.ts'},
+        'thresholds': NOTES_THRESHOLDS,
+    }
+
     for name, payload in (('config', config), ('emulator', emulator),
                           ('markers', markers_json), ('population', population),
-                          ('presets', {'presets': presets})):
+                          ('presets', {'presets': presets}), ('notes', notes)):
         (OUT / f'{name}.json').write_text(json.dumps(payload, indent=1, ensure_ascii=False) + '\n')
         print(f'  wrote src/data/{name}.json')
     missing = [m['id'] for m in markers if m['kaya']['co2PerEnergy'] is None]

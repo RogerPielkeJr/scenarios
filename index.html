@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build your own emissions scenario</title>
+<meta name="description" content="Set six assumptions and see how far they sit from what the world has done and from the seven CMIP7 scenarios.">
+<meta name="author" content="Roger Pielke Jr.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="banded">
+    <div class="band-left">
+      <h1>Build your own emissions scenario</h1>
+    </div>
+    <div class="band-right">
+      <p class="standfirst">
+        Six assumptions decide any emissions future: how many people there are, how rich they
+        are, how much energy each dollar needs, how much carbon each unit of energy carries,
+        plus land use and methane. The marks under every slider show what the world has
+        actually done and what each of the seven published CMIP7 scenarios assumes.
+      </p>
+      <button type="button" id="theme-toggle" class="ghost" aria-pressed="false">
+        <span id="theme-label">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="banded">
+    <div class="band-left">
+      <section aria-labelledby="presets-heading">
+        <h2 id="presets-heading" class="eyebrow">Start from a published scenario</h2>
+        <div class="presets" id="presets"></div>
+      </section>
+
+      <section aria-labelledby="key-heading">
+        <h2 id="key-heading" class="visually-hidden">Key to the scenario marks</h2>
+        <div class="legend" id="legend"></div>
+      </section>
+
+      <p class="lead-in">Then move the sliders to build your own.</p>
+
+      <section aria-labelledby="controls-heading">
+        <h2 id="controls-heading" class="visually-hidden">The six assumptions</h2>
+        <div id="controls"></div>
+      </section>
+    </div>
+
+    <div class="band-right">
+      <div class="panel">
+        <figure class="chart-figure">
+          <svg id="chart" viewBox="0 0 660 420" role="img"
+               aria-label="Annual CO2 emissions to 2100 for your scenario and the seven CMIP7 markers"></svg>
+          <figcaption id="chart-caption" class="caption"></figcaption>
+        </figure>
+
+        <section aria-labelledby="summary-heading">
+          <h2 id="summary-heading" class="visually-hidden">Summary</h2>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-key">Cumulative CO<sub>2</sub>, 2025 to 2100</div>
+              <div class="stat-value" id="tile-cumulative">&mdash;</div>
+              <div class="stat-note" id="tile-cumulative-note"></div>
+            </div>
+            <div class="stat">
+              <div class="stat-key">Warming in 2100</div>
+              <div class="stat-value" id="tile-warming">&mdash;</div>
+              <div class="stat-note" id="tile-warming-note"></div>
+            </div>
+            <div class="stat">
+              <div class="stat-key">Added warming from now</div>
+              <div class="stat-value" id="tile-added">&mdash;</div>
+              <div class="stat-note" id="tile-added-note"></div>
+            </div>
+            <div class="stat">
+              <div class="stat-key">Your 2100 world looks like</div>
+              <div class="stat-value stat-value-text" id="tile-analogue">&mdash;</div>
+              <div class="stat-note" id="tile-analogue-note"></div>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="table-heading">
+          <h2 id="table-heading" class="visually-hidden">Your assumptions against the record and CMIP7 HIGH</h2>
+          <table class="kaya" id="kaya-table"></table>
+        </section>
+
+        <div class="actions">
+          <button type="button" class="ghost" id="share">Copy link to this scenario</button>
+          <button type="button" class="ghost" id="download">Download chart</button>
+          <span class="action-message" id="action-message" role="status" aria-live="polite"></span>
+        </div>
+
+        <section class="notes" id="notes" aria-labelledby="notes-heading">
+          <h2 id="notes-heading" class="visually-hidden">What your scenario implies</h2>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Analysis by Roger Pielke Jr., <a href="https://thehonestbroker.org">The Honest Broker</a>.</p>
+  </footer>
+
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

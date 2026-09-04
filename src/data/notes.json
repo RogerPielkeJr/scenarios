@@ -1,0 +1,29 @@
+{
+ "meta": {
+  "generated_by": "scripts/build_carried_data.py",
+  "note": "thresholds only; the wording lives in src/ui/notes.ts"
+ },
+ "thresholds": {
+  "efficiencySlowerThanRecordRatio": 0.7,
+  "fuelMixFasterThanAnyScenarioRatio": 4.0,
+  "highScenarioEfficiencyRatio": 0.46,
+  "coherence": {
+   "fastFuelMixSlowEfficiency": {
+    "co2PerEnergyBelow": -1.2,
+    "energyPerDollarAbove": -0.9
+   },
+   "fastEfficiencyStaticFuelMix": {
+    "energyPerDollarBelow": -2.0,
+    "co2PerEnergyAbove": -0.4
+   },
+   "stagnantEconomyFastEfficiency": {
+    "incomeBelow": 0.8,
+    "energyPerDollarBelow": -1.8
+   },
+   "largeSinkUnchangedFuelMix": {
+    "landUseBelow": -6.0,
+    "co2PerEnergyAbove": -0.5
+   }
+  }
+ }
+}
