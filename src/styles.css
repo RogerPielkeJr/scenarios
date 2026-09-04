@@ -83,6 +83,10 @@ body {
   align-items: start;
 }
 
+/* A grid item defaults to min-width: auto, which lets wide content push the
+   track past the container and scroll the whole page sideways. */
+.banded > * { min-width: 0; }
+
 header.banded {
   border-bottom: 2px solid var(--navy);
   padding-bottom: 20px;
@@ -251,7 +255,11 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .stat-note { font-size: 13px; color: var(--dim); margin-top: 3px; }
 .stat-error { color: var(--scenario-high); font-family: var(--sans); font-size: 13px; }
 
-.kaya { width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 14px; }
+/* Wide content scrolls inside its own container so the page body never
+   scrolls sideways. Below the min-width the five columns would otherwise
+   crush the headings onto three lines each. */
+.scroll-x { overflow-x: auto; margin-top: 22px; }
+.kaya { width: 100%; min-width: 430px; border-collapse: collapse; font-size: 14px; }
 .kaya th {
   font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--dim);
   text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule);

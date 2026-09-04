@@ -66,6 +66,24 @@ test('a shared link restores the scenario', async ({ page }) => {
   await expect(page.locator('#readout-methane')).toHaveText('500 Mt/yr');
 });
 
+test('never scrolls the page body sideways', async ({ page }) => {
+  for (const width of [360, 768, 1280, 1600]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    const overflow = await page.evaluate(() =>
+      document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, `page body at ${width}px`).toBeLessThanOrEqual(1);
+  }
+});
+
+test('names the reader path the same way everywhere', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#chart text', { hasText: 'Build your own' })).toHaveCount(1);
+  await expect(page.locator('.legend-item.is-you')).toContainText('Build your own');
+  await expect(page.locator('#kaya-table thead th').nth(1)).toHaveText('Build your own');
+  await expect(page.locator('#kaya-table')).not.toContainText('Yours');
+});
+
 test('the masthead and the toolbar link out', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.masthead img')).toBeVisible();

@@ -18,7 +18,7 @@ function cell(text: string, className?: string): string {
  */
 export function renderTable(table: HTMLTableElement, inputs: ScenarioInputs): void {
   const header = '<thead><tr>'
-    + '<th scope="col">Assumption</th><th scope="col">Yours</th>'
+    + '<th scope="col">Assumption</th><th scope="col">Build your own</th>'
     + '<th scope="col">Observed</th><th scope="col">CMIP7 HIGH</th>'
     + '<th scope="col">Units</th></tr></thead>';
 
