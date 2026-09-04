@@ -31,8 +31,13 @@ function loadImage(source: string): Promise<HTMLImageElement> {
 }
 
 function viewBoxOf(svg: SVGSVGElement): { width: number; height: number } {
-  const parts = (svg.getAttribute('viewBox') ?? '0 0 660 420').split(/\s+/).map(Number);
-  return { width: parts[2] ?? 660, height: parts[3] ?? 420 };
+  const parts = (svg.getAttribute('viewBox') ?? '').split(/\s+/).map(Number);
+  const width = parts[2];
+  const height = parts[3];
+  if (!Number.isFinite(width) || !Number.isFinite(height)) {
+    throw new Error('chart has no usable viewBox');
+  }
+  return { width: width as number, height: height as number };
 }
 
 export async function downloadChart(svg: SVGSVGElement, filename: string): Promise<void> {

@@ -4,7 +4,10 @@ import type { ScenarioPath } from '../model/types.js';
 import { at } from '../model/types.js';
 import { spreadLabels } from './ticks.js';
 
-const VIEW = { width: 660, height: 420 };
+// Height leaves room for the year labels below the plot and nothing more.
+// The PNG export draws the viewBox straight onto a canvas, so any slack here
+// becomes a dead band in the downloaded image.
+const VIEW = { width: 660, height: 392 };
 // `top` leaves room above the highest gridline for the axis label, which
 // otherwise prints on top of the topmost number.
 const PLOT = { left: 56, right: 588, top: 40, bottom: 350 };
@@ -102,7 +105,10 @@ function userPath(path: ScenarioPath): string {
 export function renderChart(svg: SVGSVGElement, path: ScenarioPath): void {
   svg.setAttribute('viewBox', `0 0 ${VIEW.width} ${VIEW.height}`);
   svg.innerHTML = gridlines()
-    + `<text x="${PLOT.left - 9}" y="${PLOT.top - 18}" text-anchor="end" `
+    // Left-anchored at the very edge. Right-anchoring it on the number column
+    // pushes it past x=0, which the live SVG shows because it allows overflow
+    // and the export clips, so the label lost its first character in the PNG.
+    + `<text x="0" y="${PLOT.top - 18}" text-anchor="start" `
     + `font-family="${SANS}" font-size="11.5" fill="var(--dim)">GtCO2/yr</text>`
     + yearLabels()
     + markerPaths()
