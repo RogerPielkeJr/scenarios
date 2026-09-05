@@ -228,6 +228,26 @@ test('the back link returns the scenario unchanged', async ({ page }) => {
   await expect(page.locator('#scenario-name')).toHaveValue('Held steady');
 });
 
+test('a published scenario draws its own path until a slider moves', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.presets button', { hasText: 'CMIP7 MEDIUM' }).click();
+  await expect(page.locator('#tile-cumulative')).toHaveText('2,770');
+  await expect(page.locator('#tile-warming')).toHaveText('2.84 °C');
+  await expect(page.locator('#chart text', { hasText: 'CMIP7 MEDIUM as published' }))
+    .toHaveCount(1);
+  await expect(page.locator('.presets button[aria-pressed="true"]')).toHaveCount(1);
+
+  // The published path and the marker line behind it are the same 16 points.
+  const drawn = await page.locator('#chart [data-user-path]').getAttribute('d');
+  const ghost = await page.locator('#chart [data-marker="M"]').getAttribute('d');
+  expect(drawn?.replace(/^M/, '')).toBe(ghost?.replace(/^M/, ''));
+
+  await page.locator('#input-population').fill('11');
+  await page.locator('#input-population').dispatchEvent('input');
+  await expect(page.locator('#tile-cumulative')).not.toHaveText('2,770');
+  await expect(page.locator('#chart text', { hasText: 'as published' })).toHaveCount(0);
+});
+
 test('a named scenario names its download', async ({ page }) => {
   await page.goto('/');
   await page.locator('#scenario-name').fill('Coal holds on');

@@ -43,6 +43,34 @@ export function markerValueFor(marker: Marker, input: InputId): number | null {
   }
 }
 
+/** One marker's own published path, in the shape the chart draws. */
+export interface PublishedPath {
+  points: Array<{ year: number; co2Gt: number }>;
+  cumulativeGt: number;
+  warmingC: number;
+  label: string;
+}
+
+/**
+ * A marker's published emissions path, five-yearly to 2100.
+ *
+ * Loading a CMIP7 preset shows this rather than the reconstruction, so
+ * "start from a published scenario" draws the scenario that was published.
+ * Moving any slider takes the reader off those six values and back to the
+ * Kaya reconstruction.
+ */
+export function publishedPath(marker: Marker): PublishedPath {
+  return {
+    points: MARKER_YEARS.map((year, index) => ({
+      year,
+      co2Gt: marker.co2Gt[index] ?? 0,
+    })),
+    cumulativeGt: marker.cumulativeGt,
+    warmingC: marker.warmingC,
+    label: `CMIP7 ${marker.label}`,
+  };
+}
+
 /**
  * Plain-language placement of a warming figure among the markers, e.g.
  * "between CMIP7 MEDIUM and HIGH" or "above CMIP7 HIGH".

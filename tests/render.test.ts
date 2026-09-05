@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { mountApp, type RenderReport } from '../src/app.js';
 import { PRESETS } from '../src/model/bounds.js';
 import { INPUT_SPECS } from '../src/model/config.js';
+import { MARKERS } from '../src/model/markers.js';
 
 // import.meta.url is an http URL under the jsdom environment, so the page
 // is read relative to the project root instead.
@@ -183,5 +184,56 @@ describe('the learn link on a slider', () => {
     const links = document.querySelectorAll('.learn-link');
     expect(links).toHaveLength(1);
     expect(links[0]?.textContent).toBe('Learn more about population');
+  });
+});
+
+describe('a published scenario on screen', () => {
+  beforeEach(() => { loadPage(); });
+
+  it('draws the marker\'s own path and reports its own totals', () => {
+    const app = mountApp();
+    const medium = PRESETS.find((preset) => preset.id === 'cmip7-medium');
+    if (medium === undefined) throw new Error('no CMIP7 MEDIUM preset');
+    app.apply(medium.inputs);
+    const report = app.lastReport();
+    expect(report?.outputs['tile-cumulative']).toBe('2,770');
+    expect(report?.outputs['tile-warming']).toBe('2.84 °C');
+    expect(report?.outputs['tile-cumulative-note']).toContain('as published');
+    expect(report?.outputs['chart']).toContain('CMIP7 MEDIUM as published');
+    expect(report?.outputs['chart-caption']).toContain('exactly as CMIP7 MEDIUM publishes it');
+    expect(report?.outputs['notes']).toContain('You are looking at CMIP7 MEDIUM as published');
+  });
+
+  it('draws the published path through the marker\'s own points', () => {
+    const app = mountApp();
+    const veryLow = PRESETS.find((preset) => preset.id === 'cmip7-very-low');
+    const marker = MARKERS.find((candidate) => candidate.id === 'VL');
+    if (veryLow === undefined || marker === undefined) throw new Error('no VERY LOW');
+    app.apply(veryLow.inputs);
+    const path = document.querySelector('#chart [data-user-path]')?.getAttribute('d') ?? '';
+    const points = path.split(/[ML]/).filter(Boolean);
+    expect(points).toHaveLength(marker.co2Gt.length);
+  });
+
+  it('hands back to the reconstruction as soon as a slider moves', () => {
+    const app = mountApp();
+    const medium = PRESETS.find((preset) => preset.id === 'cmip7-medium');
+    if (medium === undefined) throw new Error('no CMIP7 MEDIUM preset');
+    app.apply(medium.inputs);
+    app.state.set('population', medium.inputs.population + 0.1);
+    const report = app.lastReport();
+    expect(report?.outputs['tile-cumulative']).not.toBe('2,770');
+    expect(report?.outputs['chart']).not.toContain('as published');
+    // Off the preset, the reader owns the six values, so the comparison with
+    // the scenario they started from goes with them.
+    expect(report?.outputs['notes']).not.toContain('as published');
+  });
+
+  it('leaves the presets we built ourselves as reconstructions', () => {
+    const app = mountApp();
+    const trend = PRESETS.find((preset) => preset.id === 'trend-continues');
+    if (trend === undefined) throw new Error('no Trend continues preset');
+    app.apply(trend.inputs);
+    expect(app.lastReport()?.outputs['chart']).not.toContain('as published');
   });
 });

@@ -48,6 +48,8 @@ export interface ScenarioFlags {
   };
   /** How closely a loaded CMIP7 preset reproduces the marker it names. */
   markerFidelity: MarkerFidelity | null;
+  /** True while the chart draws a published path rather than the reconstruction. */
+  showingPublished: boolean;
 }
 
 /**
@@ -110,6 +112,7 @@ export function computeFlags(
         && inputs.co2PerEnergy > c.largeSinkUnchangedFuelMix.co2PerEnergyAbove,
     },
     markerFidelity: markerFidelity(path, presetId),
+    showingPublished: markerIdForPreset(presetId) !== null,
   };
 }
 

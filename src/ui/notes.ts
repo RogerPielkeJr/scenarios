@@ -41,18 +41,25 @@ const COHERENCE_PHRASES: Record<keyof ScenarioFlags['coherence'], string> = {
  * accumulate a very different total on the way there. Both numbers go on the
  * page, computed rather than asserted.
  */
-function fidelitySentence(fit: MarkerFidelity): string {
+function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): string {
   const gt = (value: number) => `${value.toFixed(1)} GtCO2`;
-  const sentences: string[] = [
-    `<b>Against the published CMIP7 ${fit.label}.</b> These sliders carry the Kaya `
-    + `factors ${fit.label} reports.`,
-  ];
+  const sentences: string[] = showingPublished
+    ? [
+      `<b>You are looking at CMIP7 ${fit.label} as published.</b> The chart draws that `
+      + 'scenario\'s own path and the totals above come from it. Move any slider and both '
+      + `switch to your reconstruction from the six Kaya factors ${fit.label} reports.`,
+    ]
+    : [
+      `<b>Against the published CMIP7 ${fit.label}.</b> These sliders carry the Kaya `
+      + `factors ${fit.label} reports.`,
+    ];
 
+  const lead = showingPublished ? 'That reconstruction' : 'Compounding them from 2025';
   const closeEnd = !fit.markerGoesNegative && Math.abs(fit.endPercent) < 5;
   sentences.push(closeEnd
-    ? `Compounding them from 2025 reaches ${gt(fit.ourEndGt)} in 2100, within `
+    ? `${lead} reaches ${gt(fit.ourEndGt)} in 2100, within `
       + `${Math.abs(fit.endPercent).toFixed(0)}% of ${fit.label}'s own ${gt(fit.markerEndGt)}.`
-    : `Compounding them from 2025 reaches ${gt(fit.ourEndGt)} in 2100 against `
+    : `${lead} reaches ${gt(fit.ourEndGt)} in 2100 against `
       + `${fit.label}'s ${gt(fit.markerEndGt)}.`);
 
   const percent = Math.abs(fit.cumulativePercent);
@@ -65,7 +72,7 @@ function fidelitySentence(fit: MarkerFidelity): string {
 
   if (Math.abs(fit.ourMidGt - fit.markerMidGt) > 2) {
     sentences.push(`A steady rate spreads one improvement evenly across 75 years, while `
-      + `${fit.label} bends: in ${fit.midYear} this path emits ${gt(fit.ourMidGt)} where `
+      + `${fit.label} bends: in ${fit.midYear} the reconstruction emits ${gt(fit.ourMidGt)} where `
       + `${fit.label} emits ${gt(fit.markerMidGt)}.`);
   }
   if (fit.markerGoesNegative) {
@@ -73,7 +80,9 @@ function fidelitySentence(fit: MarkerFidelity): string {
       + 'factors multiplied together stay positive, so the fossil term here cannot turn '
       + 'negative and only the land use slider can pull a path below zero.');
   }
-  sentences.push(`The chart draws ${fit.label}'s published path behind yours.`);
+  sentences.push(showingPublished
+    ? 'The other six markers stay ghosted behind it.'
+    : `The chart draws ${fit.label}'s published path behind yours.`);
   return `<p>${sentences.join(' ')}</p>`;
 }
 
@@ -108,7 +117,7 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
       + 'reachable with every technological trajectory at its fastest recorded rate.</p>');
   }
   if (flags.markerFidelity !== null) {
-    parts.push(fidelitySentence(flags.markerFidelity));
+    parts.push(fidelitySentence(flags.markerFidelity, flags.showingPublished));
   }
 
   const incoherent = (Object.keys(COHERENCE_PHRASES) as Array<keyof ScenarioFlags['coherence']>)

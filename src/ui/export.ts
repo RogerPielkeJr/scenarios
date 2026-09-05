@@ -11,7 +11,7 @@
 import { INPUT_SPECS } from '../model/config.js';
 import { addedWarming, warming } from '../model/emulator.js';
 import { nearestAnalogue } from '../model/analogue.js';
-import { MARKER_BY_ID, placeAmongMarkers } from '../model/markers.js';
+import { MARKER_BY_ID, placeAmongMarkers, type PublishedPath } from '../model/markers.js';
 import type { ScenarioInputs, ScenarioPath } from '../model/types.js';
 import { displayName, type Scenario } from '../state.js';
 import { degrees, formatInput, signedDegrees, thousands } from '../format.js';
@@ -51,15 +51,23 @@ function viewBoxOf(svg: SVGSVGElement): { width: number; height: number } {
   return { width: width as number, height: height as number };
 }
 
-function summaryOf(inputs: ScenarioInputs, path: ScenarioPath): Array<[string, string, string]> {
+function summaryOf(
+  inputs: ScenarioInputs, path: ScenarioPath, published: PublishedPath | null,
+): Array<[string, string, string]> {
   const high = MARKER_BY_ID['H'];
-  const t = warming(path.cumulativeGt, inputs.methane);
+  const cumulativeGt = published === null ? path.cumulativeGt : published.cumulativeGt;
+  const t = published === null ? warming(path.cumulativeGt, inputs.methane) : published.warmingC;
+  const added = published === null
+    ? addedWarming(path.cumulativeGt, inputs.methane)
+    : published.warmingC - 1.24;
   const country = nearestAnalogue(path.final.kgCo2PerUsd);
   return [
-    ['Cumulative CO2, 2025 to 2100', thousands(path.cumulativeGt),
-      high === undefined ? 'GtCO2' : `GtCO2 · CMIP7 HIGH is ${thousands(high.cumulativeGt)}`],
-    ['Warming in 2100', degrees(t), placeAmongMarkers(t)],
-    ['Added warming from now', signedDegrees(addedWarming(path.cumulativeGt, inputs.methane)),
+    ['Cumulative CO2, 2025 to 2100', thousands(cumulativeGt),
+      published !== null ? `GtCO2 · as published by ${published.label}`
+        : (high === undefined ? 'GtCO2' : `GtCO2 · CMIP7 HIGH is ${thousands(high.cumulativeGt)}`)],
+    ['Warming in 2100', degrees(t),
+      published === null ? placeAmongMarkers(t) : `as published by ${published.label}`],
+    ['Added warming from now', signedDegrees(added),
       'above the 2015-2024 average of 1.24 °C'],
     ['Your 2100 world looks like', country === null ? 'no economy today' : country.name,
       country === null ? 'cleaner than anywhere on earth'
@@ -69,10 +77,11 @@ function summaryOf(inputs: ScenarioInputs, path: ScenarioPath): Array<[string, s
 
 /** Paints the whole sheet and hands back the canvas. */
 async function drawSheet(
-  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath,
+  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath, published: PublishedPath | null,
 ): Promise<HTMLCanvasElement> {
   const { inputs } = scenario;
-  const title = displayName(scenario.name);
+  const title = published === null ? displayName(scenario.name)
+    : `${published.label} as published`;
   const styles = window.getComputedStyle(document.documentElement);
   const paper = styles.getPropertyValue('--panel').trim() || '#ffffff';
   const ink = styles.getPropertyValue('--ink').trim() || '#16243a';
@@ -83,7 +92,7 @@ async function drawSheet(
   const view = viewBoxOf(svg);
   const chartWidth = SHEET.width - SHEET.pad * 2;
   const chartHeight = (view.height / view.width) * chartWidth;
-  const summary = summaryOf(inputs, path);
+  const summary = summaryOf(inputs, path, published);
 
   const chartTop = 86;
   const summaryTop = chartTop + chartHeight + 20;
@@ -210,16 +219,18 @@ function toBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Prom
 }
 
 export async function downloadScenarioPng(
-  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath, filename: string,
+  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath,
+  published: PublishedPath | null, filename: string,
 ): Promise<void> {
-  const canvas = await drawSheet(svg, scenario, path);
+  const canvas = await drawSheet(svg, scenario, path, published);
   save(await toBlob(canvas, 'image/png'), filename);
 }
 
 export async function downloadScenarioPdf(
-  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath, filename: string,
+  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath,
+  published: PublishedPath | null, filename: string,
 ): Promise<void> {
-  const canvas = await drawSheet(svg, scenario, path);
+  const canvas = await drawSheet(svg, scenario, path, published);
   const jpeg = new Uint8Array(await (await toBlob(canvas, 'image/jpeg', 0.92)).arrayBuffer());
   save(jpegToPdf(jpeg, canvas.width, canvas.height), filename);
 }

@@ -1,6 +1,5 @@
 import { BASE_YEAR, END_YEAR } from '../model/config.js';
 import { MARKERS, MARKER_YEARS } from '../model/markers.js';
-import type { ScenarioPath } from '../model/types.js';
 import { at } from '../model/types.js';
 import { spreadLabels } from './ticks.js';
 
@@ -59,12 +58,17 @@ const xFor = (year: number) => PLOT.left
 const yWith = (scale: Scale) => (value: number) => PLOT.bottom
   - ((value - scale.min) / (scale.max - scale.min)) * (PLOT.bottom - PLOT.top);
 
+/** Everything the chart needs of a path: a year and a total, each year. */
+export interface DrawablePath {
+  points: ReadonlyArray<{ year: number; co2Gt: number }>;
+}
+
 /**
  * The axis covers the reader's path and all seven markers, so the two stay
  * comparable however far the sliders are pushed, and nothing is ever drawn
  * outside the plot.
  */
-function scaleFor(path: ScenarioPath): Scale {
+function scaleFor(path: DrawablePath): Scale {
   const values = [
     ...path.points.map((point) => point.co2Gt),
     ...MARKERS.flatMap((marker) => [...marker.co2Gt]),
@@ -150,10 +154,10 @@ function shorten(name: string, limit = 30): string {
   return name.length <= limit ? name : `${name.slice(0, limit - 1).trimEnd()}\u2026`;
 }
 
-function userPath(path: ScenarioPath, yFor: (v: number) => number, name: string): string {
+function userPath(path: DrawablePath, yFor: (v: number) => number, name: string): string {
   const d = path.points.map((point, index) => `${index === 0 ? 'M' : 'L'}`
     + `${xFor(point.year).toFixed(1)},${yFor(point.co2Gt).toFixed(1)}`).join('');
-  const final = path.final;
+  const final = at(path.points, path.points.length - 1, 'final point');
   const label = `<text x="${(xFor(END_YEAR) - 6).toFixed(1)}" `
     + `y="${(yFor(final.co2Gt) - 11).toFixed(1)}" text-anchor="end" `
     + `font-family="${SANS}" font-size="14" font-weight="600" fill="var(--you)">`
@@ -170,7 +174,7 @@ export interface ChartOptions {
 }
 
 export function renderChart(
-  svg: SVGSVGElement, path: ScenarioPath, options: ChartOptions = {},
+  svg: SVGSVGElement, path: DrawablePath, options: ChartOptions = {},
 ): void {
   const name = options.name ?? 'Build your own';
   const highlight = options.highlightMarker ?? null;

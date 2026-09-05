@@ -1,7 +1,7 @@
 import { PRESETS } from './model/bounds.js';
 import { computeFlags, markerIdForPreset } from './model/flags.js';
 import { computePath } from './model/kaya.js';
-import { MARKERS } from './model/markers.js';
+import { MARKERS, MARKER_BY_ID, publishedPath } from './model/markers.js';
 import { defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import { ScenarioState, decodeScenario, displayName, pathWithScenario } from './state.js';
@@ -137,6 +137,13 @@ export function mountApp(root: Document = document): App {
     const scenario = state.scenario();
     const name = displayName(scenario.name);
     const presetId = state.matchingPresetId();
+    // A CMIP7 preset, untouched, shows that scenario as it was published.
+    // The first slider move takes the six values off the preset and the
+    // reconstruction takes over.
+    const markerId = markerIdForPreset(presetId);
+    const marker = markerId === null ? undefined : MARKER_BY_ID[markerId];
+    const published = marker === undefined ? null : publishedPath(marker);
+    const label = published === null ? name : `${published.label} as published`;
     const results: PanelResult[] = [];
 
     // Computed once and shared, so a slow panel cannot disagree with a fast one.
@@ -145,16 +152,20 @@ export function mountApp(root: Document = document): App {
 
     panel(results, 'sliders', null, () => sliders?.update(scenario));
     panel(results, 'presets', null, () => presets?.update(presetId));
-    panel(results, 'legend', legend, () => buildLegend(legend, name));
+    panel(results, 'legend', legend, () => buildLegend(legend, label));
     panel(results, 'chart', chart, () => {
-      renderChart(chart, path, { name, highlightMarker: markerIdForPreset(presetId) });
+      renderChart(chart, published ?? path, { name: label, highlightMarker: null });
       chart.setAttribute('aria-label',
-        `Annual CO2 to 2100 for ${name} and the seven CMIP7 markers`);
-      chartCaption.textContent = `Annual CO2 including land use, 2025 to 2100. ${name} in ink, `
-        + 'the seven CMIP7 markers ghosted behind it.';
+        `Annual CO2 to 2100 for ${label} and the seven CMIP7 markers`);
+      chartCaption.textContent = published === null
+        ? `Annual CO2 including land use, 2025 to 2100. ${name} in ink, `
+          + 'the seven CMIP7 markers ghosted behind it.'
+        : `Annual CO2 including land use, 2025 to 2100, exactly as ${published.label} `
+          + 'publishes it. Move any slider to draw your own path instead.';
     });
-    panel(results, 'stats', tiles.cumulative, () => renderStats(tiles, inputs, path));
-    panel(results, 'table', table, () => renderTable(table, inputs, name));
+    panel(results, 'stats', tiles.cumulative,
+      () => renderStats(tiles, inputs, path, published));
+    panel(results, 'table', table, () => renderTable(table, inputs, label));
     panel(results, 'notes', notes, () => {
       renderNotes(notes, computeFlags(inputs, path, presetId));
     });
@@ -165,6 +176,13 @@ export function mountApp(root: Document = document): App {
 
   function apply(inputs: ScenarioInputs): void {
     state.replace(inputs);
+  }
+
+  /** The published scenario on screen right now, if any. */
+  function publishedNow() {
+    const markerId = markerIdForPreset(state.matchingPresetId());
+    const marker = markerId === null ? undefined : MARKER_BY_ID[markerId];
+    return marker === undefined ? null : publishedPath(marker);
   }
 
   sliders = renderSliders(controls, (id, value) => state.set(id, value));
@@ -193,9 +211,11 @@ export function mountApp(root: Document = document): App {
 
   const downloads: Array<[string, string, (file: string) => Promise<void>]> = [
     ['download-png', 'png',
-      (file) => downloadScenarioPng(chart, state.scenario(), computePath(state.get()), file)],
+      (file) => downloadScenarioPng(chart, state.scenario(), computePath(state.get()),
+        publishedNow(), file)],
     ['download-pdf', 'pdf',
-      (file) => downloadScenarioPdf(chart, state.scenario(), computePath(state.get()), file)],
+      (file) => downloadScenarioPdf(chart, state.scenario(), computePath(state.get()),
+        publishedNow(), file)],
   ];
   for (const [id, extension, run] of downloads) {
     const button = root.getElementById(id);

@@ -1,6 +1,6 @@
 import { nearestAnalogue } from '../model/analogue.js';
 import { ANCHORS, addedWarming, warming } from '../model/emulator.js';
-import { MARKER_BY_ID, placeAmongMarkers } from '../model/markers.js';
+import { MARKER_BY_ID, placeAmongMarkers, type PublishedPath } from '../model/markers.js';
 import type { ScenarioInputs, ScenarioPath } from '../model/types.js';
 import { degrees, perDollar, signedDegrees, thousands } from '../format.js';
 
@@ -17,21 +17,39 @@ export interface StatTiles {
   analogueNote: HTMLElement;
 }
 
+/**
+ * The four tiles.
+ *
+ * With a published scenario on screen the first three report that scenario's
+ * own published totals rather than the reconstruction's, because the chart
+ * above them draws its published path. The country comparison keeps coming
+ * from the Kaya factors, which supply the only 2100 carbon intensity either
+ * way.
+ */
 export function renderStats(
   tiles: StatTiles,
   inputs: ScenarioInputs,
   path: ScenarioPath,
+  published: PublishedPath | null = null,
 ): void {
-  tiles.cumulative.textContent = thousands(path.cumulativeGt);
-  tiles.cumulativeNote.textContent = HIGH === undefined
-    ? 'GtCO2'
+  const cumulativeGt = published === null ? path.cumulativeGt : published.cumulativeGt;
+  tiles.cumulative.textContent = thousands(cumulativeGt);
+  const highNote = HIGH === undefined ? 'GtCO2'
     : `GtCO2 · CMIP7 HIGH is ${thousands(HIGH.cumulativeGt)}`;
+  tiles.cumulativeNote.textContent = published === null
+    ? highNote
+    : `GtCO2 · as published by ${published.label}`;
 
-  const t = warming(path.cumulativeGt, inputs.methane);
+  const t = published === null ? warming(path.cumulativeGt, inputs.methane) : published.warmingC;
   tiles.warming.textContent = degrees(t);
-  tiles.warmingNote.textContent = placeAmongMarkers(t);
+  tiles.warmingNote.textContent = published === null
+    ? placeAmongMarkers(t)
+    : `as published by ${published.label}`;
 
-  tiles.added.textContent = signedDegrees(addedWarming(path.cumulativeGt, inputs.methane));
+  const added = published === null
+    ? addedWarming(path.cumulativeGt, inputs.methane)
+    : published.warmingC - ANCHORS.recentMeanC;
+  tiles.added.textContent = signedDegrees(added);
   tiles.addedNote.textContent =
     `above the ${ANCHORS.recentPeriod} average of ${ANCHORS.recentMeanC.toFixed(2)} °C`;
 
