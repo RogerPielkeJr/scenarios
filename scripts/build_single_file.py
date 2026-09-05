@@ -33,6 +33,26 @@ def read(path: Path) -> str:
     return path.read_text()
 
 
+def preview_links() -> dict[str, str]:
+    """`--preview-link from=to` repoints links the page builds at runtime.
+
+    `--rewrite` swaps a URL written into the markup. The links between pages
+    of this site are built in JavaScript from the reader's current scenario,
+    so no fixed string exists to swap. This appends a small script, for
+    preview builds only, that repoints any anchor whose href starts with
+    `from`. It runs once at load and again after each change, because the
+    page rewrites those hrefs whenever a slider moves.
+    """
+    out = {}
+    for i, arg in enumerate(sys.argv):
+        if arg == '--preview-link' and i + 1 < len(sys.argv):
+            frm, _, to = sys.argv[i + 1].partition('=')
+            if not to:
+                raise SystemExit('--preview-link needs from=to')
+            out[frm] = to
+    return out
+
+
 def rewrites() -> dict[str, str]:
     """`--rewrite from=to` swaps a URL in the packed copy.
 
@@ -103,6 +123,31 @@ def main() -> None:
                 if not m.startswith('/#')]
     if leftover:
         raise SystemExit(f'still references files that will not exist: {leftover}')
+
+    links = preview_links()
+    if links:
+        pairs = ','.join(f'[{frm!r},{to!r}]'.replace("'", '"') for frm, to in links.items())
+        shim = (
+            '\n<script>\n'
+            '// Preview build only: the pages of this site link to each other by\n'
+            '// path, and a single packed file has no siblings to link to. The\n'
+            '// page rebuilds those hrefs whenever a slider moves, so an observer\n'
+            '// repoints them again each time. The inequality guard stops the\n'
+            '// observer retriggering itself.\n'
+            '(function(){var m=[' + pairs + '];\n'
+            'function fix(){var a=document.querySelectorAll("a[href]");\n'
+            'for(var i=0;i<a.length;i++){var h=a[i].getAttribute("href");\n'
+            'for(var j=0;j<m.length;j++){if(h.indexOf(m[j][0])===0&&h!==m[j][1]){\n'
+            'a[i].setAttribute("href",m[j][1]);a[i].setAttribute("target","_blank");\n'
+            'a[i].setAttribute("rel","noopener");}}}}\n'
+            'new MutationObserver(fix).observe(document.documentElement,\n'
+            '{childList:true,subtree:true,attributes:true,attributeFilter:["href"]});\n'
+            'fix();window.addEventListener("load",fix);})();\n'
+            '</script>\n')
+        # Inside the body, so the wrapper-free copy carries it too.
+        if '</body>' not in html:
+            raise SystemExit('no </body> to put the preview shim before')
+        html = html.replace('</body>', f'{shim}</body>', 1)
 
     suffix = '' if page == 'main' else f'-{page}'
     standalone = DIST / f'standalone{suffix}.html'
