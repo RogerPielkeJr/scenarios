@@ -13,6 +13,7 @@ import { addedWarming, warming } from '../model/emulator.js';
 import { nearestAnalogue } from '../model/analogue.js';
 import { MARKER_BY_ID, placeAmongMarkers } from '../model/markers.js';
 import type { ScenarioInputs, ScenarioPath } from '../model/types.js';
+import { displayName, type Scenario } from '../state.js';
 import { degrees, formatInput, signedDegrees, thousands } from '../format.js';
 import { jpegToPdf } from './pdf.js';
 
@@ -68,8 +69,10 @@ function summaryOf(inputs: ScenarioInputs, path: ScenarioPath): Array<[string, s
 
 /** Paints the whole sheet and hands back the canvas. */
 async function drawSheet(
-  svg: SVGSVGElement, inputs: ScenarioInputs, path: ScenarioPath,
+  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath,
 ): Promise<HTMLCanvasElement> {
+  const { inputs } = scenario;
+  const title = displayName(scenario.name);
   const styles = window.getComputedStyle(document.documentElement);
   const paper = styles.getPropertyValue('--panel').trim() || '#ffffff';
   const ink = styles.getPropertyValue('--ink').trim() || '#16243a';
@@ -101,10 +104,11 @@ async function drawSheet(
 
   ctx.fillStyle = ink;
   ctx.font = `600 22px ${SERIF}`;
-  ctx.fillText('Build your own emissions scenario', SHEET.pad, 42);
+  ctx.fillText(title, SHEET.pad, 42, SHEET.width - SHEET.pad * 2 - 46);
   ctx.fillStyle = dim;
-  ctx.font = `12px ${SANS}`;
-  ctx.fillText('Six assumptions, and where they put the century.', SHEET.pad, 62);
+  ctx.font = `12.5px ${SANS}`;
+  ctx.fillText('Build your own emissions scenario \u00b7 six assumptions, and where they '
+    + 'put the century.', SHEET.pad, 62);
 
   try {
     const logo = await loadImage(LOGO_SRC);
@@ -155,7 +159,7 @@ async function drawSheet(
   });
 
   ctx.fillStyle = dim;
-  ctx.font = `600 11px ${SANS}`;
+  ctx.font = `600 11.5px ${SANS}`;
   ctx.fillText('YOUR ASSUMPTIONS', SHEET.pad, inputsTop - 10);
 
   INPUT_SPECS.forEach((spec, index) => {
@@ -206,16 +210,16 @@ function toBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Prom
 }
 
 export async function downloadScenarioPng(
-  svg: SVGSVGElement, inputs: ScenarioInputs, path: ScenarioPath, filename: string,
+  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath, filename: string,
 ): Promise<void> {
-  const canvas = await drawSheet(svg, inputs, path);
+  const canvas = await drawSheet(svg, scenario, path);
   save(await toBlob(canvas, 'image/png'), filename);
 }
 
 export async function downloadScenarioPdf(
-  svg: SVGSVGElement, inputs: ScenarioInputs, path: ScenarioPath, filename: string,
+  svg: SVGSVGElement, scenario: Scenario, path: ScenarioPath, filename: string,
 ): Promise<void> {
-  const canvas = await drawSheet(svg, inputs, path);
+  const canvas = await drawSheet(svg, scenario, path);
   const jpeg = new Uint8Array(await (await toBlob(canvas, 'image/jpeg', 0.92)).arrayBuffer());
   save(jpegToPdf(jpeg, canvas.width, canvas.height), filename);
 }

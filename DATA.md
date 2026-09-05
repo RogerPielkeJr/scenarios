@@ -10,6 +10,7 @@ a primary source on this machine.
 | Script | Writes | Rebuildable |
 |---|---|---|
 | `scripts/build_data.py` | `observed.json`, `analogues.json`, `base.json` | Yes, from the sources below |
+| `scripts/build_wpp.py` | `learn_population.json` | Yes, from the UN download |
 | `scripts/extract_prototype.py` then `scripts/build_carried_data.py` | `config.json`, `emulator.json`, `markers.json`, `population.json`, `presets.json`, `notes.json` | No, carried from the prototype |
 
 ## Sources
@@ -92,6 +93,39 @@ ScenarioMIP and are lifted out of it by `scripts/extract_prototype.py`. Three
 markers (LOW, LOW-to-NEGATIVE, VERY LOW) publish no carbon-intensity rate, so
 those sliders carry four scenario ticks rather than seven.
 
+### UN World Population Prospects 2024
+
+Two files, both fetched from the UN Population Division's own download area
+and both keyed to the 2024 revision.
+
+- `WPP2024_TotalPopulationBySex.csv.gz`, dated 13 December 2024, about 17 MB
+  compressed. Every location, every variant, 1950 to 2100, population in
+  thousands. Used for the world series, the low, medium, high, momentum and
+  constant-fertility variants, the 95% prediction interval, and the seven
+  regional totals the population builder adds up.
+- `WPP2024_Demographic_Indicators_Medium.csv.gz`. Total fertility for the
+  world in 1950, 1990, 2024 and 2100, and for each of the seven regions in
+  2024.
+
+Neither file is committed. `scripts/build_wpp.py` extracts the subset the site
+uses into `scripts/_wpp_cache.json`, which is committed, so a build works
+offline. Re-run with `--refresh` to fetch again.
+
+**One check the build enforces.** The seven regions have to reproduce the UN's
+own world figures at the low, medium and high variants, to within 0.002
+billion. They do: 6.987, 10.180 and 14.395 billion. The build exits rather
+than write a file whose regions sum to something the UN never published.
+
+The 95% prediction intervals do not add up that way and the site says so on
+the page: the regional lower bounds sum to 8.234 billion against a world lower
+bound of 9.047, because the regions do not all land at the bottom of their own
+ranges at once.
+
+Africa is split into sub-Saharan Africa (an SDG region in the UN's own
+hierarchy) and northern Africa (a subregion), which sum exactly to the UN's
+Africa figure at every variant. That keeps the region carrying most of the
+remaining growth on a control of its own.
+
 ### IIASA SSP database v3.2 (June 2025 release)
 
 World population trajectories for SSP1, SSP2 and SSP3, five-yearly 2025 to 2100,
@@ -155,6 +189,40 @@ Window extremes, each reported with the window that produced it:
 Reported as plain highest and lowest rather than slowest and fastest, because
 which end counts as slow progress flips with the sign of the series.
 
+### `learn_population.json`
+
+Everything the population Learn More page draws and builds from, in the shape
+every Learn More data file uses: `series` for lines, `bands` for uncertainty,
+`parts` for builder controls, `constants` for the numbers the prose quotes.
+
+| Field | Value | Units |
+|---|---|---|
+| World, 2025 | 8.232 | billions |
+| World peak, medium | 10.289 in 2084 | billions |
+| World 2100, medium | 10.180 | billions |
+| World 2100, 95% interval | 9.047 to 11.437 | billions |
+| World 2100, low and high variants | 6.987 and 14.395 | billions |
+| World 2100, momentum variant | 9.596 | billions |
+| World 2100, constant fertility | 18.193 | billions |
+| Total fertility, world | 4.85 (1950), 3.31 (1990), 2.25 (2024), 1.84 (2100) | births per woman |
+
+The seven builder regions, 2100, billions:
+
+| Region | Low | Medium | High | 2025 |
+|---|---|---|---|---|
+| Sub-Saharan Africa | 2.378 | 3.351 | 4.606 | 1.274 |
+| Northern Africa | 0.319 | 0.462 | 0.648 | 0.276 |
+| Asia | 3.074 | 4.613 | 6.677 | 4.835 |
+| Europe | 0.413 | 0.592 | 0.824 | 0.744 |
+| Latin America and the Caribbean | 0.400 | 0.613 | 0.905 | 0.668 |
+| Northern America | 0.348 | 0.475 | 0.637 | 0.388 |
+| Oceania | 0.053 | 0.073 | 0.098 | 0.047 |
+
+**Not yet here: IHME.** The brief asks for the IHME projection alongside the UN
+and the SSPs on that chart. The IHME data portal was unavailable when the page
+was built, so the chart carries a line saying the projection joins it in a
+later revision. Nothing on the page reports an IHME number.
+
 ### `analogues.json`
 
 66 economies, their 2024 CO2 and PPP GDP, and CO2 per dollar in kilograms.
@@ -175,4 +243,5 @@ state the prototype used, so the two can be diffed.
 | Global Carbon Budget via Our World in Data | live file | 2026-09-04 |
 | ScenarioMIP CMIP7 markers | as carried in the prototype | 2026-09-04 |
 | IIASA SSP database | v3.2, June 2025 release | 2026-09-04 |
+| UN World Population Prospects | 2024 revision, file dated 2024-12-13 | 2026-09-05 |
 | FaIR calibration | v2.2, fair-calibrate v1.4.1 | 2026-09-04 |

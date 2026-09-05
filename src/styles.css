@@ -65,7 +65,8 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--serif);
-  line-height: 1.55;
+  font-size: 17px;
+  line-height: 1.58;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -114,14 +115,14 @@ h1 {
 }
 
 .standfirst {
-  font-size: 16.5px;
+  font-size: 18px;
   color: var(--dim);
   margin: 0 0 12px;
 }
 
 .eyebrow {
   font-family: var(--sans);
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 500;
   color: var(--dim);
   margin: 0 0 8px;
@@ -130,7 +131,7 @@ h1 {
 
 .lead-in {
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 15px;
   color: var(--ink);
   margin: 0 0 6px;
   padding-bottom: 14px;
@@ -150,8 +151,8 @@ h1 {
 /* --- buttons ----------------------------------------------------------- */
 .ghost {
   font-family: var(--sans);
-  font-size: 13px;
-  padding: 7px 12px;
+  font-size: 14px;
+  padding: 8px 13px;
   background: transparent;
   border: 1px solid var(--rule);
   color: var(--ink);
@@ -181,19 +182,69 @@ a.ghost { text-decoration: none; display: inline-block; }
   background: var(--panel);
   border: 1px solid var(--rule);
 }
-.legend .legend-intro { width: 100%; color: var(--dim); font-family: var(--sans); font-size: 12.5px; margin-bottom: 2px; }
-.legend-item { display: flex; align-items: center; gap: 7px; font-family: var(--sans); font-size: 12.5px; color: var(--dim); }
+.legend .legend-intro { width: 100%; color: var(--dim); font-family: var(--sans); font-size: 13.5px; margin-bottom: 3px; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-family: var(--sans); font-size: 13.5px; color: var(--dim); }
 .legend-item .swatch { width: 15px; height: 3px; border-radius: 2px; flex: none; }
-.legend-item b { font-weight: 600; font-size: 12px; letter-spacing: 0.02em; }
+.legend-item b { font-weight: 600; font-size: 13px; letter-spacing: 0.02em; }
 .legend-item.is-you { color: var(--ink); }
 .legend-item.is-you .swatch { height: 4px; }
 
 /* --- controls ---------------------------------------------------------- */
-.control { border-top: 1px solid var(--rule); padding: 18px 0 20px; }
+.control {
+  border-top: 1px solid var(--rule);
+  padding: 18px 0 20px;
+  border-left: 2px solid transparent;
+  padding-left: 0;
+  transition: border-color 0.25s, padding-left 0.25s;
+}
+
+/* A value arriving from a Learn More builder: shown for a moment, then gone. */
+.control.is-applied {
+  border-left-color: var(--navy);
+  padding-left: 12px;
+}
+
+/* Quiet by design: a reader looking for it finds it, and it never competes
+   with the slider label or shifts the calibration marks. */
+.learn-link {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  color: var(--navy);
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+.learn-link:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+.handoff {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  justify-content: space-between;
+  border: 1px solid var(--navy);
+  border-left-width: 3px;
+  background: color-mix(in srgb, var(--navy) 7%, transparent);
+  padding: 11px 13px;
+  margin: 0 0 16px;
+}
+.handoff p { margin: 0; font-size: 15px; }
+.handoff-dismiss {
+  flex: none;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--dim);
+  background: none;
+  border: 0;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+.handoff-dismiss:hover { color: var(--ink); text-decoration: underline; }
 .control:first-child { border-top: none; padding-top: 16px; }
-.control h3 { font-family: var(--sans); font-size: 15px; font-weight: 600; margin: 0 0 2px; }
-.control .why { font-size: 14px; color: var(--dim); margin: 0 0 14px; }
-.readout { font-family: var(--mono); font-size: 25px; font-weight: 500; letter-spacing: -0.02em; color: var(--navy); }
+.control h3 { font-family: var(--sans); font-size: 16.5px; font-weight: 600; margin: 0 0 3px; }
+.control .why { font-size: 15.5px; color: var(--dim); margin: 0 0 14px; }
+.readout { font-family: var(--mono); font-size: 28px; font-weight: 500; letter-spacing: -0.02em; color: var(--navy); }
 
 input[type='range'] {
   width: 100%;
@@ -203,7 +254,7 @@ input[type='range'] {
 }
 
 /* The calibrated track. Row 1 labels sit above the axis, row 0 below it. */
-.scale { position: relative; height: 56px; margin-top: 2px; }
+.scale { position: relative; height: 60px; margin-top: 2px; }
 .scale .axis { position: absolute; left: 0; right: 0; top: 27px; height: 1px; background: var(--rule); }
 .scale .mark { position: absolute; width: 2px; border-radius: 1px; }
 .scale .mark-row0 { top: 20px; height: 16px; }
@@ -212,14 +263,19 @@ input[type='range'] {
 .scale .label {
   position: absolute;
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   color: var(--dim);
   transform: translateX(-50%);
   white-space: nowrap;
 }
-.scale .label-row0 { top: 38px; }
+.scale .label-row0 { top: 39px; }
 .scale .label-row1 { top: 0; }
+/* A mark at either end of the track keeps itself and its label inside the
+   track, so a narrow screen never gains a horizontal scrollbar. */
+.scale .mark.at-end { margin-left: -2px; }
+.scale .label.at-start { transform: translateX(0); }
+.scale .label.at-end { transform: translateX(-100%); }
 
 /* --- output panel ------------------------------------------------------ */
 .panel {
@@ -228,9 +284,35 @@ input[type='range'] {
   padding: clamp(16px, 2.2vw, 24px);
 }
 
+/* The scenario's name titles the figure, so the reader types into the place
+   the name will appear. */
+.naming { margin: 0 0 16px; }
+.naming label {
+  display: block;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--dim);
+  margin-bottom: 4px;
+}
+.naming input {
+  width: 100%;
+  font-family: var(--serif);
+  font-size: clamp(19px, 2.1vw, 23px);
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  padding: 2px 0 7px;
+}
+.naming input::placeholder { color: var(--dim); font-weight: 400; opacity: 0.75; }
+.naming input:focus { outline: none; border-bottom-color: var(--navy); }
+.naming input:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
 .chart-figure { margin: 0; }
+.credit { display: block; margin-top: 4px; font-style: italic; }
 svg { width: 100%; height: auto; display: block; overflow: visible; }
-.caption { font-family: var(--sans); font-size: 12px; color: var(--dim); margin-top: 10px; }
+.caption { font-family: var(--sans); font-size: 13.5px; color: var(--dim); margin-top: 10px; }
 
 .stats {
   display: grid;
@@ -243,31 +325,31 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 @media (max-width: 560px) { .stats { grid-template-columns: 1fr; } }
 
 .stat { background: var(--panel); padding: 15px 16px; }
-.stat-key { font-family: var(--sans); font-size: 12.5px; color: var(--dim); margin-bottom: 5px; }
+.stat-key { font-family: var(--sans); font-size: 13.5px; color: var(--dim); margin-bottom: 5px; }
 .stat-value {
   font-family: var(--mono);
-  font-size: clamp(22px, 2.4vw, 27px);
+  font-size: clamp(23px, 2.5vw, 29px);
   font-weight: 500;
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
-.stat-value-text { font-family: var(--serif); font-size: 21px; }
-.stat-note { font-size: 13px; color: var(--dim); margin-top: 3px; }
-.stat-error { color: var(--scenario-high); font-family: var(--sans); font-size: 13px; }
+.stat-value-text { font-family: var(--serif); font-size: 22px; }
+.stat-note { font-size: 14px; color: var(--dim); margin-top: 3px; }
+.stat-error { color: var(--scenario-high); font-family: var(--sans); font-size: 14px; }
 
 /* Wide content scrolls inside its own container so the page body never
    scrolls sideways. Below the min-width the five columns would otherwise
    crush the headings onto three lines each. */
 .scroll-x { overflow-x: auto; margin-top: 22px; }
-.kaya { width: 100%; min-width: 430px; border-collapse: collapse; font-size: 14px; }
+.kaya { width: 100%; min-width: 440px; border-collapse: collapse; font-size: 15px; }
 .kaya th {
-  font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--dim);
-  text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule);
+  font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--dim);
+  text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--rule);
 }
 .kaya th:first-child { text-align: left; }
 .kaya tbody th {
-  font-family: var(--serif); font-size: 14px; font-weight: 400;
-  color: var(--ink); text-align: left; padding: 7px 8px;
+  font-family: var(--serif); font-size: 15px; font-weight: 400;
+  color: var(--ink); text-align: left; padding: 8px 8px;
 }
 .kaya td { padding: 7px 8px; text-align: right; border-bottom: 1px solid var(--rule); font-family: var(--mono); }
 .kaya td:first-child, .kaya td.units { text-align: left; font-family: var(--serif); }
@@ -276,10 +358,10 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .kaya .yours { font-weight: 600; color: var(--you); }
 
 .actions { margin-top: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.action-message { font-family: var(--sans); font-size: 13px; color: var(--dim); }
+.action-message { font-family: var(--sans); font-size: 14px; color: var(--dim); }
 
 .notes {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--dim);
   margin-top: 26px;
   border-top: 1px solid var(--rule);
@@ -293,7 +375,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .reading section { margin-bottom: 34px; }
 .reading h2 {
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--navy);
   margin: 0 0 14px;
@@ -303,17 +385,17 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 }
 .refs { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
 .refs > li { display: grid; gap: 4px; }
-.ref { margin: 0; font-size: 15.5px; }
+.ref { margin: 0; font-size: 16.5px; }
 .ref cite { font-style: italic; }
 .ref a { color: var(--navy); text-decoration-thickness: 1px; text-underline-offset: 2px; }
-.gloss { margin: 0; font-size: 14px; color: var(--dim); }
-.footnote { margin: 18px 0 0; font-size: 13.5px; color: var(--dim); font-style: italic; }
+.gloss { margin: 0; font-size: 15px; color: var(--dim); }
+.footnote { margin: 18px 0 0; font-size: 14.5px; color: var(--dim); font-style: italic; }
 
 footer {
   margin-top: 40px;
   padding-top: 16px;
   border-top: 1px solid var(--rule);
-  font-size: 13.5px;
+  font-size: 14.5px;
   color: var(--dim);
 }
 footer a { color: inherit; }
@@ -325,3 +407,243 @@ footer a { color: inherit; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* --- the Learn More pages ------------------------------------------------ */
+
+/* Every block repeats the header's grid: the heading in the left column, its
+   content in the right, so headings and body align down the page and text
+   wraps at the edge of its own track rather than at some invented width. */
+.learn-block { padding: 30px 0; border-top: 1px solid var(--rule); }
+.learn-block:first-of-type { border-top: none; }
+.learn-block .band-left h2 {
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+.learn-block .band-left .block-note {
+  font-size: 15px;
+  color: var(--dim);
+  margin: 7px 0 0;
+}
+.learn-block .band-right > p { margin: 0 0 14px; font-size: 17.5px; }
+.learn-block .band-right > p:last-child { margin-bottom: 0; }
+
+.kicker {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--navy);
+  margin: 0 0 6px;
+}
+
+.back-strip { padding: 14px 0; }
+.back-link {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--navy);
+  text-decoration: none;
+}
+.back-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- the definition box -------------------------------------------------- */
+.definition-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 0 0 20px;
+}
+.definition-grid > div { background: var(--panel); padding: 12px 14px; }
+.definition-grid dt {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 4px;
+}
+.definition-grid dd { margin: 0; font-size: 16px; }
+@media (max-width: 560px) { .definition-grid { grid-template-columns: 1fr; } }
+
+/* --- the identity -------------------------------------------------------- */
+.identity {
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  padding: 16px 16px 14px;
+}
+.identity-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+.identity-tail { margin-top: 10px; }
+.identity .factor {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--dim);
+  border: 1px solid var(--rule);
+  padding: 6px 10px;
+  text-decoration: none;
+}
+/* A factor whose page exists reads as a link; the rest stay plain. */
+.identity a.factor {
+  color: var(--navy);
+  border-color: color-mix(in srgb, var(--navy) 45%, var(--rule));
+}
+.identity a.factor:hover {
+  border-color: var(--navy);
+  background: color-mix(in srgb, var(--navy) 8%, transparent);
+}
+.identity .factor.is-active {
+  color: var(--panel);
+  background: var(--navy);
+  border-color: var(--navy);
+  font-weight: 600;
+}
+.identity .op { font-family: var(--mono); font-size: 15px; color: var(--dim); }
+.identity .identity-result {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.identity-aside { margin: 12px 0 0; font-size: 15px; color: var(--dim); }
+.identity-aside .factor { font-size: 13px; padding: 3px 7px; }
+
+/* --- the builder --------------------------------------------------------- */
+.builder { margin-top: 22px; }
+.builder-part { border-top: 1px solid var(--rule); padding: 14px 0 16px; }
+.builder-part:first-child { border-top: none; padding-top: 0; }
+.builder-part-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.builder-part h3 { font-family: var(--sans); font-size: 16px; font-weight: 600; margin: 0; }
+.builder-readout {
+  font-family: var(--mono);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--navy);
+  white-space: nowrap;
+}
+.builder-part .why { font-size: 14.5px; color: var(--dim); margin: 4px 0 0; }
+
+.builder-result {
+  border: 1px solid var(--navy);
+  border-top-width: 3px;
+  background: var(--panel);
+  padding: 18px 18px 20px;
+  margin-top: 8px;
+}
+.builder-result-key {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+.builder-result-value {
+  font-family: var(--mono);
+  font-size: clamp(24px, 3vw, 31px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.builder-detail {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 15px;
+  color: var(--dim);
+}
+.builder-detail li { padding-left: 14px; position: relative; }
+.builder-detail li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 6px;
+  height: 1px;
+  background: var(--rule);
+}
+.builder-fit { font-size: 14.5px; color: var(--dim); margin: 14px 0 16px; }
+
+.use-button {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--panel);
+  background: var(--navy);
+  border: 1px solid var(--navy);
+  padding: 11px 18px;
+  text-decoration: none;
+}
+.use-button:hover { background: color-mix(in srgb, var(--navy) 84%, var(--ink)); }
+
+/* --- the figure key and the marker table --------------------------------- */
+.chart-key { margin: 14px 0 0; }
+.swatch-dash {
+  background-image: linear-gradient(to right, currentColor 60%, transparent 60%);
+  background-size: 6px 100%;
+}
+.legend-item .swatch-dot { width: 9px; height: 9px; border-radius: 50%; }
+.markers-table { min-width: 340px; }
+.markers-table .swatch {
+  display: inline-block;
+  width: 15px;
+  height: 3px;
+  border-radius: 2px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* --- the page lists ------------------------------------------------------ */
+.learn-index { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; counter-reset: page; }
+.learn-index > li { display: grid; gap: 4px; }
+.learn-index-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.learn-index-head a {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+}
+.learn-index-head a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.forthcoming { font-family: var(--sans); font-size: 18px; font-weight: 600; color: var(--dim); }
+.forthcoming-tag {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dim);
+  border: 1px solid var(--rule);
+  padding: 2px 7px;
+}
+
+.sibling-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.sibling-list > li { display: grid; gap: 2px; }
+.sibling-list a {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+}
+.sibling-list a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sibling-list .forthcoming { font-size: 16px; }
+.sibling-list .forthcoming-tag { margin-left: 8px; }
+.sibling-summary { font-size: 15px; color: var(--dim); }

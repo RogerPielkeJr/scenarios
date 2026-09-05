@@ -10,6 +10,10 @@ const singlePage = process.env['SINGLE_PAGE'] ?? '';
 const PAGES: Record<string, string> = {
   main: 'index.html',
   bibliography: 'bibliography.html',
+  // Directory indexes, so the built site serves /learn/ and
+  // /learn/population/ as clean URLs with no rewrite rules.
+  learn: 'learn/index.html',
+  'learn-population': 'learn/population/index.html',
 };
 
 export default defineConfig({

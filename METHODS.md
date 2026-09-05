@@ -161,6 +161,90 @@ land close to the scenario they name. VERY LOW cannot:
 The reason is in the next section. The interface says so in place when one of
 these is loaded rather than leaving the reader to notice.
 
+## The Learn More pages
+
+Each of the six assumptions gets a page that teaches the quantity, shows the
+record, and hands the reader a value built from assumptions they control. The
+pages share one scaffold (`src/ui/learn/page.ts`), one builder
+(`src/ui/learn/builder.ts`) and one plot component (`src/ui/plot.ts`), and each
+page module supplies only its own words, chart and arithmetic.
+
+### The hand-off
+
+A link on the top page carries the reader's scenario to a page as
+`/learn/<slug>/?s=<six numbers>&n=<name>`, the same encoding share links use.
+The page holds that string untouched. Two exits lead back:
+
+- **Back to my scenario** returns `/#s=<the identical string>`.
+- **Use in my scenario** returns `/?applied=<field>#s=<state with one field
+  replaced>`. The top page names the value, scrolls that slider into view,
+  lights it for 1.5 seconds, and then rewrites the address bar to a clean
+  `/#s=…` so a copied link carries no stale message.
+
+A builder value passes through `roundToStep` and then `clampWithFlag`
+(`src/model/config.ts`), and the page prints the rounded value, and the clamp
+when one bites, before the reader commits. No page duplicates any of that
+arithmetic.
+
+### The population builder
+
+Seven regional 2100 populations, added up:
+
+    world 2100 = Σ region 2100
+
+Each control opens at the UN's medium variant and runs from the UN's low
+variant to its high variant. The UN builds those two by subtracting and adding
+half a child per woman at every date, and they add up across regions, so the
+sum reproduces the UN's own world figures exactly: 6.987, 10.180 and 14.395
+billion. `scripts/build_wpp.py` asserts that at build time.
+
+Three consequences worth stating, all of them visible on the page:
+
+1. The builder cannot reach the slider's floor of 6 billion. Every region at
+   the UN's low variant still gives 6.99 billion.
+2. It can exceed the slider's ceiling of 14 billion, which reports 14.395 and
+   clamps to 14.
+3. The 95% prediction intervals do not add up this way, and the page says so
+   rather than summing them: the regional lower bounds give 8.234 billion
+   against the UN's world lower bound of 9.047.
+
+The reader's curve on that page comes from `populationAt` in
+`src/model/population.js`, the same function the scenario itself uses, so the
+shape on the Learn More page and the shape behind the top page agree.
+
+## What a CMIP7 preset does and does not reproduce
+
+Loading a CMIP7 preset sets the six sliders to the Kaya factors that marker
+reports. Compounding those factors at a constant rate reproduces where the
+marker ends up far better than how it gets there, and the interface now reports
+both, computed rather than asserted (`markerFidelity` in
+`src/model/flags.ts`).
+
+| Preset | 2100 CO2, this tool | Marker | Cumulative, this tool | Marker | 2050, this tool | Marker |
+|---|---|---|---|---|---|---|
+| CMIP7 HIGH | 55.9 | 55.0 | 3,838 | 3,777 | 48.8 | 47.1 |
+| CMIP7 MEDIUM | 34.0 | 34.4 | 3,094 | 2,770 | 43.3 | 36.1 |
+| CMIP7 VERY LOW | −0.1 | −5.8 | 1,298 | 268 | 22.5 | −1.2 |
+
+Two separate causes, and the interface names whichever applies:
+
+**Shape.** A constant rate spreads one improvement evenly across 75 years,
+while the markers bend. MEDIUM lands within 1% of its own 2100 emissions and
+still accumulates 12% more over the century, because MEDIUM cuts hardest in the
+2030s and 2040s. Reproducing that would need the markers' own factor
+trajectories decade by decade, which the marker files here do not carry; see
+DATA.md.
+
+**Sign.** VERY LOW removes more CO2 than it emits from around mid-century. Four
+factors multiplied together stay positive, so the fossil term cannot turn
+negative at all, and only the land use slider can pull a path below zero. The
+tool reproduces the descent as far as the point where VERY LOW's own emissions
+cross zero and no further.
+
+The chart brings the named marker's own published path forward whenever one of
+those presets is loaded, so the divergence sits in front of the reader rather
+than in a footnote.
+
 ## What the tool does not represent
 
 **Engineered carbon removal.** The four factors multiply to a positive number

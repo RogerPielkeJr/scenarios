@@ -1,30 +1,22 @@
 import { PRESETS } from './model/bounds.js';
-import { computeFlags } from './model/flags.js';
+import { computeFlags, markerIdForPreset } from './model/flags.js';
 import { computePath } from './model/kaya.js';
 import { MARKERS } from './model/markers.js';
 import { defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
-import { ScenarioState, decodeInputs } from './state.js';
+import { ScenarioState, decodeScenario, displayName, pathWithScenario } from './state.js';
 import { renderChart } from './ui/chart.js';
 import { downloadScenarioPdf, downloadScenarioPng } from './ui/export.js';
 import { renderNotes } from './ui/notes.js';
 import { renderSliders, type SliderPanel } from './ui/sliders.js';
+import { announceHandoff, appliedInput } from './ui/handoff.js';
 import { installShare, syncHash } from './ui/share.js';
 import { renderStats, type StatTiles } from './ui/stats.js';
 import { renderTable } from './ui/table.js';
 import { installThemeToggle } from './ui/theme.js';
+import { collectOutputs, panel, type PanelResult, type RenderReport } from './ui/report.js';
 
-export interface PanelResult {
-  name: string;
-  ok: boolean;
-  error?: string;
-}
-
-export interface RenderReport {
-  panels: PanelResult[];
-  /** Text of every output element after the render, keyed by element id. */
-  outputs: Record<string, string>;
-}
+export type { PanelResult, RenderReport } from './ui/report.js';
 
 const OUTPUT_IDS = [
   'tile-cumulative', 'tile-cumulative-note',
@@ -40,39 +32,45 @@ function required<T extends Element>(root: Document, id: string): T {
   return element as unknown as T;
 }
 
-/**
- * Runs one panel's render inside its own boundary.
- *
- * A single failed edit used to take the whole page down halfway through the
- * render, leaving some tiles filled and others showing a dash with no clue
- * why. Now a broken panel says so in place and every other panel still draws.
- */
-function panel(results: PanelResult[], name: string, target: Element | null, draw: () => void): void {
-  try {
-    draw();
-    results.push({ name, ok: true });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    results.push({ name, ok: false, error: message });
-    if (target !== null) target.textContent = 'unavailable';
-    console.error(`[kaya] panel "${name}" failed to render:`, error);
-  }
+interface PresetPanel {
+  /** Presses the button whose scenario the reader is on, and no other. */
+  update(presetId: string | null): void;
 }
 
-function buildPresets(container: HTMLElement, apply: (inputs: ScenarioInputs) => void): void {
+function buildPresets(
+  container: HTMLElement, apply: (inputs: ScenarioInputs) => void,
+): PresetPanel {
   container.textContent = '';
+  const buttons = new Map<string, HTMLButtonElement>();
   for (const preset of PRESETS) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'ghost';
     button.textContent = preset.label;
     button.dataset['preset'] = preset.id;
+    button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => apply(preset.inputs));
     container.appendChild(button);
+    buttons.set(preset.id, button);
   }
+  return {
+    update(presetId) {
+      // Nothing pressed means a scenario of the reader's own, which is what
+      // a value arriving from a Learn More builder almost always produces.
+      for (const [id, button] of buttons) {
+        button.setAttribute('aria-pressed', String(id === presetId));
+      }
+    },
+  };
 }
 
-function buildLegend(container: HTMLElement): void {
+/** A filename from the scenario's name, or the plain one when unnamed. */
+function fileStem(name: string): string {
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return slug === '' ? 'emissions-scenario' : slug.slice(0, 48);
+}
+
+function buildLegend(container: HTMLElement, readerLabel: string): void {
   const intro = document.createElement('div');
   intro.className = 'legend-intro';
   intro.textContent = 'The seven published CMIP7 scenarios, shown throughout for comparison.';
@@ -80,7 +78,7 @@ function buildLegend(container: HTMLElement): void {
   container.appendChild(intro);
 
   const entries: Array<{ id: string; name: string; color: string; you: boolean }> = [
-    { id: 'Build your own', name: '', color: 'var(--you)', you: true },
+    { id: readerLabel, name: '', color: 'var(--you)', you: true },
     ...[...MARKERS].reverse().map((marker) => ({
       id: marker.id, name: marker.shortLabel, color: marker.color, you: false,
     })),
@@ -127,36 +125,41 @@ export function mountApp(root: Document = document): App {
     analogueNote: required(root, 'tile-analogue-note'),
   };
 
-  const fromHash = decodeInputs(root.defaultView?.location.hash ?? '');
-  const state = new ScenarioState(fromHash ?? defaultInputs());
+  const view = root.defaultView;
+  const fromHash = decodeScenario(view?.location.hash ?? '');
+  const state = new ScenarioState(fromHash ?? { inputs: defaultInputs(), name: '' });
   let report: RenderReport | null = null;
   let sliders: SliderPanel | null = null;
+  let presets: PresetPanel | null = null;
 
   function render(): RenderReport {
     const inputs = state.get();
+    const scenario = state.scenario();
+    const name = displayName(scenario.name);
+    const presetId = state.matchingPresetId();
     const results: PanelResult[] = [];
 
     // Computed once and shared, so a slow panel cannot disagree with a fast one.
     let path = computePath(inputs);
     panel(results, 'model', null, () => { path = computePath(inputs); });
 
-    panel(results, 'sliders', null, () => sliders?.update(inputs));
+    panel(results, 'sliders', null, () => sliders?.update(scenario));
+    panel(results, 'presets', null, () => presets?.update(presetId));
+    panel(results, 'legend', legend, () => buildLegend(legend, name));
     panel(results, 'chart', chart, () => {
-      renderChart(chart, path);
-      chartCaption.textContent = 'Annual CO2 including land use, 2025 to 2100. '
-        + 'Your path in ink, the seven CMIP7 markers ghosted behind it.';
+      renderChart(chart, path, { name, highlightMarker: markerIdForPreset(presetId) });
+      chart.setAttribute('aria-label',
+        `Annual CO2 to 2100 for ${name} and the seven CMIP7 markers`);
+      chartCaption.textContent = `Annual CO2 including land use, 2025 to 2100. ${name} in ink, `
+        + 'the seven CMIP7 markers ghosted behind it.';
     });
     panel(results, 'stats', tiles.cumulative, () => renderStats(tiles, inputs, path));
-    panel(results, 'table', table, () => renderTable(table, inputs));
+    panel(results, 'table', table, () => renderTable(table, inputs, name));
     panel(results, 'notes', notes, () => {
-      renderNotes(notes, computeFlags(inputs, path, state.matchingPresetId()));
+      renderNotes(notes, computeFlags(inputs, path, presetId));
     });
 
-    const outputs: Record<string, string> = {};
-    for (const id of OUTPUT_IDS) {
-      outputs[id] = root.getElementById(id)?.textContent?.trim() ?? '';
-    }
-    report = { panels: results, outputs };
+    report = { panels: results, outputs: collectOutputs(root, OUTPUT_IDS) };
     return report;
   }
 
@@ -165,12 +168,17 @@ export function mountApp(root: Document = document): App {
   }
 
   sliders = renderSliders(controls, (id, value) => state.set(id, value));
-  buildPresets(presetsContainer, apply);
-  buildLegend(legend);
+  presets = buildPresets(presetsContainer, apply);
+
+  const nameField = root.getElementById('scenario-name');
+  if (nameField instanceof HTMLInputElement) {
+    nameField.value = state.name();
+    nameField.addEventListener('input', () => state.setName(nameField.value));
+  }
 
   state.onChange(() => {
     render();
-    syncHash(state.get());
+    syncHash(state.scenario());
   });
 
   const themeButton = root.getElementById('theme-toggle');
@@ -180,21 +188,21 @@ export function mountApp(root: Document = document): App {
   const shareButton = root.getElementById('share');
   const actionMessage = root.getElementById('action-message');
   if (shareButton !== null && actionMessage !== null) {
-    installShare(shareButton, actionMessage, () => state.get());
+    installShare(shareButton, actionMessage, () => state.scenario());
   }
 
-  const downloads: Array<[string, string, (name: string) => Promise<void>]> = [
-    ['download-png', 'emissions-scenario.png',
-      (name) => downloadScenarioPng(chart, state.get(), computePath(state.get()), name)],
-    ['download-pdf', 'emissions-scenario.pdf',
-      (name) => downloadScenarioPdf(chart, state.get(), computePath(state.get()), name)],
+  const downloads: Array<[string, string, (file: string) => Promise<void>]> = [
+    ['download-png', 'png',
+      (file) => downloadScenarioPng(chart, state.scenario(), computePath(state.get()), file)],
+    ['download-pdf', 'pdf',
+      (file) => downloadScenarioPdf(chart, state.scenario(), computePath(state.get()), file)],
   ];
-  for (const [id, filename, run] of downloads) {
+  for (const [id, extension, run] of downloads) {
     const button = root.getElementById(id);
     if (button === null || actionMessage === null) continue;
     button.addEventListener('click', () => {
       actionMessage.textContent = 'Building your sheet...';
-      run(filename).then(
+      run(`${fileStem(state.name())}.${extension}`).then(
         () => {
           actionMessage.textContent = 'Downloaded';
           window.setTimeout(() => { actionMessage.textContent = ''; }, 2600);
@@ -208,5 +216,14 @@ export function mountApp(root: Document = document): App {
   }
 
   render();
+
+  // A value arriving from a Learn More builder: say so, then take the marker
+  // out of the address bar so a copied link opens clean.
+  const applied = appliedInput(view?.location.search ?? '');
+  if (applied !== null) {
+    announceHandoff(root, applied, state.get());
+    view?.history.replaceState(null, '', pathWithScenario(state.scenario()));
+  }
+
   return { render, apply, state, lastReport: () => report };
 }

@@ -47,6 +47,8 @@ from.
 ```sh
 npm run build:data                      # from primary sources
 python3 scripts/build_data.py --refresh # same, ignoring the cached downloads
+python3 scripts/build_wpp.py            # UN population, for the Learn More page
+python3 scripts/build_wpp.py --refresh  # same, fetching the UN files again
 python3 scripts/extract_prototype.py    # re-read the prototype's constants
 python3 scripts/build_carried_data.py   # write the carried-over data files
 ```
@@ -66,10 +68,48 @@ is updated, then commit the changed JSON.
 
 ## Pages
 
-`index.html` is the dashboard. `bibliography.html` lists the book, the
-peer-reviewed work on scenarios, the two Ausubel papers the technology bounds
-come from, and every data source. Both are Vite entry points, both carry the
-masthead and the toolbar, and `tests/pages.test.ts` checks they stay in step.
+| URL | File | What it is |
+|---|---|---|
+| `/` | `index.html` | The scenario builder |
+| `/bibliography.html` | `bibliography.html` | The book, the scenarios work, the sources |
+| `/learn/` | `learn/index.html` | Index of the six Learn More pages |
+| `/learn/population/` | `learn/population/index.html` | Population |
+
+Every page is a Vite entry point, carries the masthead and the toolbar, and is
+checked by `tests/pages.test.ts`. The `learn/…/index.html` layout gives clean
+URLs on GitHub Pages with no rewrite rules.
+
+## Adding a Learn More page
+
+Six pages are planned, one per slider. Population is finished; the other five
+are listed in `src/learn/registry.ts` as `forthcoming`. To add one:
+
+1. **Data.** Write a build script under `scripts/` that fetches from a primary
+   source and writes `src/data/learn_<slug>.json` in the shared shape:
+   `meta`, `series`, `bands`, `parts`, `constants`. Cache the extracted subset
+   under `scripts/_<name>_cache.json` and commit that, never the raw download.
+   Record the source, vintage and units in `DATA.md`.
+2. **Page module.** Add `src/learn/<slug>.ts` exporting a `LearnPageSpec`
+   (`src/learn/types.ts`): title, standfirst, definition box, chart block,
+   `drivers`, `markers`, builder and sources. The scaffold fixes the order the
+   sections appear in, so a page supplies words and arithmetic only.
+3. **Entry point.** Add `src/learn/main-<slug>.ts` (four lines, copy
+   `main-population.ts`) and `learn/<slug>/index.html` (copy the population
+   shell, change the title, heading and script path).
+4. **Register it.** Flip that entry to `status: 'live'` in
+   `src/learn/registry.ts`. That one change adds the link above the slider on
+   the top page, opens the entry on `/learn/`, and links the factor in the
+   identity graphic on every other page.
+5. **Build it.** Add `'learn-<slug>': 'learn/<slug>/index.html'` to `PAGES` in
+   `vite.config.ts`. `tests/pages.test.ts` fails if you forget.
+6. **Test it.** Extend `tests/learn.test.ts` with the page's builder
+   arithmetic, and add its screenshots to `tests/visual.spec.ts`.
+7. **Write it up.** The builder's arithmetic and its assumptions go in
+   `METHODS.md`.
+
+Rules the six pages hold to: import the model from `src/model/`, duplicate no
+arithmetic and no constants, put every number in `src/data/*.json`, and give no
+text block a ch-based maximum width — the layout container does the limiting.
 
 ## Sending someone a copy
 
@@ -96,7 +136,15 @@ npm test
 - `render.test.ts` mounts the whole page against a DOM stub and asserts that
   every summary tile fills, for all seven presets and at both ends of all six
   sliders. This is the guard against a broken edit killing the render halfway
-  through and leaving tiles empty.
+  through and leaving tiles empty. It also covers naming a scenario, the
+  preset buttons and a value arriving from a Learn More builder.
+- `state.test.ts` covers the share encoding, including a link written before
+  scenarios could be named, and the rounding and clamping a builder value
+  passes through.
+- `learn.test.ts` mounts the population page against the same stub: every
+  panel renders, the chart draws, the builder produces the sum its inputs
+  imply, and a state string survives the round trip with one field changed and
+  five untouched.
 
 Playwright takes screenshots at 360, 768, 1280 and 1600 pixels in both themes,
 committed under `tests/screenshots/`. Update them deliberately:

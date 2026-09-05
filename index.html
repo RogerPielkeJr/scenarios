@@ -29,6 +29,7 @@
       </p>
       <nav class="toolbar" aria-label="Site">
         <a class="ghost" href="https://thehonestbroker.org">The Honest Broker</a>
+        <a class="ghost" href="/learn/">Learn more</a>
         <a class="ghost" href="/bibliography.html">Bibliography</a>
         <button type="button" id="theme-toggle" class="ghost" aria-pressed="false">
           <span id="theme-label">Dark</span>
@@ -59,10 +60,19 @@
 
     <div class="band-right">
       <div class="panel">
+        <div class="naming">
+          <label for="scenario-name">Name your scenario</label>
+          <input type="text" id="scenario-name" maxlength="60" autocomplete="off"
+                 spellcheck="false" placeholder="Build your own">
+        </div>
+
         <figure class="chart-figure">
           <svg id="chart" viewBox="0 0 660 420" role="img"
                aria-label="Annual CO2 emissions to 2100 for your scenario and the seven CMIP7 markers"></svg>
-          <figcaption id="chart-caption" class="caption"></figcaption>
+          <figcaption class="caption">
+            <span id="chart-caption"></span>
+            <span class="credit">Source: analysis by Roger Pielke Jr., The Honest Broker</span>
+          </figcaption>
         </figure>
 
         <section aria-labelledby="summary-heading">

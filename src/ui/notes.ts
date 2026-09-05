@@ -1,4 +1,5 @@
-import { BOUNDS, HIGH_EFFICIENCY_RATIO, type ScenarioFlags } from '../model/flags.js';
+import { BOUNDS, HIGH_EFFICIENCY_RATIO,
+  type MarkerFidelity, type ScenarioFlags } from '../model/flags.js';
 import { ANALOGUE_META } from '../model/analogue.js';
 import { BOUND_RATES } from '../model/observed.js';
 import { UN_2024 } from '../model/population.js';
@@ -32,6 +33,50 @@ const COHERENCE_PHRASES: Record<keyof ScenarioFlags['coherence'], string> = {
     'a large land sink alongside an unchanged fuel mix, which no marker pairs together',
 };
 
+/**
+ * How far a CMIP7 preset lands from the marker it names, with the reason.
+ *
+ * The endpoint and the century total fail in different ways and for different
+ * reasons: a constant rate can hit the marker's 2100 emissions and still
+ * accumulate a very different total on the way there. Both numbers go on the
+ * page, computed rather than asserted.
+ */
+function fidelitySentence(fit: MarkerFidelity): string {
+  const gt = (value: number) => `${value.toFixed(1)} GtCO2`;
+  const sentences: string[] = [
+    `<b>Against the published CMIP7 ${fit.label}.</b> These sliders carry the Kaya `
+    + `factors ${fit.label} reports.`,
+  ];
+
+  const closeEnd = !fit.markerGoesNegative && Math.abs(fit.endPercent) < 5;
+  sentences.push(closeEnd
+    ? `Compounding them from 2025 reaches ${gt(fit.ourEndGt)} in 2100, within `
+      + `${Math.abs(fit.endPercent).toFixed(0)}% of ${fit.label}'s own ${gt(fit.markerEndGt)}.`
+    : `Compounding them from 2025 reaches ${gt(fit.ourEndGt)} in 2100 against `
+      + `${fit.label}'s ${gt(fit.markerEndGt)}.`);
+
+  const percent = Math.abs(fit.cumulativePercent);
+  sentences.push(percent < 3
+    ? `The two century totals agree within ${percent.toFixed(0)}%, `
+      + `${thousands(fit.ourCumulativeGt)} against ${thousands(fit.markerCumulativeGt)} GtCO2.`
+    : `Over the century this path totals ${thousands(fit.ourCumulativeGt)} GtCO2 against `
+      + `${thousands(fit.markerCumulativeGt)}, ${percent.toFixed(0)}% `
+      + `${fit.cumulativePercent > 0 ? 'above' : 'below'} it.`);
+
+  if (Math.abs(fit.ourMidGt - fit.markerMidGt) > 2) {
+    sentences.push(`A steady rate spreads one improvement evenly across 75 years, while `
+      + `${fit.label} bends: in ${fit.midYear} this path emits ${gt(fit.ourMidGt)} where `
+      + `${fit.label} emits ${gt(fit.markerMidGt)}.`);
+  }
+  if (fit.markerGoesNegative) {
+    sentences.push(`${fit.label} also removes more CO2 than it emits before 2100. Four `
+      + 'factors multiplied together stay positive, so the fossil term here cannot turn '
+      + 'negative and only the land use slider can pull a path below zero.');
+  }
+  sentences.push(`The chart draws ${fit.label}'s published path behind yours.`);
+  return `<p>${sentences.join(' ')}</p>`;
+}
+
 export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void {
   const parts: string[] = [];
   parts.push(comparisonSentence(flags));
@@ -62,13 +107,8 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
     parts.push(`<p>Below ${thousands(BOUNDS.fast)} GtCO2 you have passed the lowest total `
       + 'reachable with every technological trajectory at its fastest recorded rate.</p>');
   }
-  if (flags.markerPresetGap !== null) {
-    const { label, gapGt } = flags.markerPresetGap;
-    const direction = gapGt > 0 ? 'above' : 'below';
-    parts.push(`<p>These are the Kaya factors CMIP7 ${label} reports, but running them `
-      + `forward lands ${thousands(Math.abs(gapGt))} GtCO2 ${direction} that scenario's own `
-      + 'total. The four factors here have no term for engineered carbon removal, which the '
-      + 'low scenarios rely on, so a scenario that removes carbon cannot be rebuilt from them.</p>');
+  if (flags.markerFidelity !== null) {
+    parts.push(fidelitySentence(flags.markerFidelity));
   }
 
   const incoherent = (Object.keys(COHERENCE_PHRASES) as Array<keyof ScenarioFlags['coherence']>)

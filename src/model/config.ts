@@ -53,3 +53,38 @@ export function clampInput(id: InputId, value: number): number {
   const spec = SPEC_BY_ID[id];
   return Math.min(spec.max, Math.max(spec.min, value));
 }
+
+/**
+ * Snaps a value to the slider's own step, so a value arriving from a Learn
+ * More builder lands somewhere the slider can actually stop. Binary step
+ * arithmetic leaves 10.200000000000001, which the spec's decimals settle.
+ */
+export function roundToStep(id: InputId, value: number): number {
+  const spec = SPEC_BY_ID[id];
+  const snapped = spec.min + Math.round((value - spec.min) / spec.step) * spec.step;
+  return Number(snapped.toFixed(spec.decimals));
+}
+
+/** Clamps and says whether it had to, so a builder can tell the reader. */
+export function clampWithFlag(
+  id: InputId, value: number,
+): { value: number; clamped: 'min' | 'max' | null } {
+  const spec = SPEC_BY_ID[id];
+  if (value < spec.min) return { value: spec.min, clamped: 'min' };
+  if (value > spec.max) return { value: spec.max, clamped: 'max' };
+  return { value, clamped: null };
+}
+
+/** Rounds, then clamps: the order a builder hands a value to a slider. */
+export function fitToSlider(
+  id: InputId, value: number,
+): { value: number; clamped: 'min' | 'max' | null } {
+  return clampWithFlag(id, roundToStep(id, value));
+}
+
+/** One field replaced, the other five carried through untouched. */
+export function withInput(
+  inputs: ScenarioInputs, id: InputId, value: number,
+): ScenarioInputs {
+  return { ...inputs, [id]: value };
+}

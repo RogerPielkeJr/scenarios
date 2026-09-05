@@ -7,6 +7,10 @@ import { formatInput } from '../format.js';
 const OBSERVED = presetByLabel('Kaya at observed rates');
 const HIGH = MARKER_BY_ID['H'];
 
+function escapeText(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function cell(text: string, className?: string): string {
   const attribute = className === undefined ? '' : ` class="${className}"`;
   return `<td${attribute}>${text}</td>`;
@@ -16,9 +20,11 @@ function cell(text: string, className?: string): string {
  * Your six assumptions against the observed record and against CMIP7 HIGH.
  * A dash means that scenario publishes no value for that factor.
  */
-export function renderTable(table: HTMLTableElement, inputs: ScenarioInputs): void {
+export function renderTable(
+  table: HTMLTableElement, inputs: ScenarioInputs, name = 'Build your own',
+): void {
   const header = '<thead><tr>'
-    + '<th scope="col">Assumption</th><th scope="col">Build your own</th>'
+    + `<th scope="col">Assumption</th><th scope="col">${escapeText(name)}</th>`
     + '<th scope="col">Observed</th><th scope="col">CMIP7 HIGH</th>'
     + '<th scope="col">Units</th></tr></thead>';
 

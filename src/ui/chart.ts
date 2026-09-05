@@ -11,7 +11,7 @@ const VIEW = { width: 660, height: 392 };
 // `top` leaves room above the highest gridline for the axis label, which
 // otherwise prints on top of the topmost number.
 const PLOT = { left: 56, right: 588, top: 40, bottom: 350 };
-const LABEL_GAP = 13;
+const LABEL_GAP = 14;
 
 /** Roughly how many horizontal gridlines to aim for. */
 const TARGET_GRIDLINES = 8;
@@ -91,7 +91,7 @@ function gridlines(scale: Scale, yFor: (v: number) => number): string {
     svg += `<line x1="${PLOT.left}" x2="${PLOT.right}" y1="${y}" y2="${y}" `
       + `stroke="var(--rule)" stroke-width="${weight}"/>`;
     svg += `<text x="${PLOT.left - 9}" y="${y + 4}" text-anchor="end" `
-      + `font-family="${MONO}" font-size="11" fill="var(--dim)">${format(value)}</text>`;
+      + `font-family="${MONO}" font-size="12" fill="var(--dim)">${format(value)}</text>`;
   }
   return svg;
 }
@@ -106,23 +106,27 @@ function yearLabels(): string {
   return years.map((year, index) => {
     const anchor = index === 0 ? 'start' : (index === years.length - 1 ? 'end' : 'middle');
     return `<text x="${xFor(year)}" y="${PLOT.bottom + 22}" text-anchor="${anchor}" `
-      + `font-family="${SANS}" font-size="12" fill="var(--dim)">${year}</text>`;
+      + `font-family="${SANS}" font-size="13" fill="var(--dim)">${year}</text>`;
   }).join('');
 }
 
-function markerPaths(yFor: (v: number) => number): string {
+function markerPaths(yFor: (v: number) => number, highlight: string | null): string {
   return MARKERS.map((marker) => {
     const d = MARKER_YEARS.map((year, index) => {
       const command = index === 0 ? 'M' : 'L';
       return `${command}${xFor(year).toFixed(1)},${yFor(at(marker.co2Gt, index)).toFixed(1)}`;
     }).join('');
-    return `<path d="${d}" fill="none" stroke="${marker.color}" stroke-width="1.6" `
-      + `opacity="0.42" data-marker="${marker.id}"/>`;
+    // A loaded CMIP7 preset brings its own marker forward, so the reader can
+    // see how far a constant rate drifts from the path it names.
+    const lit = marker.id === highlight;
+    return `<path d="${d}" fill="none" stroke="${marker.color}" `
+      + `stroke-width="${lit ? 2.6 : 1.6}" opacity="${lit ? 0.95 : 0.42}" `
+      + `data-marker="${marker.id}"${lit ? ' data-highlight="1"' : ''}/>`;
   }).join('');
 }
 
 /** Right-edge scenario labels, pushed apart and given leader lines. */
-function markerLabels(yFor: (v: number) => number): string {
+function markerLabels(yFor: (v: number) => number, highlight: string | null): string {
   const placed = spreadLabels(
     MARKERS.map((marker) => ({
       value: marker,
@@ -136,23 +140,40 @@ function markerLabels(yFor: (v: number) => number): string {
         + `y2="${y.toFixed(1)}" stroke="${marker.color}" stroke-width="1" opacity="0.5"/>`
       : '';
     return `${leader}<text x="${PLOT.right + 10}" y="${(y + 4).toFixed(1)}" `
-      + `font-family="${SANS}" font-size="11" font-weight="600" fill="${marker.color}" `
-      + `opacity="0.85">${escapeText(marker.id)}</text>`;
+      + `font-family="${SANS}" font-size="12" font-weight="600" fill="${marker.color}" `
+      + `opacity="${marker.id === highlight ? 1 : 0.85}">${escapeText(marker.id)}</text>`;
   }).join('');
 }
 
-function userPath(path: ScenarioPath, yFor: (v: number) => number): string {
+/** Long names get an ellipsis on the chart; the caption carries the whole thing. */
+function shorten(name: string, limit = 30): string {
+  return name.length <= limit ? name : `${name.slice(0, limit - 1).trimEnd()}\u2026`;
+}
+
+function userPath(path: ScenarioPath, yFor: (v: number) => number, name: string): string {
   const d = path.points.map((point, index) => `${index === 0 ? 'M' : 'L'}`
     + `${xFor(point.year).toFixed(1)},${yFor(point.co2Gt).toFixed(1)}`).join('');
   const final = path.final;
   const label = `<text x="${(xFor(END_YEAR) - 6).toFixed(1)}" `
     + `y="${(yFor(final.co2Gt) - 11).toFixed(1)}" text-anchor="end" `
-    + `font-family="${SANS}" font-size="13" font-weight="600" fill="var(--you)">Build your own</text>`;
+    + `font-family="${SANS}" font-size="14" font-weight="600" fill="var(--you)">`
+    + `${escapeText(shorten(name))}</text>`;
   return `<path d="${d}" fill="none" stroke="var(--you)" stroke-width="3.4" `
     + `stroke-linejoin="round" data-user-path="1"/>${label}`;
 }
 
-export function renderChart(svg: SVGSVGElement, path: ScenarioPath): void {
+export interface ChartOptions {
+  /** What to call the reader's path. */
+  name?: string;
+  /** A CMIP7 marker to bring forward, or null. */
+  highlightMarker?: string | null;
+}
+
+export function renderChart(
+  svg: SVGSVGElement, path: ScenarioPath, options: ChartOptions = {},
+): void {
+  const name = options.name ?? 'Build your own';
+  const highlight = options.highlightMarker ?? null;
   const scale = scaleFor(path);
   const yFor = yWith(scale);
   svg.setAttribute('viewBox', `0 0 ${VIEW.width} ${VIEW.height}`);
@@ -162,11 +183,11 @@ export function renderChart(svg: SVGSVGElement, path: ScenarioPath): void {
     // pushes it past x=0, which the live SVG shows because it allows overflow
     // and the export clips, so the label lost its first character in the PNG.
     + `<text x="0" y="${PLOT.top - 18}" text-anchor="start" `
-    + `font-family="${SANS}" font-size="11.5" fill="var(--dim)">GtCO2/yr</text>`
+    + `font-family="${SANS}" font-size="12.5" fill="var(--dim)">GtCO2/yr</text>`
     + yearLabels()
-    + markerPaths(yFor)
-    + markerLabels(yFor)
-    + userPath(path, yFor);
+    + markerPaths(yFor, highlight)
+    + markerLabels(yFor, highlight)
+    + userPath(path, yFor, name);
 }
 
 export const CHART_GEOMETRY = { VIEW, PLOT };

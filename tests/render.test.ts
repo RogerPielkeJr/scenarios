@@ -18,9 +18,10 @@ const TILE_IDS = [
   'tile-analogue', 'tile-analogue-note',
 ];
 
-function loadPage(): void {
+function loadPage(url = '/'): void {
   const body = HTML.slice(HTML.indexOf('<body>') + '<body>'.length, HTML.indexOf('</body>'));
   document.body.innerHTML = body.replace(/<script[\s\S]*?<\/script>/g, '');
+  window.history.replaceState(null, '', url);
 }
 
 function expectComplete(report: RenderReport, label: string): void {
@@ -91,5 +92,96 @@ describe('page render', () => {
     expect(app.state.get().population).toBeCloseTo(9.5, 9);
     expect(app.state.get().methane).toBeCloseTo(200, 9);
     window.location.hash = '';
+  });
+});
+
+describe('naming a scenario', () => {
+  beforeEach(() => { loadPage(); });
+
+  it('carries the name into the chart, the legend and the table', () => {
+    const app = mountApp();
+    app.state.setName('Fast electrification');
+    const report = app.lastReport();
+    expect(report?.outputs['chart']).toContain('Fast electrification');
+    expect(report?.outputs['kaya-table']).toContain('Fast electrification');
+    expect(document.querySelector('.legend-item.is-you b')?.textContent)
+      .toBe('Fast electrification');
+    expect(report?.outputs['chart-caption']).toContain('Fast electrification');
+  });
+
+  it('falls back to the default label with no name set', () => {
+    const app = mountApp();
+    expect(app.lastReport()?.outputs['kaya-table']).toContain('Build your own');
+  });
+
+  it('opens with the name a link carries', () => {
+    loadPage('/#s=10.2_1.91_-1.62_-0.48_1_300&n=Coal%20holds%20on');
+    const app = mountApp();
+    expect(app.state.name()).toBe('Coal holds on');
+    expect(app.lastReport()?.outputs['chart-caption']).toContain('Coal holds on');
+  });
+});
+
+describe('a value arriving from a Learn More builder', () => {
+  it('names it, points at its slider and cleans the address bar', () => {
+    loadPage('/?applied=population#s=11.7_1.91_-1.62_-0.48_1_300');
+    const app = mountApp();
+    expect(app.state.get().population).toBe(11.7);
+    const line = document.querySelector('.handoff');
+    expect(line?.textContent).toContain('11.7');
+    expect(line?.textContent).toContain('population page');
+    expect(document.querySelector('.control.is-applied')?.getAttribute('data-input'))
+      .toBe('population');
+    expect(window.location.search).toBe('');
+    expect(window.location.hash).toContain('s=11.7');
+  });
+
+  it('dismisses the line when asked', () => {
+    loadPage('/?applied=methane#s=10.2_1.91_-1.62_-0.48_1_250');
+    mountApp();
+    const dismiss = document.querySelector('.handoff-dismiss');
+    expect(dismiss).not.toBeNull();
+    (dismiss as HTMLButtonElement).click();
+    expect(document.querySelector('.handoff')).toBeNull();
+  });
+});
+
+describe('the preset buttons', () => {
+  beforeEach(() => { loadPage(); });
+
+  it('presses the preset the reader is on, and only that one', () => {
+    const app = mountApp();
+    const preset = PRESETS[1];
+    if (preset === undefined) throw new Error('no presets');
+    app.apply(preset.inputs);
+    const pressed = [...document.querySelectorAll('[data-preset][aria-pressed="true"]')];
+    expect(pressed.map((button) => button.getAttribute('data-preset'))).toEqual([preset.id]);
+  });
+
+  it('presses nothing once a slider moves off a preset', () => {
+    const app = mountApp();
+    app.state.set('population', 11.3);
+    expect(document.querySelectorAll('[data-preset][aria-pressed="true"]')).toHaveLength(0);
+  });
+});
+
+describe('the learn link on a slider', () => {
+  beforeEach(() => { loadPage(); });
+
+  it('carries the reader\'s current scenario to the page', () => {
+    const app = mountApp();
+    app.state.set('population', 11.3);
+    app.state.setName('Crowded century');
+    const link = document.querySelector('.control[data-input="population"] .learn-link');
+    const href = link?.getAttribute('href') ?? '';
+    expect(href).toContain('/learn/population/?s=11.3_');
+    expect(href).toContain('n=Crowded%20century');
+  });
+
+  it('appears only for the sliders whose pages exist', () => {
+    mountApp();
+    const links = document.querySelectorAll('.learn-link');
+    expect(links).toHaveLength(1);
+    expect(links[0]?.textContent).toBe('Learn more about population');
   });
 });

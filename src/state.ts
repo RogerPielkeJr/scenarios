@@ -1,11 +1,38 @@
 import { INPUT_SPECS, clampInput, defaultInputs } from './model/config.js';
 import { PRESETS } from './model/bounds.js';
-import type { ScenarioInputs } from './model/types.js';
+import type { InputId, ScenarioInputs } from './model/types.js';
 
-const HASH_PREFIX = '#s=';
+/**
+ * A scenario is the six numbers plus whatever the reader called it. The name
+ * travels with the numbers through share links and through the Learn More
+ * pages, so a named scenario stays named wherever it is opened.
+ */
+export interface Scenario {
+  inputs: ScenarioInputs;
+  /** Empty until the reader types one; the interface then says "Build your own". */
+  name: string;
+}
+
+export const MAX_NAME_LENGTH = 60;
+export const DEFAULT_SCENARIO_NAME = 'Build your own';
+
+/** Collapses whitespace and caps the length, so a name cannot bloat a link. */
+export function cleanName(raw: string): string {
+  return raw.replace(/\s+/g, ' ').trim().slice(0, MAX_NAME_LENGTH);
+}
+
+/** What the interface calls the reader's path when they have not named it. */
+export function displayName(name: string): string {
+  return name === '' ? DEFAULT_SCENARIO_NAME : name;
+}
+
+/** Every input at its default, with no name. */
+export function defaultScenario(): Scenario {
+  return { inputs: defaultInputs(), name: '' };
+}
 
 /** Order is fixed by INPUT_SPECS, so old links keep working. */
-function orderedIds() {
+function orderedIds(): InputId[] {
   return INPUT_SPECS.map((spec) => spec.id);
 }
 
@@ -14,12 +41,29 @@ export function encodeInputs(inputs: ScenarioInputs): string {
 }
 
 /**
- * Reads a scenario out of a URL hash. Returns null for anything malformed,
- * so a mangled link opens the default scenario rather than a broken page.
+ * `s=10.2_1.91_-1.62_-0.48_1_300&n=Fast%20electrification`.
+ *
+ * The six numbers keep the shape they have always had, so links written
+ * before scenarios could be named still open. The name rides alongside.
  */
-export function decodeInputs(hash: string): ScenarioInputs | null {
-  if (!hash.startsWith(HASH_PREFIX)) return null;
-  const parts = hash.slice(HASH_PREFIX.length).split('_');
+export function encodeScenario(scenario: Scenario): string {
+  const numbers = `s=${encodeInputs(scenario.inputs)}`;
+  const name = cleanName(scenario.name);
+  return name === '' ? numbers : `${numbers}&n=${encodeURIComponent(name)}`;
+}
+
+/**
+ * Reads a scenario out of a URL hash or query string. Returns null for
+ * anything malformed, so a mangled link opens the default scenario rather
+ * than a broken page.
+ */
+export function decodeScenario(text: string): Scenario | null {
+  const body = text.replace(/^[#?]/, '');
+  if (body === '') return null;
+  const params = new URLSearchParams(body);
+  const numbers = params.get('s');
+  if (numbers === null) return null;
+  const parts = numbers.split('_');
   const ids = orderedIds();
   if (parts.length !== ids.length) return null;
   const values = parts.map(Number);
@@ -28,33 +72,74 @@ export function decodeInputs(hash: string): ScenarioInputs | null {
   ids.forEach((id, i) => {
     inputs[id] = clampInput(id, values[i] as number);
   });
-  return inputs;
+  return { inputs, name: cleanName(params.get('n') ?? '') };
 }
 
-export function hashFor(inputs: ScenarioInputs): string {
-  return HASH_PREFIX + encodeInputs(inputs);
+export function hashFor(scenario: Scenario): string {
+  return `#${encodeScenario(scenario)}`;
 }
 
-export function shareUrl(inputs: ScenarioInputs): string {
+/**
+ * The address bar entry for a scenario on the page it already sits on.
+ *
+ * Replacing history with a bare hash resolves against the current URL and
+ * keeps any query string, which would leave ?applied= behind for a reader
+ * to copy into a link.
+ */
+export function pathWithScenario(scenario: Scenario): string {
+  return `${window.location.pathname}${hashFor(scenario)}`;
+}
+
+export function shareUrl(scenario: Scenario): string {
   const { origin, pathname } = window.location;
-  return `${origin}${pathname}${hashFor(inputs)}`;
+  return `${origin}${pathname}${hashFor(scenario)}`;
 }
 
-/** Holds the six values and tells listeners when they change. */
+/** The link from a slider on the top page to its Learn More page. */
+export function learnHref(slug: string, scenario: Scenario): string {
+  return `/learn/${slug}/?${encodeScenario(scenario)}`;
+}
+
+/**
+ * The link back to the scenario builder. `applied` names the one field a
+ * builder replaced, which the top page uses to say where the value came
+ * from and then strips out of the address bar.
+ */
+export function returnHref(scenario: Scenario, applied?: InputId): string {
+  const query = applied === undefined ? '' : `?applied=${applied}`;
+  return `/${query}${hashFor(scenario)}`;
+}
+
+/** Holds the scenario and tells listeners when it changes. */
 export class ScenarioState {
   private inputs: ScenarioInputs;
-  private listeners: Array<(inputs: ScenarioInputs) => void> = [];
+  private label: string;
+  private listeners: Array<(scenario: Scenario) => void> = [];
 
-  constructor(initial?: ScenarioInputs | null) {
-    this.inputs = initial ?? defaultInputs();
+  constructor(initial?: Scenario | null) {
+    this.inputs = initial?.inputs ?? defaultInputs();
+    this.label = initial?.name ?? '';
   }
 
   get(): ScenarioInputs {
     return { ...this.inputs };
   }
 
+  name(): string {
+    return this.label;
+  }
+
+  scenario(): Scenario {
+    return { inputs: this.get(), name: this.label };
+  }
+
   set<K extends keyof ScenarioInputs>(id: K, value: number): void {
     this.inputs[id] = clampInput(id, value);
+    this.emit();
+  }
+
+  setName(name: string): void {
+    this.label = cleanName(name);
     this.emit();
   }
 
@@ -63,7 +148,7 @@ export class ScenarioState {
     this.emit();
   }
 
-  /** True when the current values match a preset exactly. */
+  /** True when the current values match a preset exactly. The name is free. */
   matchingPresetId(): string | null {
     const current = this.inputs;
     const match = PRESETS.find((preset) => orderedIds()
@@ -71,12 +156,12 @@ export class ScenarioState {
     return match ? match.id : null;
   }
 
-  onChange(listener: (inputs: ScenarioInputs) => void): void {
+  onChange(listener: (scenario: Scenario) => void): void {
     this.listeners.push(listener);
   }
 
   private emit(): void {
-    const snapshot = this.get();
+    const snapshot = this.scenario();
     for (const listener of this.listeners) listener(snapshot);
   }
 }

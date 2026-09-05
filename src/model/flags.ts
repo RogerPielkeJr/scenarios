@@ -2,9 +2,10 @@ import notesJson from '../data/notes.json';
 import { OBSERVED_RATES } from './config.js';
 import { PRESET_BY_ID, presetByLabel } from './bounds.js';
 import { computePath } from './kaya.js';
-import { MARKER_BY_ID } from './markers.js';
+import { MARKER_BY_ID, MARKER_YEARS } from './markers.js';
 import { outsideUnRange } from './population.js';
 import type { ScenarioInputs, ScenarioPath } from './types.js';
+import { at } from './types.js';
 
 const T = notesJson.thresholds;
 
@@ -45,8 +46,32 @@ export interface ScenarioFlags {
     stagnantEconomyFastEfficiency: boolean;
     largeSinkUnchangedFuelMix: boolean;
   };
-  /** Set when a loaded CMIP7 preset cannot reproduce the marker it names. */
-  markerPresetGap: { markerId: string; label: string; gapGt: number } | null;
+  /** How closely a loaded CMIP7 preset reproduces the marker it names. */
+  markerFidelity: MarkerFidelity | null;
+}
+
+/**
+ * A CMIP7 preset sets the sliders to the Kaya factors that marker reports.
+ * Compounding those factors at a constant rate reproduces where the marker
+ * ends up far better than how it gets there, and this records both, so the
+ * interface can say which by how much instead of waving at it.
+ */
+export interface MarkerFidelity {
+  markerId: string;
+  label: string;
+  ourCumulativeGt: number;
+  markerCumulativeGt: number;
+  ourEndGt: number;
+  markerEndGt: number;
+  ourMidGt: number;
+  markerMidGt: number;
+  midYear: number;
+  /** Cumulative gap as a share of the marker's own total, in percent. */
+  cumulativePercent: number;
+  /** 2100 gap as a share of the marker's own 2100 emissions, in percent. */
+  endPercent: number;
+  /** True when the marker's path crosses into net removal, which a product of four positive factors cannot. */
+  markerGoesNegative: boolean;
 }
 
 export function computeFlags(
@@ -84,7 +109,7 @@ export function computeFlags(
         inputs.landUse < c.largeSinkUnchangedFuelMix.landUseBelow
         && inputs.co2PerEnergy > c.largeSinkUnchangedFuelMix.co2PerEnergyAbove,
     },
-    markerPresetGap: markerGap(path, presetId),
+    markerFidelity: markerFidelity(path, presetId),
   };
 }
 
@@ -96,24 +121,53 @@ function isAbove(value: number | null, limit: number): boolean {
   return value !== null && value > limit;
 }
 
-/** Marker presets whose Kaya factors cannot reproduce their own total. */
+/** Which marker each CMIP7 preset names. */
 const MARKER_PRESETS: Record<string, string> = {
   'cmip7-high': 'H',
   'cmip7-medium': 'M',
   'cmip7-very-low': 'VL',
 };
 
-function markerGap(path: ScenarioPath, presetId: string | null) {
+/** The year the comparison quotes mid-century, where the paths part company. */
+const MID_YEAR = 2050;
+
+/** The marker a preset names, for the chart to bring forward. Null for the rest. */
+export function markerIdForPreset(presetId: string | null): string | null {
+  if (presetId === null) return null;
+  return MARKER_PRESETS[presetId] ?? null;
+}
+
+function markerFidelity(path: ScenarioPath, presetId: string | null): MarkerFidelity | null {
   if (presetId === null) return null;
   const markerId = MARKER_PRESETS[presetId];
   if (markerId === undefined) return null;
   const marker = MARKER_BY_ID[markerId];
   const preset = PRESET_BY_ID[presetId];
   if (marker === undefined || preset === undefined) return null;
-  const gapGt = path.cumulativeGt - marker.cumulativeGt;
-  // Small gaps are not worth a sentence; a marker the Kaya terms simply
-  // cannot reach is.
-  return Math.abs(gapGt) < 200 ? null : { markerId, label: marker.label, gapGt };
+
+  const midIndex = MARKER_YEARS.indexOf(MID_YEAR);
+  const ourMid = path.points.find((point) => point.year === MID_YEAR);
+  if (midIndex < 0 || ourMid === undefined) return null;
+
+  const markerEndGt = at(marker.co2Gt, marker.co2Gt.length - 1, 'marker 2100');
+  const markerMidGt = at(marker.co2Gt, midIndex, 'marker 2050');
+  return {
+    markerId,
+    label: marker.label,
+    ourCumulativeGt: path.cumulativeGt,
+    markerCumulativeGt: marker.cumulativeGt,
+    ourEndGt: path.final.co2Gt,
+    markerEndGt,
+    ourMidGt: ourMid.co2Gt,
+    markerMidGt,
+    midYear: MID_YEAR,
+    cumulativePercent:
+      ((path.cumulativeGt - marker.cumulativeGt) / marker.cumulativeGt) * 100,
+    endPercent: Math.abs(markerEndGt) < 0.5
+      ? Number.NaN
+      : ((path.final.co2Gt - markerEndGt) / Math.abs(markerEndGt)) * 100,
+    markerGoesNegative: marker.co2Gt.some((value) => value < 0),
+  };
 }
 
 export const HIGH_EFFICIENCY_RATIO = T.highScenarioEfficiencyRatio;

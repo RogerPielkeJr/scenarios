@@ -8,6 +8,10 @@ const SSP2: readonly number[] = CURVES.SSP2;
 const SSP3: readonly number[] = CURVES.SSP3;
 
 export const UN_2024 = populationJson.un2024;
+/** The five-yearly SSP world trajectories, for charts that draw them. */
+export const SSP_YEARS = YEARS;
+export const SSP_CURVES: Readonly<Record<'SSP1' | 'SSP2' | 'SSP3', readonly number[]>> =
+  Object.freeze({ SSP1, SSP2, SSP3 });
 export const ANCHORS_2100 = populationJson.anchors2100;
 
 const END_1 = at(SSP1, SSP1.length - 1, 'SSP1 end');

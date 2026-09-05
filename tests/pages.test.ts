@@ -2,10 +2,21 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { existsSync } from 'node:fs';
+import { LEARN_ENTRIES } from '../src/learn/registry.js';
+
 const read = (name: string) => readFileSync(resolve(process.cwd(), name), 'utf8');
 const INDEX = read('index.html');
 const BIBLIOGRAPHY = read('bibliography.html');
-const PAGES = [['index.html', INDEX], ['bibliography.html', BIBLIOGRAPHY]] as const;
+const LEARN_INDEX = read('learn/index.html');
+const LEARN_POPULATION = read('learn/population/index.html');
+const VITE_CONFIG = read('vite.config.ts');
+const PAGES = [
+  ['index.html', INDEX],
+  ['bibliography.html', BIBLIOGRAPHY],
+  ['learn/index.html', LEARN_INDEX],
+  ['learn/population/index.html', LEARN_POPULATION],
+] as const;
 
 describe('both pages', () => {
   it.each(PAGES)('%s carries the masthead logo', (_name, html) => {
@@ -23,9 +34,11 @@ describe('both pages', () => {
     expect(html).toContain('id="theme-toggle"');
   });
 
-  it('links the two pages to each other', () => {
+  it('links the pages to each other', () => {
     expect(INDEX).toContain('href="/bibliography.html"');
+    expect(INDEX).toContain('href="/learn/"');
     expect(BIBLIOGRAPHY).toContain('href="/"');
+    expect(LEARN_POPULATION).toContain('href="/learn/"');
   });
 
   it.each(PAGES)('%s gives the logo explicit dimensions so it cannot reflow', (_name, html) => {
@@ -67,5 +80,40 @@ describe('bibliography', () => {
   it('uses only https links', () => {
     const urls = [...BIBLIOGRAPHY.matchAll(/href="(https?:[^"]+)"/g)].map((m) => m[1] ?? '');
     expect(urls.filter((u) => u.startsWith('http:'))).toEqual([]);
+  });
+});
+
+describe('the Learn More pages', () => {
+  const live = LEARN_ENTRIES.filter((entry) => entry.status === 'live');
+
+  it('has a page on disk for every entry the registry calls live', () => {
+    expect(live.length).toBeGreaterThan(0);
+    for (const entry of live) {
+      expect(existsSync(resolve(process.cwd(), `learn/${entry.slug}/index.html`)), entry.slug)
+        .toBe(true);
+      expect(existsSync(resolve(process.cwd(), `src/learn/main-${entry.slug}.ts`)), entry.slug)
+        .toBe(true);
+    }
+  });
+
+  // A page Vite never builds is a 404 for the reader, however complete it is.
+  it('builds every live page as its own entry point', () => {
+    for (const entry of live) {
+      expect(VITE_CONFIG, entry.slug).toContain(`learn/${entry.slug}/index.html`);
+    }
+    expect(VITE_CONFIG).toContain("learn: 'learn/index.html'");
+  });
+
+  it('leaves no page behind for an entry still in preparation', () => {
+    for (const entry of LEARN_ENTRIES.filter((candidate) => candidate.status !== 'live')) {
+      expect(existsSync(resolve(process.cwd(), `learn/${entry.slug}/index.html`)), entry.slug)
+        .toBe(false);
+    }
+  });
+
+  it('names each page in its own title and heading', () => {
+    expect(LEARN_POPULATION).toContain('<title>Population');
+    expect(LEARN_POPULATION).toContain('id="learn-title"');
+    expect(LEARN_INDEX).toContain('id="learn-main"');
   });
 });

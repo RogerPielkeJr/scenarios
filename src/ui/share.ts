@@ -1,15 +1,14 @@
-import { hashFor, shareUrl } from '../state.js';
-import type { ScenarioInputs } from '../model/types.js';
+import { pathWithScenario, shareUrl, type Scenario } from '../state.js';
 
 export function installShare(
   button: HTMLElement,
   message: HTMLElement,
-  currentInputs: () => ScenarioInputs,
+  current: () => Scenario,
 ): void {
   button.addEventListener('click', () => {
-    const inputs = currentInputs();
-    const url = shareUrl(inputs);
-    window.history.replaceState(null, '', hashFor(inputs));
+    const scenario = current();
+    const url = shareUrl(scenario);
+    window.history.replaceState(null, '', pathWithScenario(scenario));
 
     const done = () => {
       message.textContent = 'Link copied';
@@ -27,6 +26,6 @@ export function installShare(
 }
 
 /** Keeps the address bar in step without adding a history entry per drag. */
-export function syncHash(inputs: ScenarioInputs): void {
-  window.history.replaceState(null, '', hashFor(inputs));
+export function syncHash(scenario: Scenario): void {
+  window.history.replaceState(null, '', pathWithScenario(scenario));
 }

@@ -67,12 +67,15 @@ test('a shared link restores the scenario', async ({ page }) => {
 });
 
 test('never scrolls the page body sideways', async ({ page }) => {
-  for (const width of [360, 768, 1280, 1600]) {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto('/');
-    const overflow = await page.evaluate(() =>
-      document.documentElement.scrollWidth - document.documentElement.clientWidth);
-    expect(overflow, `page body at ${width}px`).toBeLessThanOrEqual(1);
+  // 380 is the narrowest width the pages have to work at; 360 gives a margin.
+  for (const path of ['/', '/learn/', '/learn/population/', '/bibliography.html']) {
+    for (const width of [360, 380, 768, 1280, 1600]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(path);
+      const overflow = await page.evaluate(() =>
+        document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow, `${path} at ${width}px`).toBeLessThanOrEqual(1);
+    }
   }
 });
 
@@ -156,4 +159,90 @@ test('the theme toggle overrides the system setting', async ({ page }) => {
   // The choice has to survive a reload, or it is not a setting.
   await page.reload();
   await expect(root).toHaveAttribute('data-theme', 'dark');
+});
+
+for (const breakpoint of BREAKPOINTS) {
+  for (const theme of THEMES) {
+    test(`the population page at ${breakpoint.name}px, ${theme}`, async ({ page }) => {
+      await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
+      await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
+      await page.goto('/learn/population/');
+      await page.waitForSelector('#learn-chart [data-series="reader"]');
+      await page.evaluate(() => document.fonts.ready);
+      await expect(page).toHaveScreenshot(`learn-population-${breakpoint.name}-${theme}.png`,
+        { fullPage: true });
+    });
+  }
+}
+
+for (const breakpoint of [BREAKPOINTS[0], BREAKPOINTS[2]]) {
+  test(`the learn index at ${breakpoint?.name}px`, async ({ page }) => {
+    if (!breakpoint) return;
+    await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
+    await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+    await page.goto('/learn/');
+    await page.waitForSelector('.learn-index a');
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page).toHaveScreenshot(`learn-index-${breakpoint.name}.png`, { fullPage: true });
+  });
+}
+
+test('a scenario survives the round trip through the population page', async ({ page }) => {
+  await page.goto('/#s=11.3_2.2_-1.9_-0.7_-1.5_240');
+  await page.locator('#scenario-name').fill('Crowded century');
+  await page.locator('.control[data-input="population"] .learn-link').click();
+
+  await expect(page).toHaveURL(/\/learn\/population\/\?s=11\.3_2\.2_-1\.9_-0\.7_-1\.5_240/);
+  await expect(page).toHaveURL(/n=Crowded%20century/);
+  await expect(page.locator('h1')).toHaveText('Population');
+
+  // Everything at the UN low variant, which the builder adds up to 6.99.
+  const parts = page.locator('.builder-part input[type="range"]');
+  const count = await parts.count();
+  for (let index = 0; index < count; index += 1) {
+    const part = parts.nth(index);
+    await part.evaluate((node) => {
+      const input = node as HTMLInputElement;
+      input.value = input.min;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
+  await expect(page.locator('.builder-result-value')).toContainText('6.99 billion');
+  await page.locator('.use-button').click();
+
+  await expect(page).toHaveURL(/#s=7_2\.2_-1\.9_-0\.7_-1\.5_240/);
+  await expect(page).toHaveURL(/n=Crowded%20century/);
+  await expect(page).not.toHaveURL(/applied=/);
+  await expect(page.locator('#readout-population')).toHaveText('7.0 billion');
+  await expect(page.locator('#readout-methane')).toHaveText('240 Mt/yr');
+  await expect(page.locator('#scenario-name')).toHaveValue('Crowded century');
+  await expect(page.locator('.handoff')).toContainText('7.0 billion');
+  await expect(page.locator('#kaya-table thead th').nth(1)).toHaveText('Crowded century');
+});
+
+test('the back link returns the scenario unchanged', async ({ page }) => {
+  await page.goto('/learn/population/?s=11.3_2.2_-1.9_-0.7_-1.5_240&n=Held%20steady');
+  await page.locator('.back-link').first().click();
+  await expect(page).toHaveURL(/#s=11\.3_2\.2_-1\.9_-0\.7_-1\.5_240&n=Held%20steady/);
+  await expect(page.locator('#readout-population')).toHaveText('11.3 billion');
+  await expect(page.locator('#scenario-name')).toHaveValue('Held steady');
+});
+
+test('a named scenario names its download', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#scenario-name').fill('Coal holds on');
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.locator('#download-png').click(),
+  ]);
+  expect(download.suggestedFilename()).toBe('coal-holds-on.png');
+});
+
+test('the learn index opens every finished page', async ({ page }) => {
+  await page.goto('/learn/');
+  await expect(page.locator('.learn-index > li')).toHaveCount(6);
+  await expect(page.locator('.learn-index a')).toHaveCount(1);
+  await expect(page.locator('.forthcoming-tag')).toHaveCount(5);
+  await page.locator('.learn-index a').click();
+  await expect(page.locator('h1')).toHaveText('Population');
 });
