@@ -7,6 +7,7 @@
  * CMIP7 markers as points at 2100.
  */
 import { spreadLabels } from './ticks.js';
+import type { Column, FigureData } from './figure.js';
 
 export interface Scale {
   min: number;
@@ -379,4 +380,62 @@ export function renderStrip(svg: SVGSVGElement, spec: StripSpec): void {
 
   svg.setAttribute('viewBox', `0 0 ${STRIP.width} ${STRIP.height}`);
   svg.innerHTML = markup;
+}
+
+/**
+ * The numbers behind a plot, as a table a reader can download.
+ *
+ * Built from the same spec the chart draws, so a spreadsheet can never
+ * disagree with the picture above it.
+ */
+export function plotTable(spec: PlotSpec, title: string): FigureData {
+  const years = new Set<number>();
+  for (const series of spec.series) for (const point of series.points) years.add(point.year);
+  for (const area of spec.areas ?? []) for (const year of area.years) years.add(year);
+  for (const band of spec.bands ?? []) for (const year of band.years) years.add(year);
+  const ordered = [...years].sort((a, b) => a - b);
+  const at = (theseYears: readonly number[], values: readonly number[], year: number) => {
+    const index = theseYears.indexOf(year);
+    return index < 0 ? null : values[index] ?? null;
+  };
+
+  const columns: Column[] = [{ header: 'Year', values: ordered }];
+  for (const area of spec.areas ?? []) {
+    columns.push({
+      header: area.label,
+      values: ordered.map((year) => at(area.years, area.values, year)),
+    });
+  }
+  for (const band of spec.bands ?? []) {
+    columns.push({
+      header: `${band.label}, low`,
+      values: ordered.map((year) => at(band.years, band.lo, year)),
+    });
+    columns.push({
+      header: `${band.label}, high`,
+      values: ordered.map((year) => at(band.years, band.hi, year)),
+    });
+  }
+  for (const series of spec.series) {
+    if (series.points.length === 0) continue;
+    const theseYears = series.points.map((point) => point.year);
+    const values = series.points.map((point) => point.value);
+    columns.push({
+      header: series.label === '' ? series.id : series.label,
+      values: ordered.map((year) => at(theseYears, values, year)),
+    });
+  }
+
+  const extraRows = (spec.points ?? []).map((point) =>
+    [`${point.label === '' ? point.id : point.label} (${point.year})`, point.value]);
+  return { title, columns, extraRows };
+}
+
+/** The same, for the distribution strip. */
+export function stripTable(spec: StripSpec, title: string): FigureData {
+  return {
+    title,
+    columns: [{ header: spec.axisLabel, values: [...spec.values] }],
+    extraRows: spec.highlights.map((item) => [item.label, item.value]),
+  };
 }

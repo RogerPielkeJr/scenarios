@@ -108,9 +108,12 @@ another, or to rebuild one from scratch:
    under `scripts/_<name>_cache.json` and commit that, never the raw download.
    Record the source, vintage and units in `DATA.md`.
 2. **Page module.** Add `src/learn/<slug>.ts` exporting a `LearnPageSpec`
-   (`src/learn/types.ts`): title, standfirst, definition box, chart block,
-   `drivers`, `markers`, builder and sources. The scaffold fixes the order the
-   sections appear in, so a page supplies words and arithmetic only.
+   (`src/learn/types.ts`): title, standfirst, `accent`, definition box, chart
+   block, `drivers`, `markers`, builder and sources. The scaffold fixes the
+   order the sections appear in — builder first, then the reading — so a page
+   supplies words, colour and arithmetic only. Give the page an `accent` no
+   other page uses and none of the seven scenario colours use; it carries the
+   kicker, the headings, the sliders and the builder.
 3. **Entry point.** Add `src/learn/main-<slug>.ts` (four lines, copy
    `main-population.ts`) and `learn/<slug>/index.html` (copy the population
    shell, change the title, heading and script path).
@@ -125,9 +128,19 @@ another, or to rebuild one from scratch:
 7. **Write it up.** The builder's arithmetic and its assumptions go in
    `METHODS.md`.
 
+Every figure gets a PNG and an XLS button without the page asking: the
+scaffold builds the spreadsheet from the same spec the chart draws
+(`plotTable` and `stripTable` in `src/ui/plot.ts`), so the numbers a reader
+downloads can never disagree with the picture. XLS means SpreadsheetML, a
+single XML file Excel and LibreOffice both open, written by
+`src/ui/figure.ts` with no library.
+
 Rules the six pages hold to: import the model from `src/model/`, duplicate no
-arithmetic and no constants, put every number in `src/data/*.json`, and give no
-text block a ch-based maximum width — the layout container does the limiting.
+arithmetic and no constants, put every number in `src/data/*.json`, give no
+text block a ch-based maximum width, and label the reader's own line with
+`readerLabel(scenario, fallback)` so a named scenario carries its name onto
+every page. Write in the active voice and avoid forms of the verb "to be";
+`tests/` will not catch that, so read the prose back.
 
 ## Sending someone a copy
 

@@ -6,7 +6,7 @@
  */
 import { SPEC_BY_ID, fitToSlider, withInput } from '../../model/config.js';
 import { formatInput, formatInputWithUnit } from '../../format.js';
-import { returnHref, type Scenario } from '../../state.js';
+import { readerLabel, returnHref, type Scenario } from '../../state.js';
 import type { InputId } from '../../model/types.js';
 import type {
   BuilderBlock, BuilderMode, BuilderOutcome, BuilderPart,
@@ -141,7 +141,9 @@ export function renderBuilder(
   }
 
   const result = element(root, 'div', 'builder-result');
-  const resultKey = element(root, 'div', 'builder-result-key', 'Your value');
+  // The reader's own name for the scenario, when they gave one.
+  const resultKey = element(root, 'div', 'builder-result-key',
+    readerLabel(scenario, 'Your value'));
   const resultValue = element(root, 'div', 'builder-result-value');
   const resultDetail = element(root, 'ul', 'builder-detail');
   const resultFit = element(root, 'p', 'builder-fit');

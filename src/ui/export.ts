@@ -64,7 +64,8 @@ function summaryOf(
   return [
     ['Cumulative CO2, 2025 to 2100', thousands(cumulativeGt),
       published !== null ? `GtCO2 · as published by ${published.label}`
-        : (high === undefined ? 'GtCO2' : `GtCO2 · CMIP7 HIGH is ${thousands(high.cumulativeGt)}`)],
+        : (high === undefined ? 'GtCO2'
+          : `GtCO2 · CMIP7 HIGH reaches ${thousands(high.cumulativeGt)}`)],
     ['Warming in 2100', degrees(t),
       published === null ? placeAmongMarkers(t) : `as published by ${published.label}`],
     ['Added warming from now', signedDegrees(added),

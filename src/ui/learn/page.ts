@@ -11,7 +11,8 @@ import { formatInput } from '../../format.js';
 import { LEARN_ENTRIES } from '../../learn/registry.js';
 import type { KeyEntry, LearnPageSpec, ProseBlock, Source } from '../../learn/types.js';
 import { decodeScenario, defaultScenario, hashFor, type Scenario } from '../../state.js';
-import { renderPlot, renderStrip } from '../plot.js';
+import { plotTable, renderPlot, renderStrip, stripTable } from '../plot.js';
+import { attachFigureButtons, type FigureButtons } from '../figure.js';
 import { installThemeToggle } from '../theme.js';
 import { collectOutputs, panel, type RenderReport } from '../report.js';
 import { buildIdentity } from './identity.js';
@@ -170,6 +171,10 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   if (main === null) throw new Error('missing element #learn-main');
   main.textContent = '';
 
+  // The page's own colour, and the reader's own name for their scenario.
+  root.documentElement.style.setProperty('--accent', spec.accent);
+  root.documentElement.dataset['learnPage'] = spec.slug;
+
   const title = root.getElementById('learn-title');
   if (title !== null) title.textContent = spec.title;
   const standfirst = root.getElementById('learn-standfirst');
@@ -179,6 +184,15 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   if (toolbarBack instanceof HTMLAnchorElement) toolbarBack.href = `/${hashFor(scenario)}`;
 
   main.appendChild(backLink(root, scenario, fresh));
+
+  // The builder comes first: a reader arrives here to set a number, and the
+  // explanation reads better once they have moved something.
+  const builderBlock = band(root, spec.builder.heading, spec.builder.note);
+  paragraphs(root, builderBlock.body, spec.builder.paragraphs);
+  const builderHost = element(root, 'div', 'builder');
+  builderBlock.body.appendChild(builderHost);
+  builderBlock.section.classList.add('builder-block');
+  main.appendChild(builderBlock.section);
 
   // Definition.
   const definition = band(root, 'What it measures');
@@ -225,10 +239,15 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   record.body.appendChild(figure);
 
   record.body.appendChild(buildKey(root, spec.chart.key));
+  const chartButtons = attachFigureButtons(
+    root, chart, { title: spec.title, columns: [] }, `${spec.slug}-figure`,
+  );
+  record.body.appendChild(chartButtons.element);
 
   // A second figure, where one chart cannot carry the story: a distribution
   // on one page, a second time series on another.
   let extra: SVGSVGElement | null = null;
+  let extraButtons: FigureButtons | null = null;
   if (spec.chart.extra !== undefined) {
     const block = spec.chart.extra;
     const figure = element(root, 'figure', 'chart-figure extra-figure');
@@ -245,6 +264,10 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
     figure.appendChild(extraCaption);
     record.body.appendChild(figure);
     if (block.key !== undefined) record.body.appendChild(buildKey(root, block.key));
+    extraButtons = attachFigureButtons(
+      root, extra, { title: spec.title, columns: [] }, `${spec.slug}-figure-2`,
+    );
+    record.body.appendChild(extraButtons.element);
   }
   main.appendChild(record.section);
 
@@ -256,13 +279,6 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   scroller.appendChild(markerTable(root, spec));
   markers.body.appendChild(scroller);
   main.appendChild(markers.section);
-
-  // The builder.
-  const builderBlock = band(root, spec.builder.heading, spec.builder.note);
-  paragraphs(root, builderBlock.body, spec.builder.paragraphs);
-  const builderHost = element(root, 'div', 'builder');
-  builderBlock.body.appendChild(builderHost);
-  main.appendChild(builderBlock.section);
 
   const sources = band(root, 'Sources');
   sources.body.appendChild(sourceList(root, spec.sources));
@@ -279,14 +295,23 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
     const outcome = builder?.outcome();
     if (outcome === undefined) return { panels: results, outputs: {} };
     panel(results, 'chart', chart, () => {
-      renderPlot(chart, spec.chart.spec(outcome, scenario));
+      const plot = spec.chart.spec(outcome, scenario);
+      renderPlot(chart, plot);
+      chartButtons.update(plotTable(plot, `${spec.title} — ${spec.chart.heading}`));
     });
     if (extra !== null && spec.chart.extra !== undefined) {
       const block = spec.chart.extra;
       panel(results, 'extra', extra, () => {
         if (extra === null) return;
-        if (block.kind === 'strip') renderStrip(extra, block.spec(outcome));
-        else renderPlot(extra, block.spec(outcome));
+        if (block.kind === 'strip') {
+          const strip = block.spec(outcome, scenario);
+          renderStrip(extra, strip);
+          extraButtons?.update(stripTable(strip, `${spec.title} — distribution`));
+        } else {
+          const plot = block.spec(outcome, scenario);
+          renderPlot(extra, plot);
+          extraButtons?.update(plotTable(plot, `${spec.title} — second figure`));
+        }
       });
     }
     report = { panels: results, outputs: collectOutputs(root, OUTPUT_IDS) };

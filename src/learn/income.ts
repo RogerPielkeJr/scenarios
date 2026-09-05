@@ -9,7 +9,7 @@ import data from '../data/learn_income.json';
 import { BASE, BASE_YEAR, END_YEAR, SPEC_BY_ID } from '../model/config.js';
 import { MARKERS, MARKER_BY_ID, markerValueFor } from '../model/markers.js';
 import { cagr, compound } from '../model/rates.js';
-import { displayName } from '../state.js';
+import { readerLabel } from '../state.js';
 import type { PlotSeries, PlotSpec, Point } from '../ui/plot.js';
 import type { BuilderPart, LearnPageSpec } from './types.js';
 
@@ -149,6 +149,7 @@ function weightedWorld(values: Readonly<Record<string, number>>): number {
 
 export const INCOME_PAGE: LearnPageSpec = {
   slug: 'income',
+  accent: '#8a5a00',
   input: 'income',
   title: 'Income per person',
   standfirst: 'One slider sets how fast the average person gets richer. Seventy-five years '
@@ -232,7 +233,7 @@ export const INCOME_PAGE: LearnPageSpec = {
           },
           {
             id: 'reader',
-            label: scenario.name === '' ? 'Your rate' : displayName(scenario.name),
+            label: readerLabel(scenario, 'Your rate'),
             points: forwardPath(outcome.value),
             color: 'var(--you)',
             width: 3.4,
@@ -298,9 +299,9 @@ export const INCOME_PAGE: LearnPageSpec = {
       `Low-income countries did not converge. They grew ${rate(LOW_INCOME.growth)} a year `
       + `since 1990 and ${rate(LOW_INCOME.growthRecentDecade)} over the past decade, while `
       + `holding ${LOW_INCOME.populationShare.toFixed(1)}% of the world's people and `
-      + `${LOW_INCOME.gdpShare.toFixed(1)}% of its output. Whether that changes is the single `
-      + 'largest question inside any 2100 income figure, and it is also where most of the '
-      + 'remaining population growth happens.',
+      + `${LOW_INCOME.gdpShare.toFixed(1)}% of its output. Whether that changes decides more `
+      + 'of any 2100 income figure than anything else on this page, and those same countries '
+      + 'carry most of the remaining population growth.',
       'Energy demand follows income through the services people buy with it. A household that '
       + 'reaches middle income buys a refrigerator, then air conditioning, then a vehicle, '
       + 'and each purchase raises the energy behind that household for decades. The models '
@@ -314,10 +315,10 @@ export const INCOME_PAGE: LearnPageSpec = {
       + 'after which the middle-income average passes the high-income one. The second figure '
       + 'above shows it. Treat that as a demonstration of what steady extrapolation does '
       + 'across 75 years rather than as a forecast.',
-      'That saturation is why income and energy intensity have to be read together. A '
+      'That saturation ties income to energy intensity, so read the two together. A '
       + 'scenario can pair fast income growth with fast intensity decline and land on modest '
       + 'energy demand, or pair slow growth with slow decline and land in the same place. The '
-      + 'four factors multiply, so only the product is determined.',
+      + 'four factors multiply, so only their product settles anything.',
     ],
   },
 
@@ -450,8 +451,8 @@ export const INCOME_PAGE: LearnPageSpec = {
       publisher: 'World Bank',
       vintage: '2026 classification',
       url: 'https://datahelpdesk.worldbank.org/knowledgebase/articles/906519',
-      used: 'Which economies count as high, middle and low income. The current '
-        + 'classification is applied across the whole record, so no country moves group '
+      used: 'Which economies count as high, middle and low income. The build applies the '
+        + 'current classification across the whole record, so no country moves group '
         + 'mid-series.',
     },
     {

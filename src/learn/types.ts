@@ -69,8 +69,14 @@ export interface BuilderPart {
 /** What a builder makes of its parts. */
 /** The second figure: a distribution, or another time series. */
 export type ExtraFigure =
-  | { kind: 'strip'; caption: string; key?: KeyEntry[]; spec(outcome: BuilderOutcome): StripSpec }
-  | { kind: 'plot'; caption: string; key?: KeyEntry[]; spec(outcome: BuilderOutcome): PlotSpec };
+  | {
+    kind: 'strip'; caption: string; key?: KeyEntry[];
+    spec(outcome: BuilderOutcome, scenario: Scenario): StripSpec;
+  }
+  | {
+    kind: 'plot'; caption: string; key?: KeyEntry[];
+    spec(outcome: BuilderOutcome, scenario: Scenario): PlotSpec;
+  };
 
 export interface KeyEntry {
   label: string;
@@ -124,6 +130,12 @@ export interface BuilderBlock {
 
 export interface LearnPageSpec {
   slug: string;
+  /**
+   * The page's own colour, used for its kicker, headings, figure furniture
+   * and the builder. Each page takes a different one, so a reader moving
+   * between them can see at a glance which one they are on.
+   */
+  accent: string;
   /** The slider this page feeds. */
   input: InputId;
   title: string;

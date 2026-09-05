@@ -1,7 +1,7 @@
 import { PRESETS } from './model/bounds.js';
 import { computeFlags, markerIdForPreset } from './model/flags.js';
 import { computePath } from './model/kaya.js';
-import { MARKERS, MARKER_BY_ID, publishedPath } from './model/markers.js';
+import { MARKERS, MARKER_BY_ID, MARKER_YEARS, publishedPath } from './model/markers.js';
 import { defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import { ScenarioState, decodeScenario, displayName, pathWithScenario } from './state.js';
@@ -9,6 +9,7 @@ import { renderChart } from './ui/chart.js';
 import { downloadScenarioPdf, downloadScenarioPng } from './ui/export.js';
 import { renderNotes } from './ui/notes.js';
 import { renderSliders, type SliderPanel } from './ui/sliders.js';
+import { attachFigureButtons } from './ui/figure.js';
 import { announceHandoff, appliedInput } from './ui/handoff.js';
 import { installShare, syncHash } from './ui/share.js';
 import { renderStats, type StatTiles } from './ui/stats.js';
@@ -61,6 +62,28 @@ function buildPresets(
         button.setAttribute('aria-pressed', String(id === presetId));
       }
     },
+  };
+}
+
+/**
+ * The numbers behind the front page's chart: the reader's own path year by
+ * year, and every marker at the five-yearly points it publishes.
+ */
+function chartTable(label: string, drawn: ReadonlyArray<{ year: number; co2Gt: number }>) {
+  const years = drawn.map((point) => point.year);
+  return {
+    title: `${label} — annual CO2 to 2100`,
+    columns: [
+      { header: 'Year', values: years },
+      { header: `${label}, GtCO2`, values: drawn.map((point) => point.co2Gt) },
+      ...MARKERS.map((marker) => ({
+        header: `CMIP7 ${marker.label}, GtCO2`,
+        values: years.map((year) => {
+          const index = MARKER_YEARS.indexOf(year);
+          return index < 0 ? null : marker.co2Gt[index] ?? null;
+        }),
+      })),
+    ],
   };
 }
 
@@ -155,6 +178,7 @@ export function mountApp(root: Document = document): App {
     panel(results, 'legend', legend, () => buildLegend(legend, label));
     panel(results, 'chart', chart, () => {
       renderChart(chart, published ?? path, { name: label, highlightMarker: null });
+      figureButtons.update(chartTable(label, (published ?? path).points));
       chart.setAttribute('aria-label',
         `Annual CO2 to 2100 for ${label} and the seven CMIP7 markers`);
       chartCaption.textContent = published === null
@@ -184,6 +208,11 @@ export function mountApp(root: Document = document): App {
     const marker = markerId === null ? undefined : MARKER_BY_ID[markerId];
     return marker === undefined ? null : publishedPath(marker);
   }
+
+  const figureButtons = attachFigureButtons(
+    root, chart, { title: 'Emissions scenario', columns: [] }, 'emissions-scenario',
+  );
+  chart.parentElement?.insertAdjacentElement('afterend', figureButtons.element);
 
   sliders = renderSliders(controls, (id, value) => state.set(id, value));
   presets = buildPresets(presetsContainer, apply);

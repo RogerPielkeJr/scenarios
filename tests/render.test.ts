@@ -202,7 +202,7 @@ describe('a published scenario on screen', () => {
     expect(report?.outputs['tile-cumulative-note']).toContain('as published');
     expect(report?.outputs['chart']).toContain('CMIP7 MEDIUM as published');
     expect(report?.outputs['chart-caption']).toContain('exactly as CMIP7 MEDIUM publishes it');
-    expect(report?.outputs['notes']).toContain('You are looking at CMIP7 MEDIUM as published');
+    expect(report?.outputs['notes']).toContain('This shows CMIP7 MEDIUM as published');
   });
 
   it('draws the published path through the marker\'s own points', () => {

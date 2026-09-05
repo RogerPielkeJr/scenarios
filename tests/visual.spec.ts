@@ -262,6 +262,58 @@ test('a published scenario draws its own path until a slider moves', async ({ pa
   await expect(page.locator('#chart text', { hasText: 'as published' })).toHaveCount(0);
 });
 
+test('every figure offers a PNG and a spreadsheet', async ({ page }) => {
+  for (const path of ['/', '/learn/population/', '/learn/energy-intensity/']) {
+    await page.goto(path);
+    const figures = await page.locator('.chart-figure').count();
+    await expect(page.locator('.figure-actions')).toHaveCount(figures);
+  }
+});
+
+test('the PNG button under a figure downloads that figure', async ({ page }) => {
+  await page.goto('/learn/population/');
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.locator('.figure-actions button', { hasText: 'PNG' }).first().click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/^population-.*\.png$/);
+  const { readFileSync } = await import('node:fs');
+  const bytes = readFileSync((await download.path()) as string);
+  expect(bytes.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
+  expect(bytes.length).toBeGreaterThan(10_000);
+});
+
+test('the XLS button downloads the numbers behind the figure', async ({ page }) => {
+  await page.goto('/learn/population/');
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.locator('.figure-actions button', { hasText: 'XLS' }).first().click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/\.xls$/);
+  const { readFileSync } = await import('node:fs');
+  const text = readFileSync((await download.path()) as string, 'utf8');
+  expect(text).toContain('<?mso-application progid="Excel.Sheet"?>');
+  expect(text).toContain('UN medium');
+  expect(text).toContain('Roger Pielke Jr.');
+  // The years the chart draws have to be in the file the reader downloads.
+  expect(text).toContain('<Data ss:Type="Number">1950</Data>');
+  expect(text).toContain('<Data ss:Type="Number">2100</Data>');
+});
+
+test('a learn page names the reader\'s value after their scenario', async ({ page }) => {
+  await page.goto('/learn/population/?s=11.3_2.2_-1.9_-0.7_-1.5_240&n=Crowded%20century');
+  await expect(page.locator('.builder-result-key')).toHaveText('Crowded century');
+  await expect(page.locator('#learn-chart text', { hasText: 'Crowded century' }))
+    .toHaveCount(1);
+});
+
+test('the builder comes first on a learn page', async ({ page }) => {
+  await page.goto('/learn/income/');
+  const first = page.locator('.learn-block').first();
+  await expect(first).toHaveClass(/builder-block/);
+  await expect(first.locator('h2')).toHaveText('Build your value');
+});
+
 test('a named scenario names its download', async ({ page }) => {
   await page.goto('/');
   await page.locator('#scenario-name').fill('Coal holds on');

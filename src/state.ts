@@ -26,6 +26,17 @@ export function displayName(name: string): string {
   return name === '' ? DEFAULT_SCENARIO_NAME : name;
 }
 
+/**
+ * What to call the reader's own line, value or column on a Learn More page.
+ *
+ * A reader who named their scenario on the front page sees that name here
+ * too, so the line they are moving carries their own label rather than a
+ * generic one.
+ */
+export function readerLabel(scenario: Scenario, fallback: string): string {
+  return scenario.name === '' ? fallback : scenario.name;
+}
+
 /** Every input at its default, with no name. */
 export function defaultScenario(): Scenario {
   return { inputs: defaultInputs(), name: '' };

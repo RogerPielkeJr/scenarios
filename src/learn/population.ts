@@ -9,7 +9,7 @@ import data from '../data/learn_population.json';
 import { BASE_YEAR, END_YEAR } from '../model/config.js';
 import { MARKERS, markerValueFor } from '../model/markers.js';
 import { ANCHORS_2100, SSP_CURVES, SSP_YEARS, populationAt } from '../model/population.js';
-import { displayName } from '../state.js';
+import { readerLabel } from '../state.js';
 import type { PlotPoint, PlotSeries, PlotSpec, Point } from '../ui/plot.js';
 import type { BuilderPart, LearnPageSpec } from './types.js';
 
@@ -124,6 +124,7 @@ const BUILDER_PARTS: BuilderPart[] = PARTS.map((part) => ({
 
 export const POPULATION_PAGE: LearnPageSpec = {
   slug: 'population',
+  accent: '#0f6f74',
   input: 'population',
   title: 'Population',
   standfirst: 'One slider fixes how many people share the world in 2100. This page shows '
@@ -212,8 +213,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
             labelAtEnd: true,
           },
           ...sspSeries(),
-          readerSeries(outcome.value, scenario.name === '' ? 'Your value'
-            : displayName(scenario.name)),
+          readerSeries(outcome.value, readerLabel(scenario, 'Your value')),
         ],
         points: markerPoints(),
         divider: { year: MEDIUM.years[0] ?? 2023, label: 'projection' },

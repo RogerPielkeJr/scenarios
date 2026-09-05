@@ -98,6 +98,38 @@ describe.each(LIVE_PAGES.map((page) => [page.title, page] as const))('%s', (_tit
     }
   });
 
+  it('opens with the builder, before the reading', () => {
+    mountLearnPage(page);
+    const blocks = [...document.querySelectorAll('.learn-block')];
+    expect(blocks[0]?.classList.contains('builder-block')).toBe(true);
+    expect(blocks[0]?.querySelector('h2')?.textContent).toBe(page.builder.heading);
+  });
+
+  it('carries its own colour', () => {
+    mountLearnPage(page);
+    expect(document.documentElement.style.getPropertyValue('--accent')).toBe(page.accent);
+    expect(document.documentElement.dataset['learnPage']).toBe(page.slug);
+  });
+
+  it('offers a PNG and a spreadsheet under every figure', () => {
+    mountLearnPage(page);
+    const figures = document.querySelectorAll('.chart-figure').length;
+    const bars = document.querySelectorAll('.figure-actions');
+    expect(bars).toHaveLength(figures);
+    for (const bar of bars) {
+      expect([...bar.querySelectorAll('button')].map((button) => button.textContent))
+        .toEqual(['PNG', 'XLS']);
+    }
+  });
+
+  it('names the reader\'s own value after their scenario', () => {
+    mountLearnPage(page);
+    expect(document.querySelector('.builder-result-key')?.textContent).toBe(SCENARIO.name);
+    const figures = document.getElementById('learn-chart')?.innerHTML
+      + (document.getElementById('learn-extra')?.innerHTML ?? '');
+    expect(figures).toContain(SCENARIO.name);
+  });
+
   it('gives every source a link, a vintage and a use', () => {
     expect(page.sources.length).toBeGreaterThanOrEqual(4);
     expect(page.sources.length).toBeLessThanOrEqual(8);

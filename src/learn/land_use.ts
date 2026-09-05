@@ -8,6 +8,7 @@
 import data from '../data/learn_land_use.json';
 import { BASE, BASE_YEAR, END_YEAR } from '../model/config.js';
 import { MARKERS, MARKER_BY_ID, markerValueFor } from '../model/markers.js';
+import { readerLabel } from '../state.js';
 import type { PlotSpec, Point } from '../ui/plot.js';
 import type { BuilderPart, LearnPageSpec } from './types.js';
 
@@ -73,7 +74,7 @@ const PARTS: BuilderPart[] = [
     default: 0,
     decimals: 0,
     unitSuffix: ' Mha',
-    note: 'Newly restored land, over and above what is already regrowing. For scale, the '
+    note: 'Newly restored land, over and above what already regrows. For scale, the '
       + 'world holds about 4,000 Mha of forest today.',
     marks: [
       { value: 0, label: 'none', kind: 'observed' },
@@ -123,11 +124,12 @@ const MEDIUM_LOW = MARKER_BY_ID['ML'];
 
 export const LAND_USE_PAGE: LearnPageSpec = {
   slug: 'land-use',
+  accent: '#2f6b3a',
   input: 'landUse',
   title: 'Land use CO2',
-  standfirst: 'One slider sets what forests and farming do to the atmosphere in 2100. It is '
-    + 'the smallest of the six terms, the most uncertain, and the only one that can turn '
-    + 'negative on its own.',
+  standfirst: 'One slider sets what forests and farming do to the atmosphere in 2100. This '
+    + 'term runs smallest of the six, carries the widest uncertainty, and alone among them '
+    + 'turns negative on its own.',
 
   definition: {
     quantity: 'Net CO2 from land use, land-use change and forestry in 2100',
@@ -144,39 +146,39 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + 'emissions grew.',
       `Two large flows netted against each other produce a small number with a large `
       + `uncertainty. The Global Carbon Budget reports ±${C.uncertaintyGtCo2} GtCO2 at one `
-      + `standard deviation, which is ${(C.uncertaintyGtCo2 / D.net * 100).toFixed(0)}% of `
-      + 'the net figure itself.',
+      + `standard deviation, ${(C.uncertaintyGtCo2 / D.net * 100).toFixed(0)}% of the net `
+      + 'figure itself.',
     ],
   },
 
   chart: {
     heading: 'What the world has done',
-    note: 'The band is the published uncertainty, not a range of scenarios.',
+    note: 'The band shows the published uncertainty rather than a spread of scenarios.',
     paragraphs: [
       `Land-use CO2 ran ${gt(C.levels.first)} in ${C.firstYear}, peaked at `
       + `${gt(C.levels.peak)} in ${C.levels.peakYear}, and reached ${gt(C.levels.last)} in `
       + `${C.lastYear}. The Global Carbon Budget records a statistically significant decline `
       + 'of about 0.7 GtCO2 per decade since the late 1990s.',
       `The uncertainty swamps the trend in any single year. At ±${C.uncertaintyGtCo2} GtCO2 `
-      + 'the band is wide enough to contain both a substantial source and something close to '
-      + 'neutral, which is why the scenarios disagree about this term more than about any other.',
+      + 'the band spans both a substantial source and something close to neutral, which '
+      + 'explains why the scenarios disagree about this term more than about any other.',
       `Two figures from the same project show what that means. The series drawn here averages `
       + `${gt(C.vintageGap.seriesDecadeMean)} over 2014 to 2023, while the Global Carbon `
       + `Budget's own 2024 paper reports ${gt(C.vintageGap.paperDecadeMean)} for that decade. `
       + `The ${(C.vintageGap.seriesDecadeMean - C.vintageGap.paperDecadeMean).toFixed(2)} `
-      + 'GtCO2 between them is smaller than the uncertainty on either, and larger than most '
-      + 'of what the sliders on this page argue about.',
+      + 'GtCO2 between them falls short of the uncertainty on either, and exceeds most of '
+      + 'what the sliders on this page argue about.',
     ],
     caption: `World land-use CO2, ${C.firstYear} to ${C.lastYear}, with the Global Carbon `
       + `Budget's one-sigma uncertainty of ±${C.uncertaintyGtCo2} GtCO2, then a straight line `
-      + 'to the 2100 flux you build below. The seven CMIP7 markers sit as dots at 2100.',
+      + 'to the 2100 flux you set above. The seven CMIP7 markers sit as dots at 2100.',
     key: [
       { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
       { label: 'Published uncertainty, 1σ', color: 'var(--navy)' },
       { label: 'Your path', color: 'var(--you)' },
       { label: 'CMIP7 markers at 2100', color: 'var(--dim)', dot: true },
     ],
-    spec(outcome): PlotSpec {
+    spec(outcome, scenario): PlotSpec {
       const band = data.bands[0];
       if (band === undefined) throw new Error('learn_land_use.json has no band');
       const forward: Point[] = [];
@@ -213,7 +215,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
           },
           {
             id: 'reader',
-            label: 'Your path',
+            label: readerLabel(scenario, 'Your path'),
             points: forward,
             color: 'var(--you)',
             width: 3.4,
@@ -239,18 +241,18 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     heading: 'What moves it',
     note: 'Clearing, regrowth, and what turns the term negative.',
     paragraphs: [
-      'Agricultural demand drives the clearing. Cropland and pasture expand where forest is '
-      + 'cheapest to convert and where the crops pay: soy and cattle in the Amazon, oil palm '
+      'Agricultural demand drives the clearing. Cropland and pasture expand where forest '
+      + 'converts most cheaply and where the crops pay: soy and cattle in the Amazon, oil palm '
       + 'in insular Asia, subsistence and charcoal in the Congo basin. Those three countries '
       + 'account for more than half of global land-use emissions.',
       'Regrowth runs in the other direction and receives less attention. Farmland abandoned '
-      + 'in one place regrows while forest falls in another, and the net is what reaches the '
+      + 'in one place regrows while forest falls in another, and only the net reaches the '
       + `atmosphere. Regrowth currently offsets two-thirds of the deforestation flux, so the `
       + 'balance can shift without either flow changing much.',
       'For the term to turn negative, three things have to happen together: clearing has to '
       + 'stop almost entirely, regrowth has to continue or expand on the land already '
-      + 'recovering, and new land has to come into forest at scale. The arithmetic below '
-      + 'makes the size of that requirement explicit.',
+      + 'recovering, and new land has to come into forest at scale. The controls at the top '
+      + 'of this page make the size of that requirement explicit.',
       `Engineered removal sits alongside those. In this tool it belongs on this slider, `
       + 'because a product of four positive factors cannot go below zero however fast the '
       + 'fuel mix changes. Every CMIP7 marker that reaches net negative CO2 does it through '
@@ -281,7 +283,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     paragraphs: [
       'Set what the world clears, what regrows, how much land comes back into forest and how '
       + 'much carbon engineering removes. The builder nets them into a single 2100 flux.',
-      `The restoration arithmetic is area times rate: a million hectares taking up `
+      `The restoration arithmetic multiplies area by rate: a million hectares taking up `
       + `${C.growthRates.matureTropical} tonnes of CO2 a hectare each year removes `
       + `${(C.growthRates.matureTropical / 1000).toFixed(3)} GtCO2 a year. Reaching a gigatonne `
       + `at that rate needs ${Math.round(1000 / C.growthRates.matureTropical)} Mha, and at the `

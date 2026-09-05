@@ -9,7 +9,7 @@ import data from '../data/learn_energy_intensity.json';
 import { BASE, BASE_YEAR, END_YEAR, OBSERVED_RATES } from '../model/config.js';
 import { MARKERS, MARKER_BY_ID, markerValueFor } from '../model/markers.js';
 import { cagr, compound } from '../model/rates.js';
-import { displayName } from '../state.js';
+import { readerLabel } from '../state.js';
 import type { PlotSeries, PlotSpec, Point, StripSpec } from '../ui/plot.js';
 import type { BuilderOutcome, BuilderPart, LearnPageSpec } from './types.js';
 
@@ -153,6 +153,7 @@ function windowRate(values: Readonly<Record<string, number>>): {
 
 export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
   slug: 'energy-intensity',
+  accent: '#1f5fa8',
   input: 'energyPerDollar',
   title: 'Energy per dollar',
   standfirst: 'One slider sets how fast the world squeezes energy out of each dollar of '
@@ -191,12 +192,12 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       + `${mj(C.levels.last)} in ${C.lastYear}, a fall of `
       + `${(100 * (1 - C.levels.last / C.levels.first)).toFixed(0)}% across 59 years. `
       + `Primary energy grew ${rate(C.energy.growth)} over that span and world output `
-      + `${rate(C.gdp.growth)}; the gap between those two rates is this term.`,
+      + `${rate(C.gdp.growth)}; the gap between those two rates gives this term.`,
       `The whole record improves at ${rate(C.rates.wholeRecord)}. The 34 years the World `
       + `Bank covers on its own improve faster, at ${rate(C.rates.longRecord)}, and the past `
       + `decade faster still, at ${rate(C.rates.recentDecade)}.`,
-      `Before 1990 no purchasing-power GDP series exists, so the level is carried back on `
-      + 'the growth rates of the Maddison Project Database. That choice moves the '
+      `Before 1990 no purchasing-power GDP series exists, so the build carries the level `
+      + 'back on Maddison Project growth rates. That choice moves the '
       + `whole-record rate: adjusting Maddison's growth to match the World Bank over the 32 `
       + `years they share gives ${rate(C.spliceSensitivity.wholeRecordRate)} instead of `
       + `${rate(C.rates.wholeRecord)}. Everything from 1990 onward rests on the World Bank alone.`,
@@ -237,7 +238,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
           },
           {
             id: 'reader',
-            label: scenario.name === '' ? 'Your rate' : displayName(scenario.name),
+            label: readerLabel(scenario, 'Your rate'),
             points: forwardPath(outcome.value),
             color: 'var(--you)',
             width: 3.4,
@@ -253,7 +254,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
         + `${rate(WINDOWS.fastest.value)} in ${WINDOWS.fastest.from}-${WINDOWS.fastest.to} to `
         + `${rate(WINDOWS.slowest.value)} in ${WINDOWS.slowest.from}-${WINDOWS.slowest.to}. `
         + 'Faster improvement sits to the left.',
-      spec(outcome: BuilderOutcome): StripSpec {
+      spec(outcome: BuilderOutcome, scenario): StripSpec {
         const chosen = outcome.value;
         const min = Math.min(-2.6, Math.floor((chosen - 0.3) * 2) / 2);
         const max = Math.max(0.2, Math.ceil((chosen + 0.3) * 2) / 2);
@@ -263,7 +264,12 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
           highlights: [
             { id: 'observed', label: 'observed', value: OBSERVED, color: 'var(--navy)' },
             { id: 'high', label: 'CMIP7 HIGH', value: HIGH_RATE, color: 'var(--scenario-high)' },
-            { id: 'reader', label: 'your rate', value: chosen, color: 'var(--you)' },
+            {
+              id: 'reader',
+              label: readerLabel(scenario, 'your rate'),
+              value: chosen,
+              color: 'var(--you)',
+            },
           ],
           min,
           max,
@@ -395,7 +401,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       vintage: 'accessed 2026',
       url: 'https://data.worldbank.org/indicator/NY.GDP.MKTP.PP.KD',
       used: 'World output from 1990 onward, the denominator of the intensity series and the '
-        + 'basis every rate on this page is measured against.',
+        + 'basis every rate on this page measures against.',
     },
     {
       title: 'Maddison-style estimates of the evolution of the world economy: A new 2023 update',

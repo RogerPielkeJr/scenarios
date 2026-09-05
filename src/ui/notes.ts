@@ -45,7 +45,7 @@ function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): strin
   const gt = (value: number) => `${value.toFixed(1)} GtCO2`;
   const sentences: string[] = showingPublished
     ? [
-      `<b>You are looking at CMIP7 ${fit.label} as published.</b> The chart draws that `
+      `<b>This shows CMIP7 ${fit.label} as published.</b> The chart draws that `
       + 'scenario\'s own path and the totals above come from it. Move any slider and both '
       + `switch to your reconstruction from the six Kaya factors ${fit.label} reports.`,
     ]
@@ -129,18 +129,19 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
       + 'unexamined.</p>');
   }
 
-  parts.push('<p><b>How this is worked out.</b> Emissions come from four factors multiplied '
+  parts.push('<p><b>How the tool works this out.</b> Emissions come from four factors '
+    + 'multiplied '
     + 'together: how many people, how much each of them earns, how much energy each dollar of '
     + 'that income needs, and how much carbon each unit of energy carries. Economists call the '
-    + 'middle two energy intensity and carbon intensity. Land use CO2 is added on top from its '
+    + 'middle two energy intensity and carbon intensity. Land use CO2 joins them from its '
     + 'own slider. The four cover fossil and industrial CO2, cement included, so they count '
     + 'the same emissions the CMIP7 scenarios count.</p>');
 
-  parts.push('<p><b>What the warming figure is.</b> A curve fitted to FaIR runs of the seven '
-    + 'CMIP7 markers, so treat it as indicative rather than a model result. It reads the total '
+  parts.push('<p><b>Where the warming figure comes from.</b> A curve fitted to FaIR runs of '
+    + 'the seven CMIP7 markers, so treat it as indicative rather than as a model result. It reads the total '
     + 'CO2 you emit and your methane, and nothing else, which means two paths reaching the same '
     + 'total give the same answer however differently they got there. Methane adds about '
-    + `0.12 °C per 100 Mt a year. The form is ${EMULATOR_FORM}.</p>`);
+    + `0.12 °C per 100 Mt a year. It takes the form ${EMULATOR_FORM}.</p>`);
 
   parts.push(`<p><b>The two technology bounds.</b> Jesse Ausubel argued in 1995 that `
     + 'technological trajectories move at rates steady enough to bound the future, and that a '

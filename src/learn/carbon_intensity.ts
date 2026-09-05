@@ -9,6 +9,7 @@ import data from '../data/learn_fuel_mix.json';
 import { BASE, BASE_YEAR, END_YEAR } from '../model/config.js';
 import { MARKERS, MARKER_BY_ID, markerValueFor } from '../model/markers.js';
 import { cagr, compound } from '../model/rates.js';
+import { readerLabel } from '../state.js';
 import type { PlotArea, PlotSeries, PlotSpec, Point } from '../ui/plot.js';
 import type { BuilderOutcome, BuilderPart, LearnPageSpec } from './types.js';
 
@@ -179,6 +180,7 @@ const FOSSIL_1965 = FOSSIL_IDS.reduce(
 
 export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
   slug: 'carbon-intensity',
+  accent: '#8c2f39',
   input: 'co2PerEnergy',
   title: 'CO2 per unit of energy',
   standfirst: 'One slider sets how fast the carbon comes out of the world’s energy. '
@@ -195,7 +197,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + `${factorFor('coal').toFixed(1)} kgCO2 for every gigajoule it delivers, oil `
       + `${factorFor('oil').toFixed(1)} and natural gas ${factorFor('gas').toFixed(1)}. `
       + 'Nuclear, hydro, wind and solar release none at the point of use. Shifting energy '
-      + 'between those columns is the whole of this factor.',
+      + "between those columns does the whole of this factor's work.",
       `Two accountings run side by side here. Burning fuel released `
       + `${kg(C.levels.energyBasis2024)} in ${C.lastYear}. The slider measures `
       + `${kg(C.levels.sliderBasis2024)}, because it also carries the cement, flaring and `
@@ -228,10 +230,10 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + `${C.firstYear} to ${kg(C.levels.sliderBasis2024)} in ${C.lastYear}, a fall of `
       + `${(100 * (1 - C.levels.sliderBasis2024 / C.levels.sliderBasis1965)).toFixed(0)}% in `
       + `59 years, or ${rate(C.rates.sliderBasisWhole)}. Energy intensity fell 46% over the `
-      + 'same span. That gap is why the middle two Kaya terms behave so differently.',
+      + 'same span. That gap explains why the middle two Kaya terms behave so differently.',
     ],
     caption: `Shares of world primary energy, ${C.firstYear} to ${C.lastYear} as measured, `
-      + 'then a straight line to the mix you build below. Fossil fuels fill the bottom three '
+      + 'then a straight line to the mix you set above. Fossil fuels fill the bottom three '
       + 'bands.',
     key: FACTORS.map((factor) => ({
       label: factor.label,
@@ -263,7 +265,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
         { label: 'Your mix', color: 'var(--you)' },
         { label: 'CMIP7 markers', color: 'var(--dim)', dash: true },
       ],
-      spec(outcome: BuilderOutcome): PlotSpec {
+      spec(outcome: BuilderOutcome, scenario): PlotSpec {
         return {
           xMin: C.firstYear,
           xMax: END_YEAR,
@@ -290,7 +292,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
             },
             {
               id: 'reader',
-              label: 'Your mix',
+              label: readerLabel(scenario, 'Your mix'),
               points: forwardPath(outcome.value),
               color: 'var(--you)',
               width: 3.4,
@@ -312,11 +314,10 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + 'times as much energy as it consumed in 1965, and fossil fuels supplied most of that '
       + 'addition, so a large absolute build-out of nuclear, hydro, wind and solar still left '
       + `the fossil share at ${pc(FOSSIL_2024)}.`,
-      'The arithmetic is unforgiving. To cut this term by half while total energy doubles, '
+      'The arithmetic forgives nothing. To cut this term by half while total energy doubles, '
       + 'zero-carbon supply has to quadruple and then some, because it has to cover both the '
       + 'share it takes from fossil fuels and the growth in the total. Every scenario that '
-      + 'decarbonises quickly is, underneath, a scenario about how fast clean supply can be '
-      + 'built.',
+      + 'decarbonises quickly rests, underneath, on how fast the world builds clean supply.',
       `Fuel switching inside the fossil block helps and runs out. Replacing every remaining `
       + `tonne of coal with gas would cut about `
       + `${((factorFor('coal') - factorFor('gas')) * (FACTORS.find((f) => f.id === 'coal')?.share2024 ?? 0) / 100).toFixed(1)} `
@@ -334,11 +335,11 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
     heading: 'What the CMIP7 markers assume',
     note: 'Four of the seven publish a rate for this term.',
     paragraphs: [
-      `CMIP7 HIGH assumes ${rate(HIGH_RATE)}, which is slower than the `
+      `CMIP7 HIGH assumes ${rate(HIGH_RATE)}, slower than the `
       + `${rate(C.rates.sliderBasis1990)} the world has managed since 1990 and slower still `
       + `than the ${rate(C.rates.sliderBasisDecade)} of the past decade. A world that keeps `
-      + 'building energy at that carbon content is a world where the past ten years of wind, '
-      + 'solar and nuclear turn out to have been an aberration.',
+      + 'building energy at that carbon content treats the past ten years of wind, solar and '
+      + 'nuclear as an aberration.',
       `CMIP7 MEDIUM assumes ${rate(MEDIUM_RATE)}, about `
       + `${(MEDIUM_RATE / C.rates.sliderBasis1990).toFixed(0)} times the rate since 1990. `
       + `MEDIUM-to-LOW assumes ${rate(markerValueFor(MARKER_BY_ID['ML'] ?? MARKERS[0]!, 'co2PerEnergy') ?? 0)}, `
@@ -352,16 +353,16 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
     note: 'Set the 2100 mix; the page converts it.',
     paragraphs: [
       'Set a share for each fuel in 2100. The shares need not add to 100, because the builder '
-      + 'normalises them; what matters is their proportions. Published emission factors turn '
+      + 'normalises them; their proportions carry the answer. Published emission factors turn '
       + 'the mix into kilograms of CO2 per gigajoule, and the distance from today’s '
       + `${kg(C.levels.sliderBasis2024)} across 75 years gives the rate the slider takes.`,
-      `Two adjustments sit between the mix and the answer, both of them visible below. The `
-      + `emission factors are scaled by ${C.calibration.factor.toFixed(3)}, because applied `
+      `Two adjustments sit between the mix and the answer, both of them visible in the result. The `
+      + `page scales the emission factors by ${C.calibration.factor.toFixed(3)}, because applied `
       + `raw to the ${C.lastYear} mix they give ${kg(C.calibration.modelled2024)} against the `
       + `${kg(C.calibration.observed2024)} the world actually emitted from energy, the `
-      + 'difference being oil that becomes plastics, lubricants and bitumen rather than '
-      + `exhaust. And ${kg(C.nonCombustion.kgPerGj)} of cement, flaring and industrial CO2 is `
-      + 'added on top, which the last control lets you change.',
+      + 'difference falling to oil that becomes plastics, lubricants and bitumen rather than '
+      + `exhaust. It then adds ${kg(C.nonCombustion.kgPerGj)} of cement, flaring and `
+      + 'industrial CO2 on top, which the last control lets you change.',
     ],
     action: 'Use this rate in my scenario',
     modes: [{

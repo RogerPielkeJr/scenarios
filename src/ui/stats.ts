@@ -35,7 +35,7 @@ export function renderStats(
   const cumulativeGt = published === null ? path.cumulativeGt : published.cumulativeGt;
   tiles.cumulative.textContent = thousands(cumulativeGt);
   const highNote = HIGH === undefined ? 'GtCO2'
-    : `GtCO2 · CMIP7 HIGH is ${thousands(HIGH.cumulativeGt)}`;
+    : `GtCO2 · CMIP7 HIGH reaches ${thousands(HIGH.cumulativeGt)}`;
   tiles.cumulativeNote.textContent = published === null
     ? highNote
     : `GtCO2 · as published by ${published.label}`;
@@ -61,6 +61,7 @@ export function renderStats(
   } else {
     tiles.analogue.textContent = country.name;
     tiles.analogueNote.textContent =
-      `${perDollar(intensity)} kg CO2 per dollar · ${country.name} is ${perDollar(country.kg_co2_per_usd)}`;
+      `${perDollar(intensity)} kg CO2 per dollar · ${country.name} runs `
+      + `${perDollar(country.kg_co2_per_usd)}`;
   }
 }

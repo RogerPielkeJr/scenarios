@@ -9,6 +9,7 @@ import data from '../data/learn_methane.json';
 import { BASE, BASE_YEAR, END_YEAR, SPEC_BY_ID } from '../model/config.js';
 import { MARKERS, MARKER_BY_ID, markerValueFor } from '../model/markers.js';
 import { METHANE } from '../model/emulator.js';
+import { readerLabel } from '../state.js';
 import type { PlotArea, PlotSpec } from '../ui/plot.js';
 import type { BuilderPart, LearnPageSpec } from './types.js';
 
@@ -88,6 +89,7 @@ function warmingFrom(value: number): number {
 
 export const METHANE_PAGE: LearnPageSpec = {
   slug: 'methane',
+  accent: '#5c4a9e',
   input: 'methane',
   title: 'Methane',
   standfirst: 'One slider sets how much methane the world emits in 2100. Methane leaves the '
@@ -107,7 +109,7 @@ export const METHANE_PAGE: LearnPageSpec = {
       + 'the flow in a given year does almost all of it.',
       'That turns this slider into a level rather than a rate. The four CO2 factors set rates '
       + 'of change and the tool adds up everything they emit. Methane asks one question: how '
-      + 'much is the world still emitting in 2100?',
+      + 'much does the world still emit in 2100?',
       `The tool converts that answer at ${degrees(METHANE.k * 100)} per 100 Mt a year against `
       + `today's ${mt(METHANE.refMt)}. Moving the slider across its whole range, ${SPEC.min} `
       + `to ${SPEC.max} Mt, changes the 2100 warming figure by `
@@ -130,17 +132,20 @@ export const METHANE_PAGE: LearnPageSpec = {
       + `${pc(RICE.share)}. The first two carry most of the reductions the scenarios assume.`,
       'Natural wetlands emit more than all of these together and sit outside both the chart '
       + 'and the slider. The Global Methane Budget puts wetlands and inland fresh water at '
-      + '248 Tg a year against 369 Tg from direct anthropogenic sources, which is why a '
-      + 'scenario can cut human methane hard and still leave a large natural flux in place.',
+      + '248 Tg a year against 369 Tg from direct anthropogenic sources, which lets a '
+      + 'scenario cut human methane hard and still leave a large natural flux in place.',
     ],
     caption: `Anthropogenic methane by source, ${C.firstYear} to ${C.lastYear}, in million `
-      + 'tonnes a year, then a straight line to the 2100 total you build below. The seven '
+      + 'tonnes a year, then a straight line to the 2100 total you set above. The seven '
       + 'CMIP7 markers sit as dots at 2100.',
-    key: SOURCES.map((entry) => ({
-      label: entry.label,
-      color: SOURCE_COLORS[entry.id] ?? 'var(--dim)',
-    })),
-    spec(outcome): PlotSpec {
+    key: [
+      ...SOURCES.map((entry) => ({
+        label: entry.label,
+        color: SOURCE_COLORS[entry.id] ?? 'var(--dim)',
+      })),
+      { label: 'All sources together', color: 'var(--you)' },
+    ],
+    spec(outcome, scenario): PlotSpec {
       const values = outcome.values ?? {};
       const forwardYears = [2030, 2040, 2050, 2060, 2070, 2080, 2090, END_YEAR];
       const areas: PlotArea[] = SOURCES.map((entry) => {
@@ -159,6 +164,13 @@ export const METHANE_PAGE: LearnPageSpec = {
           color: SOURCE_COLORS[entry.id] ?? 'var(--dim)',
         };
       });
+      // A line across the top of the stack, so the reader's own total carries
+      // their name rather than sitting as an unlabelled edge.
+      const first = areas[0];
+      const total = first === undefined ? [] : first.years.map((year, index) => ({
+        year,
+        value: areas.reduce((sum, area) => sum + (area.values[index] ?? 0), 0),
+      }));
       return {
         xMin: C.firstYear,
         xMax: END_YEAR,
@@ -166,7 +178,14 @@ export const METHANE_PAGE: LearnPageSpec = {
         yLabel: 'Mt CH4 a year',
         yDecimals: 0,
         areas,
-        series: [],
+        series: [{
+          id: 'reader',
+          label: readerLabel(scenario, 'All sources'),
+          points: total,
+          color: 'var(--you)',
+          width: 2.4,
+          labelAtEnd: true,
+        }],
         points: MARKERS.flatMap((marker) => {
           const value = markerValueFor(marker, 'methane');
           return value === null ? [] : [{
@@ -190,22 +209,22 @@ export const METHANE_PAGE: LearnPageSpec = {
       'A short atmospheric life cuts both ways. Methane emitted in the 2030s has stopped '
       + 'warming the planet by 2100, so a scenario can emit a great deal along the way and '
       + 'still land at a low 2100 level. A cut also delivers its cooling within two decades '
-      + 'rather than over centuries, which is why methane attracts attention out of '
-      + 'proportion to its share of emissions.',
+      + 'rather than over centuries, which draws attention to methane out of proportion to '
+      + 'its share of emissions.',
       'Fossil methane leaks from wells, pipelines, compressors and mines, and stopping it '
       + 'often pays for itself in recovered gas. Satellites now find individual leaks, which '
       + 'has moved this source from an estimate to an observation and revised inventories '
       + 'upward in the process.',
       'Livestock methane comes out of rumen fermentation and manure. It scales with herd '
       + 'size, herd size scales with meat and dairy demand, and that demand rises with income '
-      + 'in exactly the countries where income is projected to rise. Feed additives, breeding '
+      + 'in exactly the countries whose income the projections raise. Feed additives, breeding '
       + 'and manure management each shave a few percent off it; none of them halves it.',
-      `Rice paddies emit while flooded, and drainage regimes change that. Rice is the one `
-      + `source on this chart that fell between ${C.firstYear} and ${C.lastYear}, at `
+      `Rice paddies emit while flooded, and drainage regimes change that. Rice alone fell `
+      + `among the sources on this chart between ${C.firstYear} and ${C.lastYear}, at `
       + `${RICE.growth >= 0 ? '+' : '−'}${Math.abs(RICE.growth).toFixed(2)}% a year, while `
       + `waste methane from landfills and wastewater grew fastest of the five at `
-      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both are `
-      + 'smaller than fossil fuels or livestock, and both are more tractable.',
+      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both run `
+      + 'smaller than fossil fuels or livestock, and both yield more readily.',
       'The Global Methane Budget records that direct anthropogenic methane has tracked the '
       + 'scenarios assuming no or minimal mitigation policy since 2012. That describes the '
       + 'past decade; the slider asks about the seven that follow.',
@@ -220,13 +239,14 @@ export const METHANE_PAGE: LearnPageSpec = {
       + `spread of ${(HIGH_CH4 / VERY_LOW_CH4).toFixed(1)} times. HIGH assumes `
       + `${((HIGH_CH4 / BASE.methaneMt - 1) * 100).toFixed(0)}% more than today; VERY LOW `
       + `assumes ${((1 - VERY_LOW_CH4 / BASE.methaneMt) * 100).toFixed(0)}% less.`,
-      `That whole spread is worth ${degrees(METHANE.k * (HIGH_CH4 - VERY_LOW_CH4))} in this `
-      + 'tool, against the 1.65 °C that separates those two scenarios overall. Methane '
+      `That whole spread moves this tool's warming figure by `
+      + `${degrees(METHANE.k * (HIGH_CH4 - VERY_LOW_CH4))}, against the 1.65 °C separating `
+      + 'those two scenarios overall. Methane '
       + 'matters here, and the CO2 factors decide the century.',
       'Treat the coefficient with care. It comes from fitting a straight line to seven FaIR '
       + 'runs, so it reproduces those seven and carries no information about a methane path '
-      + 'outside their range. It also ignores when the methane is emitted, which for a gas '
-      + 'with a decade-long life is a real simplification.',
+      + 'outside their range. It also ignores when the methane leaves the ground, a real '
+      + 'simplification for a gas that clears the atmosphere within a decade.',
     ],
   },
 
@@ -239,8 +259,8 @@ export const METHANE_PAGE: LearnPageSpec = {
       `EDGAR's inventory totals ${mt(C.totals.last)} for ${C.lastYear}, while the tool's base `
       + `year uses ${mt(BASE.methaneMt)}, which sits inside the Global Methane Budget's `
       + 'top-down estimate of 369 Tg a year for direct anthropogenic sources, range 350 to '
-      + `391. Each source here is scaled by ${CALIBRATION.toFixed(3)} so today's five add up `
-      + 'to the number the slider starts from.',
+      + `391. The page scales each source by ${CALIBRATION.toFixed(3)} so today's five add `
+      + 'up to the number the slider starts from.',
     ],
     action: 'Use this methane figure in my scenario',
     modes: [{
