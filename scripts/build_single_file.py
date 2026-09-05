@@ -74,12 +74,10 @@ def main() -> None:
     for i, arg in enumerate(sys.argv):
         if arg == '--page' and i + 1 < len(sys.argv):
             page = sys.argv[i + 1]
-    sources = {
-        'main': 'index.html',
-        'bibliography': 'bibliography.html',
-        'learn': 'learn/index.html',
-        'learn-population': 'learn/population/index.html',
-    }
+    # Every entry point vite.config.ts builds, read from it rather than
+    # repeated here, so a new page needs registering in one place only.
+    config = (ROOT / 'vite.config.ts').read_text()
+    sources = dict(re.findall(r"'?([\w-]+)'?: '([^']+\.html)'", config))
     if page not in sources:
         raise SystemExit(f'--page must be one of {", ".join(sources)}')
     source = sources[page]
