@@ -55,6 +55,25 @@ REGIONS = [
 # is what separates what the age structure alone does from what fertility does.
 VARIANTS = ('Medium', 'Low', 'High', 'Lower 95 PI', 'Upper 95 PI',
             'Momentum', 'Constant fertility')
+
+# IHME's reference forecast, from the findings of Vollset et al. (2020),
+# The Lancet 396:1285-1306, doi:10.1016/S0140-6736(20)30677-2. The full
+# trajectory sits behind a login at the Global Health Data Exchange, so the
+# page draws the two published points and says so.
+IHME = {
+    'source': 'Vollset et al. (2020), The Lancet 396, reference scenario',
+    'doi': 'https://doi.org/10.1016/S0140-6736(20)30677-2',
+    'peakYear': 2064,
+    'peakBn': 9.73,
+    'peakLo': 8.84,
+    'peakHi': 10.9,
+    'end2100Bn': 8.79,
+    'end2100Lo': 6.83,
+    'end2100Hi': 11.8,
+    'fertility2100': 1.66,
+    'note': 'the two points the paper states; the full trajectory needs a '
+            'Global Health Data Exchange account',
+}
 # Years the fertility figures are quoted for.
 FERTILITY_YEARS = (1950, 1990, 2024, 2100)
 WANTED = {(name, kind) for name, kind, _, _ in REGIONS} | {('World', 'World')}
@@ -239,6 +258,7 @@ def main() -> None:
                 'subSaharanConstantFertility': round_to(
                     series_for(table, 'Sub-Saharan Africa', 'Constant fertility')[LAST_YEAR], 3),
             },
+            'ihme': IHME,
             'fertility': {
                 'world': {str(year): fertility['World'][year] for year in FERTILITY_YEARS
                           if year in fertility.get('World', {})},

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { existsSync } from 'node:fs';
 import { LEARN_ENTRIES } from '../src/learn/registry.js';
+import { SOURCES_BY_SLUG, citedSources } from '../src/learn/sources/index.js';
 
 const read = (name: string) => readFileSync(resolve(process.cwd(), name), 'utf8');
 const INDEX = read('index.html');
@@ -115,5 +116,40 @@ describe('the Learn More pages', () => {
     expect(LEARN_POPULATION).toContain('<title>Population');
     expect(LEARN_POPULATION).toContain('id="learn-title"');
     expect(LEARN_INDEX).toContain('id="learn-main"');
+  });
+});
+
+describe('the bibliography against the Learn More pages', () => {
+  it('holds a source list for every page the registry calls live', () => {
+    for (const entry of LEARN_ENTRIES.filter((page) => page.status === 'live')) {
+      const sources = SOURCES_BY_SLUG[entry.slug];
+      expect(sources, entry.slug).toBeDefined();
+      expect(sources?.length ?? 0, entry.slug).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('lists every work the live pages cite, once each', () => {
+    const cited = citedSources();
+    const urls = cited.map((entry) => entry.source.url);
+    expect(new Set(urls).size).toBe(urls.length);
+    for (const entry of LEARN_ENTRIES.filter((page) => page.status === 'live')) {
+      for (const source of SOURCES_BY_SLUG[entry.slug] ?? []) {
+        const found = cited.find((candidate) => candidate.source.url === source.url);
+        expect(found, `${entry.slug} → ${source.title}`).toBeDefined();
+        expect(found?.pages).toContain(entry.title);
+      }
+    }
+  });
+
+  it('gives every cited work a resolvable link and a plain-language gloss', () => {
+    for (const { source } of citedSources()) {
+      expect(source.url, source.title).toMatch(/^https:\/\//);
+      expect(source.used.length, source.title).toBeGreaterThan(20);
+    }
+  });
+
+  it('leaves room on the page for the generated list', () => {
+    expect(BIBLIOGRAPHY).toContain('id="learn-sources"');
+    expect(BIBLIOGRAPHY).toContain('Behind the Learn More pages');
   });
 });

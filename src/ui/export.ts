@@ -66,7 +66,7 @@ function summaryOf(
       published !== null ? `GtCO2 · as published by ${published.label}`
         : (high === undefined ? 'GtCO2'
           : `GtCO2 · CMIP7 HIGH reaches ${thousands(high.cumulativeGt)}`)],
-    ['Warming in 2100', degrees(t),
+    ['Warming in 2100 above 1850-1900', degrees(t),
       published === null ? placeAmongMarkers(t) : `as published by ${published.label}`],
     ['Added warming from now', signedDegrees(added),
       'above the 2015-2024 average of 1.24 °C'],

@@ -145,5 +145,5 @@ export interface LearnPageSpec {
   drivers: ProseBlock;
   markers: ProseBlock;
   builder: BuilderBlock;
-  sources: Source[];
+  sources: readonly Source[];
 }

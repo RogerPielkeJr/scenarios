@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { citedSources } from '../src/learn/sources/index.js';
 
 const BREAKPOINTS = [
   { name: '360', width: 360, height: 1400 },
@@ -100,7 +101,10 @@ test('the bibliography button reaches the bibliography and back', async ({ page 
   await page.locator('.toolbar a', { hasText: 'Bibliography' }).click();
   await expect(page).toHaveURL(/bibliography\.html$/);
   await expect(page.locator('h1')).toHaveText('Bibliography');
-  await expect(page.locator('.refs > li')).toHaveCount(16);
+  // Sixteen hand-written entries, plus one per work the Learn More pages cite.
+  await expect(page.locator('#learn-sources > li')).toHaveCount(citedSources().length);
+  await expect(page.locator('.refs > li')).toHaveCount(16 + citedSources().length);
+  await expect(page.locator('.cited-by').first()).toContainText('Cited by:');
   await expect(page.getByText('The Climate Fix')).toBeVisible();
   await page.locator('.toolbar a', { hasText: 'Back to the scenario builder' }).click();
   await expect(page.locator('h1')).toHaveText('Build your own emissions scenario');

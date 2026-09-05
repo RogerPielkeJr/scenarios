@@ -333,6 +333,40 @@ The chart brings the named marker's own published path forward whenever one of
 those presets is loaded, so the divergence sits in front of the reader rather
 than in a footnote.
 
+## How far the marker factors can be checked
+
+The seven markers' Kaya factors arrived with the prototype and have no primary
+source on this machine; verifying them needs the IIASA ScenarioMIP database,
+which requires an account. Two checks are possible without it, and both were
+run.
+
+**Populations reconcile exactly.** HIGH takes SSP3's 12.98 billion, MEDIUM and
+three others take SSP2's 9.89, HIGH-to-LOW and VERY LOW take SSP1's 8.09 to
+8.12. Those match `population.json` to the last digit.
+
+**The rates reconcile with each marker's own 2100 total, where a rate can
+exist.** Compounding population, income and energy per dollar from the base
+year, then solving for the carbon intensity rate that lands on the marker's own
+2100 fossil CO2:
+
+| Marker | Published rate | Rate implied by its own 2100 total |
+|---|---|---|
+| HIGH | −0.08 %/yr | −0.10 %/yr |
+| MEDIUM | −0.87 %/yr | −0.85 %/yr |
+| HIGH-to-LOW | −2.78 %/yr | −3.50 %/yr |
+| MEDIUM-to-LOW | −3.06 %/yr | no rate reaches it |
+| LOW, LOW-to-NEGATIVE, VERY LOW | none published | no rate reaches it |
+
+HIGH and MEDIUM agree within 0.02 percentage points, which is as much
+corroboration as an internal check can give. HIGH-to-LOW is 0.72 points out.
+
+The last four rows are the interesting result. Those four markers reach 2100
+with fossil and industrial CO2 **below zero** once their land-use term is
+separated: −0.4, −3.7, −23.2 and −1.1 GtCO2 a year. A rate applied to a
+positive quantity cannot reach a negative one, which explains why three of them
+publish no carbon-intensity rate at all. It is the same structural limit the
+CMIP7 preset note reports on the front page.
+
 ## What the tool does not represent
 
 **Engineered carbon removal.** The four factors multiply to a positive number

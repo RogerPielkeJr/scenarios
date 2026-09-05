@@ -12,6 +12,7 @@ import { ANCHORS_2100, SSP_CURVES, SSP_YEARS, populationAt } from '../model/popu
 import { readerLabel } from '../state.js';
 import type { PlotPoint, PlotSeries, PlotSpec, Point } from '../ui/plot.js';
 import type { BuilderPart, LearnPageSpec } from './types.js';
+import { POPULATION_SOURCES } from './sources/population.js';
 
 const C = data.constants;
 const PARTS = data.parts;
@@ -65,6 +66,29 @@ function markerPoints(): PlotPoint[] {
     dots.push({ id: marker.id, label: '', year: END_YEAR, value, color: marker.color });
   }
   return dots;
+}
+
+const IHME = C.ihme;
+
+/**
+ * IHME's reference forecast, as two published points joined by a straight
+ * line. The paper states the peak and the 2100 level; the trajectory between
+ * them sits behind a login, and the caption says so rather than inventing a
+ * shape.
+ */
+function ihmeSeries(): PlotSeries {
+  return {
+    id: 'ihme',
+    label: 'IHME',
+    points: [
+      { year: IHME.peakYear, value: IHME.peakBn },
+      { year: END_YEAR, value: IHME.end2100Bn },
+    ],
+    color: 'var(--dim)',
+    width: 2,
+    dash: '2 5',
+    labelAtEnd: true,
+  };
 }
 
 const SSP_COLORS: Record<string, string> = {
@@ -152,7 +176,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
 
   chart: {
     heading: 'What the world has done',
-    note: 'The IHME projection joins this chart in a later revision.',
+    note: 'Three forecasters, three answers, and the reader\'s own on top.',
     paragraphs: [
       `World population grew from ${bn(FIRST_VALUE)} in ${FIRST_YEAR} to ${bn(C.today.worldBn)} in `
       + `${C.today.year}. The UN's medium projection peaks at ${bn(C.today.peakBn)} in `
@@ -162,12 +186,22 @@ export const POPULATION_PAGE: LearnPageSpec = {
       + 'SSP3. Those three describe '
       + 'different development stories, so their spread measures disagreement about how the '
       + 'century unfolds rather than statistical uncertainty about one projection.',
+      `A third forecaster lands lower than either. IHME's reference scenario peaks at `
+      + `${bn(IHME.peakBn)} in ${IHME.peakYear} and falls to ${bn(IHME.end2100Bn)} by 2100, `
+      + `with a 95% uncertainty interval of ${bn(IHME.end2100Lo)} to ${bn(IHME.end2100Hi)}. `
+      + `That sits ${bn(C.world2100.medium - IHME.end2100Bn)} below the UN medium and inside `
+      + `SSP1. The gap turns on fertility: IHME forecasts a world total of `
+      + `${IHME.fertility2100} births per woman in 2100 against the UN's `
+      + `${FERTILITY.world['2100']}, on the argument that female education and access to `
+      + 'contraception push fertility down faster than the UN assumes. This chart draws the '
+      + 'two points that paper states, joined by a straight line, because the trajectory '
+      + 'between them needs an account at the Global Health Data Exchange.',
     ],
     caption: `World population, ${FIRST_YEAR} to ${END_YEAR}: UN estimates and the medium `
       + 'projection with its '
       + '95% prediction interval, the three SSP trajectories the CMIP7 markers use, the seven '
-      + 'markers as dots at 2100, and your own value. Each marker sits on an SSP trajectory, '
-      + 'so four of the seven share one point.',
+      + 'markers as dots at 2100, IHME\'s two published points, and your own value. Each '
+      + 'marker sits on an SSP trajectory, so four of the seven share one point.',
     key: [
       { label: `Estimates to ${HISTORY.years[HISTORY.years.length - 1] ?? 2023}`,
         color: 'var(--ink)' },
@@ -175,6 +209,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
       { label: 'SSP1', color: 'var(--scenario-very-low)', dash: true },
       { label: 'SSP2', color: 'var(--scenario-medium)', dash: true },
       { label: 'SSP3', color: 'var(--scenario-high)', dash: true },
+      { label: `IHME reference, ${IHME.peakYear} and 2100`, color: 'var(--dim)', dash: true },
       { label: 'Your value', color: 'var(--you)' },
       { label: 'The seven CMIP7 markers at 2100', color: 'var(--dim)', dot: true },
     ],
@@ -213,6 +248,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
             labelAtEnd: true,
           },
           ...sspSeries(),
+          ihmeSeries(),
           readerSeries(outcome.value, readerLabel(scenario, 'Your value')),
         ],
         points: markerPoints(),
@@ -307,71 +343,6 @@ export const POPULATION_PAGE: LearnPageSpec = {
     }],
   },
 
-  sources: [
-    {
-      title: 'World Population Prospects 2024, Total Population by Sex (standard projections)',
-      publisher: 'UN Department of Economic and Social Affairs, Population Division',
-      vintage: '2024 revision, file dated 13 December 2024',
-      url: 'https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)'
-        + '/CSV_FILES/WPP2024_TotalPopulationBySex.csv.gz',
-      used: 'World estimates 1950 to 2023, the medium projection to 2100, the low, high, '
-        + 'momentum and constant-fertility variants, the 95% prediction interval, and the '
-        + 'seven regional totals the builder adds up.',
-    },
-    {
-      title: 'World Population Prospects 2024, Demographic Indicators (medium variant)',
-      publisher: 'UN Department of Economic and Social Affairs, Population Division',
-      vintage: '2024 revision',
-      url: 'https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)'
-        + '/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz',
-      used: 'Total fertility for the world in 1950, 1990, 2024 and 2100, and for each of the '
-        + 'seven regions in 2024.',
-    },
-    {
-      title: 'World Population Prospects 2024: Methodology of the United Nations population '
-        + 'estimates and projections',
-      publisher: 'UN DESA/POP/2024/DC/NO.10',
-      vintage: 'July 2024',
-      url: 'https://population.un.org/wpp/assets/Files/WPP2024_Methodology.pdf',
-      used: 'How the UN builds the low, high and momentum variants, and how it derives the '
-        + 'probabilistic intervals.',
-    },
-    {
-      title: 'World Population Prospects 2024: Summary of Results',
-      publisher: 'UN Department of Economic and Social Affairs, Population Division',
-      vintage: '2024',
-      url: 'https://population.un.org/wpp/assets/Files/WPP2024_Summary-of-Results.pdf',
-      used: 'The projected peak and the regional pattern behind it.',
-    },
-    {
-      title: 'Bayesian probabilistic population projections for all countries',
-      publisher: 'Raftery, Li, Ševčíková, Gerland and Heilig, PNAS 109(35)',
-      vintage: '2012',
-      url: 'https://doi.org/10.1073/pnas.1211452109',
-      used: 'The method that produces the 95% prediction interval drawn on the chart.',
-    },
-    {
-      title: 'World population stabilization unlikely this century',
-      publisher: 'Gerland and colleagues, Science 346(6206)',
-      vintage: '2014',
-      url: 'https://doi.org/10.1126/science.1257469',
-      used: 'The probabilistic result that reset expectations of an early plateau.',
-    },
-    {
-      title: 'The human core of the shared socioeconomic pathways: Population scenarios by age, '
-        + 'sex and level of education for all countries to 2100',
-      publisher: 'KC and Lutz, Global Environmental Change 42',
-      vintage: '2017',
-      url: 'https://doi.org/10.1016/j.gloenvcha.2014.06.004',
-      used: 'The SSP population trajectories, including SSP1, SSP2 and SSP3 drawn here.',
-    },
-    {
-      title: 'The Shared Socioeconomic Pathways and their energy, land use, and greenhouse gas '
-        + 'emissions implications: An overview',
-      publisher: 'Riahi and colleagues, Global Environmental Change 42',
-      vintage: '2017',
-      url: 'https://doi.org/10.1016/j.gloenvcha.2016.05.009',
-      used: 'How the CMIP7 markers inherit their populations from the SSP framework.',
-    },
-  ],
+  sources: POPULATION_SOURCES,
 };
+
