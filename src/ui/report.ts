@@ -1,5 +1,5 @@
 /**
- * Render boundaries, shared by the scenario builder and the Learn More pages.
+ * Render boundaries, shared by the THB Scenario Builder and the Learn More pages.
  *
  * A single failed edit used to take a whole page down halfway through the
  * render, leaving some panels filled and others showing a dash with no clue

@@ -4,6 +4,7 @@ import { plotTable, stripTable } from '../src/ui/plot.js';
 
 const DATA: FigureData = {
   title: 'World population',
+  source: 'UN World Population Prospects 2024',
   columns: [
     { header: 'Year', values: [2025, 2050, 2100] },
     { header: 'UN medium', values: [8.23, 9.66, 10.18] },
@@ -28,12 +29,13 @@ describe('the spreadsheet a figure downloads', () => {
   });
 
   it('leaves a gap where a series has no value', () => {
-    // Header row, three data rows, a blank, the extra row, a blank, the credit.
-    expect(xml.match(/<Row>/g)?.length).toBe(6);
+    // Header, three data rows, a blank, the extra row, a blank, source, credit.
+    expect(xml.match(/<Row>/g)?.length).toBe(7);
     expect(xml).toContain('<Cell/>');
   });
 
-  it('carries the credit line and anything outside the table', () => {
+  it('carries the source, the credit and anything outside the table', () => {
+    expect(xml).toContain('Data: UN World Population Prospects 2024');
     expect(xml).toContain('Roger Pielke Jr.');
     expect(xml).toContain('CMIP7 HIGH (2100)');
     expect(xml).toContain('<Data ss:Type="Number">12.98</Data>');
@@ -42,6 +44,7 @@ describe('the spreadsheet a figure downloads', () => {
   it('escapes what would otherwise break the XML', () => {
     const escaped = toSpreadsheet({
       title: 'A/B: <test>',
+      source: 'Coal & oil data',
       columns: [{ header: 'Coal & oil', values: ['<x>'] }],
     });
     expect(escaped).toContain('Coal &amp; oil');
@@ -72,7 +75,7 @@ describe('turning a chart spec into a table', () => {
         { id: 'empty', label: 'Nothing', color: 'black', points: [] },
       ],
       points: [{ id: 'H', label: 'HIGH', year: 2020, value: 55, color: 'red' }],
-    }, 'A chart');
+    }, 'A chart', 'A source');
 
     expect(table.columns.map((column) => column.header)).toEqual([
       'Year', 'Coal', 'Range, low', 'Range, high', 'Record',
@@ -91,7 +94,7 @@ describe('turning a chart spec into a table', () => {
       max: 0,
       ticks: [-2, -1, 0],
       axisLabel: '%/yr',
-    }, 'Windows');
+    }, 'Windows', 'A source');
     expect(table.columns[0]?.header).toBe('%/yr');
     expect(table.columns[0]?.values).toHaveLength(3);
     expect(table.extraRows).toEqual([['observed', -1.43]]);

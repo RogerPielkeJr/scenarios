@@ -200,6 +200,7 @@ export const INCOME_PAGE: LearnPageSpec = {
     caption: `World GDP per person, ${C.firstYear} to ${C.lastYear}, then your rate and the `
       + 'seven CMIP7 markers compounding forward from 2025. Constant 2021 international '
       + 'dollars at purchasing power parity.',
+    dataSource: 'World Bank purchasing-power GDP and population; Maddison Project Database 2023 before 1990; ScenarioMIP CMIP7 markers',
     key: [
       { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
       { label: 'Observed rate, continued', color: 'var(--navy)', dash: true },
@@ -248,6 +249,7 @@ export const INCOME_PAGE: LearnPageSpec = {
       kind: 'plot',
       caption: 'The same question inside the three World Bank income groups: what each '
         + 'averages now, and where the growth you set for it lands by 2100.',
+      dataSource: 'World Bank purchasing-power GDP and population, by income group',
       key: GROUPS.map((entry, index) => ({
         label: entry.label,
         color: ['var(--scenario-low)', 'var(--scenario-medium)', 'var(--scenario-high)'][index]

@@ -18,7 +18,33 @@ import { collectOutputs, panel, type RenderReport } from '../report.js';
 import { buildIdentity } from './identity.js';
 import { renderBuilder, type BuilderHandle } from './builder.js';
 
-const CREDIT = 'Source: analysis by Roger Pielke Jr., The Honest Broker';
+const CREDIT = 'Analysis by Roger Pielke Jr., The Honest Broker';
+/** Where the seven marker values come from, on every page that shows them. */
+const MARKER_SOURCE = 'ScenarioMIP CMIP7 marker scenarios, as carried in this tool';
+
+/**
+ * The mark, the source of the numbers and the analysis credit, under every
+ * figure and every table. A figure that leaves the page as an image has to
+ * carry the same three things, which is why figureToPng draws them too.
+ */
+function buildCredit(root: Document, source: string): HTMLElement {
+  const block = root.createElement('div');
+  block.className = 'figure-credit';
+
+  const logo = root.createElement('img');
+  logo.src = '/thb-logo.png';
+  logo.alt = 'The Honest Broker';
+  logo.width = 216;
+  logo.height = 216;
+  block.appendChild(logo);
+
+  const lines = root.createElement('div');
+  const data = element(root, 'span', 'credit-data', `Data: ${source}`);
+  const credit = element(root, 'span', 'credit', CREDIT);
+  lines.append(data, credit);
+  block.appendChild(lines);
+  return block;
+}
 
 const OUTPUT_IDS = [
   'learn-title', 'learn-standfirst', 'definition-body', 'chart-caption',
@@ -234,13 +260,15 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   const captionText = element(root, 'span', undefined, spec.chart.caption);
   captionText.id = 'chart-caption';
   caption.appendChild(captionText);
-  caption.appendChild(element(root, 'span', 'credit', CREDIT));
   figure.appendChild(caption);
+  figure.appendChild(buildCredit(root, spec.chart.dataSource));
   record.body.appendChild(figure);
 
   record.body.appendChild(buildKey(root, spec.chart.key));
   const chartButtons = attachFigureButtons(
-    root, chart, { title: spec.title, columns: [] }, `${spec.slug}-figure`,
+    root, chart,
+    { title: spec.title, source: spec.chart.dataSource, columns: [] },
+    `${spec.slug}-figure`,
   );
   record.body.appendChild(chartButtons.element);
 
@@ -260,12 +288,13 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
     const extraText = element(root, 'span', undefined, block.caption);
     extraText.id = 'extra-caption';
     extraCaption.appendChild(extraText);
-    extraCaption.appendChild(element(root, 'span', 'credit', CREDIT));
     figure.appendChild(extraCaption);
+    figure.appendChild(buildCredit(root, block.dataSource));
     record.body.appendChild(figure);
     if (block.key !== undefined) record.body.appendChild(buildKey(root, block.key));
     extraButtons = attachFigureButtons(
-      root, extra, { title: spec.title, columns: [] }, `${spec.slug}-figure-2`,
+      root, extra, { title: spec.title, source: block.dataSource, columns: [] },
+      `${spec.slug}-figure-2`,
     );
     record.body.appendChild(extraButtons.element);
   }
@@ -278,6 +307,7 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   const scroller = element(root, 'div', 'scroll-x');
   scroller.appendChild(markerTable(root, spec));
   markers.body.appendChild(scroller);
+  markers.body.appendChild(buildCredit(root, MARKER_SOURCE));
   main.appendChild(markers.section);
 
   const sources = band(root, 'Sources');
@@ -297,7 +327,9 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
     panel(results, 'chart', chart, () => {
       const plot = spec.chart.spec(outcome, scenario);
       renderPlot(chart, plot);
-      chartButtons.update(plotTable(plot, `${spec.title} — ${spec.chart.heading}`));
+      chartButtons.update(
+        plotTable(plot, `${spec.title} — ${spec.chart.heading}`, spec.chart.dataSource),
+      );
     });
     if (extra !== null && spec.chart.extra !== undefined) {
       const block = spec.chart.extra;
@@ -306,11 +338,15 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
         if (block.kind === 'strip') {
           const strip = block.spec(outcome, scenario);
           renderStrip(extra, strip);
-          extraButtons?.update(stripTable(strip, `${spec.title} — distribution`));
+          extraButtons?.update(
+            stripTable(strip, `${spec.title} — distribution`, block.dataSource),
+          );
         } else {
           const plot = block.spec(outcome, scenario);
           renderPlot(extra, plot);
-          extraButtons?.update(plotTable(plot, `${spec.title} — second figure`));
+          extraButtons?.update(
+            plotTable(plot, `${spec.title} — second figure`, block.dataSource),
+          );
         }
       });
     }

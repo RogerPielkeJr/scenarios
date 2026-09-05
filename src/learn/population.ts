@@ -202,6 +202,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
       + '95% prediction interval, the three SSP trajectories the CMIP7 markers use, the seven '
       + 'markers as dots at 2100, IHME\'s two published points, and your own value. Each '
       + 'marker sits on an SSP trajectory, so four of the seven share one point.',
+    dataSource: 'UN World Population Prospects 2024; IIASA SSP database v3.2; IHME reference forecast (Vollset et al. 2020); ScenarioMIP CMIP7 markers',
     key: [
       { label: `Estimates to ${HISTORY.years[HISTORY.years.length - 1] ?? 2023}`,
         color: 'var(--ink)' },

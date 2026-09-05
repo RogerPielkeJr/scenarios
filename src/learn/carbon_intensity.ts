@@ -237,6 +237,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
     caption: `Shares of world primary energy, ${C.firstYear} to ${C.lastYear} as measured, `
       + 'then a straight line to the mix you set above. Fossil fuels fill the bottom three '
       + 'bands.',
+    dataSource: 'Energy Institute Statistical Review 2026, consumption by fuel',
     key: FACTORS.map((factor) => ({
       label: factor.label,
       color: FUEL_COLORS[factor.id] ?? 'var(--dim)',
@@ -261,6 +262,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       caption: 'CO2 per unit of energy on the basis the slider measures, which includes '
         + 'cement, flaring and other industrial CO2: the record, then each rate compounding '
         + 'forward from 2025.',
+      dataSource: 'Global Carbon Budget fossil and industrial CO2 over Energy Institute total energy supply; ScenarioMIP CMIP7 markers',
       key: [
         { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
         { label: 'Observed rate, continued', color: 'var(--navy)', dash: true },

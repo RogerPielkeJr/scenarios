@@ -112,7 +112,7 @@ export function learnHref(slug: string, scenario: Scenario): string {
 }
 
 /**
- * The link back to the scenario builder. `applied` names the one field a
+ * The link back to the THB Scenario Builder. `applied` names the one field a
  * builder replaced, which the top page uses to say where the value came
  * from and then strips out of the address bar.
  */

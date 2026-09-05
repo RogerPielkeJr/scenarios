@@ -83,7 +83,7 @@ is updated, then commit the changed JSON.
 
 | URL | File | What it is |
 |---|---|---|
-| `/` | `index.html` | The scenario builder |
+| `/` | `index.html` | The THB Scenario Builder |
 | `/bibliography.html` | `bibliography.html` | The book, the scenarios work, the sources |
 | `/learn/` | `learn/index.html` | Index of the six Learn More pages |
 | `/learn/population/` | `learn/population/index.html` | Population |
@@ -134,6 +134,13 @@ scaffold builds the spreadsheet from the same spec the chart draws
 downloads can never disagree with the picture. XLS means SpreadsheetML, a
 single XML file Excel and LibreOffice both open, written by
 `src/ui/figure.ts` with no library.
+
+Every figure and every table also carries the same three things: the THB
+mark, the source of its numbers, and the analysis credit. A page names its
+sources in `chart.dataSource` and `chart.extra.dataSource`; the scaffold puts
+them under the figure, the XLS writes them into the workbook, and the PNG
+draws them in a band under the drawing, so a figure that leaves the site says
+where it came from.
 
 Rules the six pages hold to: import the model from `src/model/`, duplicate no
 arithmetic and no constants, put every number in `src/data/*.json`, give no

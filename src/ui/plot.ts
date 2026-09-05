@@ -388,7 +388,7 @@ export function renderStrip(svg: SVGSVGElement, spec: StripSpec): void {
  * Built from the same spec the chart draws, so a spreadsheet can never
  * disagree with the picture above it.
  */
-export function plotTable(spec: PlotSpec, title: string): FigureData {
+export function plotTable(spec: PlotSpec, title: string, source: string): FigureData {
   const years = new Set<number>();
   for (const series of spec.series) for (const point of series.points) years.add(point.year);
   for (const area of spec.areas ?? []) for (const year of area.years) years.add(year);
@@ -428,13 +428,14 @@ export function plotTable(spec: PlotSpec, title: string): FigureData {
 
   const extraRows = (spec.points ?? []).map((point) =>
     [`${point.label === '' ? point.id : point.label} (${point.year})`, point.value]);
-  return { title, columns, extraRows };
+  return { title, source, columns, extraRows };
 }
 
 /** The same, for the distribution strip. */
-export function stripTable(spec: StripSpec, title: string): FigureData {
+export function stripTable(spec: StripSpec, title: string, source: string): FigureData {
   return {
     title,
+    source,
     columns: [{ header: spec.axisLabel, values: [...spec.values] }],
     extraRows: spec.highlights.map((item) => [item.label, item.value]),
   };

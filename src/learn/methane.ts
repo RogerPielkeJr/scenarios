@@ -139,6 +139,7 @@ export const METHANE_PAGE: LearnPageSpec = {
     caption: `Anthropogenic methane by source, ${C.firstYear} to ${C.lastYear}, in million `
       + 'tonnes a year, then a straight line to the 2100 total you set above. The seven '
       + 'CMIP7 markers sit as dots at 2100.',
+    dataSource: 'EDGAR 2024 release, anthropogenic CH4 by sector; ScenarioMIP CMIP7 markers',
     key: [
       ...SOURCES.map((entry) => ({
         label: entry.label,

@@ -334,7 +334,33 @@ input[type='range'] {
 .naming input:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 
 .chart-figure { margin: 0; }
-.credit { display: block; margin-top: 4px; font-style: italic; }
+
+/* The mark, the source and the credit, under every figure and every table.
+   The same three things the downloaded PNG carries. */
+.figure-credit {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--rule);
+}
+.figure-credit img {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  margin-top: 1px;
+}
+.figure-credit > div { display: grid; gap: 1px; min-width: 0; }
+.credit-data,
+.credit {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--dim);
+  display: block;
+}
+.credit { font-style: italic; }
 svg { width: 100%; height: auto; display: block; overflow: visible; }
 .caption { font-family: var(--sans); font-size: 14.5px; color: var(--dim); margin-top: 10px; }
 

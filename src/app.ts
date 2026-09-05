@@ -69,10 +69,13 @@ function buildPresets(
  * The numbers behind the front page's chart: the reader's own path year by
  * year, and every marker at the five-yearly points it publishes.
  */
+const CHART_SOURCE = 'ScenarioMIP CMIP7 marker scenarios; Energy Institute, World Bank and '
+  + 'Global Carbon Budget for the base year';
 function chartTable(label: string, drawn: ReadonlyArray<{ year: number; co2Gt: number }>) {
   const years = drawn.map((point) => point.year);
   return {
     title: `${label} — annual CO2 to 2100`,
+    source: CHART_SOURCE,
     columns: [
       { header: 'Year', values: years },
       { header: `${label}, GtCO2`, values: drawn.map((point) => point.co2Gt) },
@@ -210,7 +213,8 @@ export function mountApp(root: Document = document): App {
   }
 
   const figureButtons = attachFigureButtons(
-    root, chart, { title: 'Emissions scenario', columns: [] }, 'emissions-scenario',
+    root, chart, { title: 'Emissions scenario', source: CHART_SOURCE, columns: [] },
+    'emissions-scenario',
   );
   chart.parentElement?.insertAdjacentElement('afterend', figureButtons.element);
 

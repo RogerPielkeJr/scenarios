@@ -206,6 +206,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
     caption: `World energy intensity, ${C.firstYear} to ${C.lastYear}, then each rate `
       + 'compounding forward from 2025: your own, the observed rate, and the four CMIP7 '
       + 'markers that publish one.',
+    dataSource: 'Energy Institute Statistical Review 2026; World Bank purchasing-power GDP; Maddison Project Database 2023 before 1990',
     key: [
       { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
       { label: 'Observed rate, continued', color: 'var(--navy)', dash: true },
@@ -255,6 +256,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
         + `${rate(WINDOWS.fastest.value)} in ${WINDOWS.fastest.from}-${WINDOWS.fastest.to} to `
         + `${rate(WINDOWS.slowest.value)} in ${WINDOWS.slowest.from}-${WINDOWS.slowest.to}. `
         + 'Faster improvement sits to the left.',
+      dataSource: 'Energy Institute Statistical Review 2026 over World Bank and Maddison output',
       spec(outcome: BuilderOutcome, scenario): StripSpec {
         const chosen = outcome.value;
         const min = Math.min(-2.6, Math.floor((chosen - 0.3) * 2) / 2);

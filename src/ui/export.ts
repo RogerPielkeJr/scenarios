@@ -19,7 +19,9 @@ import { jpegToPdf } from './pdf.js';
 
 const SCALE = 2;
 const SHEET = { width: 720, pad: 26 };
-const CREDIT = 'Source: analysis by Roger Pielke Jr., The Honest Broker';
+const CREDIT = 'Analysis by Roger Pielke Jr., The Honest Broker';
+const DATA_SOURCE = 'Data: ScenarioMIP CMIP7 marker scenarios; Energy Institute, World Bank '
+  + 'and Global Carbon Budget for the base year';
 const LOGO_SRC = '/thb-logo.png';
 const SANS = "'IBM Plex Sans', system-ui, sans-serif";
 const MONO = "'IBM Plex Mono', ui-monospace, monospace";
@@ -100,7 +102,7 @@ async function drawSheet(
   const summaryHeight = 58;
   const inputsTop = summaryTop + summaryHeight + 26;
   const rowHeight = 22;
-  const height = inputsTop + INPUT_SPECS.length * rowHeight + 46;
+  const height = inputsTop + INPUT_SPECS.length * rowHeight + 60;
 
   const canvas = document.createElement('canvas');
   canvas.width = SHEET.width * SCALE;
@@ -194,7 +196,8 @@ async function drawSheet(
 
   ctx.fillStyle = dim;
   ctx.font = `11px ${SANS}`;
-  ctx.fillText(CREDIT, SHEET.pad, height - 16);
+  ctx.fillText(DATA_SOURCE, SHEET.pad, height - 30, SHEET.width - SHEET.pad * 2);
+  ctx.fillText(CREDIT, SHEET.pad, height - 15);
 
   return canvas;
 }

@@ -97,6 +97,22 @@ describe('page render', () => {
   });
 });
 
+describe('the mark and the source under every figure', () => {
+  beforeEach(() => { loadPage(); });
+
+  it('sits under the chart and under the table', () => {
+    mountApp();
+    const credits = [...document.querySelectorAll('.figure-credit')];
+    expect(credits).toHaveLength(2);
+    for (const credit of credits) {
+      expect(credit.querySelector('img')?.getAttribute('src')).toBe('/thb-logo.png');
+      expect(credit.querySelector('.credit-data')?.textContent).toMatch(/^Data: .{20,}/);
+      expect(credit.querySelector('.credit')?.textContent)
+        .toContain('Roger Pielke Jr.');
+    }
+  });
+});
+
 describe('naming a scenario', () => {
   beforeEach(() => { loadPage(); });
 

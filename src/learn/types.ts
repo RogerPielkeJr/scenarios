@@ -38,6 +38,8 @@ export interface ChartBlock {
   note?: string;
   paragraphs: string[];
   caption: string;
+  /** Where the numbers come from, in a phrase, for the credit under the figure. */
+  dataSource: string;
   /** Legend entries under the figure. */
   key: KeyEntry[];
   /**
@@ -70,11 +72,11 @@ export interface BuilderPart {
 /** The second figure: a distribution, or another time series. */
 export type ExtraFigure =
   | {
-    kind: 'strip'; caption: string; key?: KeyEntry[];
+    kind: 'strip'; caption: string; dataSource: string; key?: KeyEntry[];
     spec(outcome: BuilderOutcome, scenario: Scenario): StripSpec;
   }
   | {
-    kind: 'plot'; caption: string; key?: KeyEntry[];
+    kind: 'plot'; caption: string; dataSource: string; key?: KeyEntry[];
     spec(outcome: BuilderOutcome, scenario: Scenario): PlotSpec;
   };
 

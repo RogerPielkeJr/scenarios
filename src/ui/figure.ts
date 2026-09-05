@@ -16,15 +16,19 @@ export interface Column {
 export interface FigureData {
   /** The sheet name, and the first line of the file. */
   title: string;
+  /** Where the numbers come from, printed on the image and in the workbook. */
+  source: string;
   columns: Column[];
   /** Rows appended under the table, for values that sit outside its shape. */
   extraRows?: Array<Array<number | string | null>>;
 }
 
-const CREDIT = 'Source: analysis by Roger Pielke Jr., The Honest Broker';
+const CREDIT = 'Analysis by Roger Pielke Jr., The Honest Broker';
+const LOGO_SRC = '/thb-logo.png';
 const SCALE = 2;
-/** Room under the drawing for the credit line in the PNG. */
-const CREDIT_BAND = 34;
+/** Room under the drawing for the logo and the two credit lines. */
+const CREDIT_BAND = 52;
+const LOGO_SIZE = 30;
 
 function resolveVariables(markup: string, styles: CSSStyleDeclaration): string {
   return markup.replace(/var\(\s*(--[\w-]+)\s*\)/g, (whole, name: string) => {
@@ -63,11 +67,18 @@ function save(blob: Blob, filename: string): void {
   URL.revokeObjectURL(href);
 }
 
-/** The figure as a PNG, on the page's own background, with the credit line. */
-export async function figureToPng(svg: SVGSVGElement, filename: string): Promise<void> {
+/**
+ * The figure as a PNG, on the page's own background, over a band carrying the
+ * mark, the source of the numbers and the analysis credit. A figure that
+ * leaves the site has to say where it came from without the page around it.
+ */
+export async function figureToPng(
+  svg: SVGSVGElement, filename: string, source: string,
+): Promise<void> {
   const styles = window.getComputedStyle(document.documentElement);
   const paper = styles.getPropertyValue('--panel').trim() || '#ffffff';
   const dim = styles.getPropertyValue('--dim').trim() || '#5a6c82';
+  const rule = styles.getPropertyValue('--rule').trim() || '#c9d4e0';
   const view = viewBoxOf(svg);
 
   const canvas = document.createElement('canvas');
@@ -91,9 +102,27 @@ export async function figureToPng(svg: SVGSVGElement, filename: string): Promise
     URL.revokeObjectURL(url);
   }
 
+  const bandTop = view.height + 6;
+  ctx.strokeStyle = rule;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(8, bandTop);
+  ctx.lineTo(view.width - 8, bandTop);
+  ctx.stroke();
+
+  let textLeft = 8;
+  try {
+    const logo = await loadImage(LOGO_SRC);
+    ctx.drawImage(logo, 8, bandTop + 8, LOGO_SIZE, LOGO_SIZE);
+    textLeft = 8 + LOGO_SIZE + 10;
+  } catch {
+    // A missing logo should not cost the reader the image.
+  }
+
   ctx.fillStyle = dim;
   ctx.font = "12px 'IBM Plex Sans', system-ui, sans-serif";
-  ctx.fillText(CREDIT, 8, view.height + 20);
+  ctx.fillText(`Data: ${source}`, textLeft, bandTop + 20, view.width - textLeft - 8);
+  ctx.fillText(CREDIT, textLeft, bandTop + 36, view.width - textLeft - 8);
 
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((made) => (made === null
@@ -138,6 +167,7 @@ export function toSpreadsheet(data: FigureData): string {
     }
   }
   body.push('<Row/>');
+  body.push(`<Row>${cell(`Data: ${data.source}`)}</Row>`);
   body.push(`<Row>${cell(CREDIT)}</Row>`);
 
   // Excel truncates a sheet name at 31 characters and rejects several
@@ -192,7 +222,7 @@ export function attachFigureButtons(
   png.setAttribute('aria-label', 'Download this figure as a PNG image');
   png.addEventListener('click', () => {
     message.textContent = 'Building…';
-    figureToPng(svg, `${fileStem(data.title, fallbackStem)}.png`).then(
+    figureToPng(svg, `${fileStem(data.title, fallbackStem)}.png`, data.source).then(
       () => { message.textContent = 'Downloaded'; hide(); },
       (error: unknown) => {
         message.textContent = 'Could not build the image';

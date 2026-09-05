@@ -88,6 +88,18 @@ test('names the reader path the same way everywhere', async ({ page }) => {
   await expect(page.locator('#kaya-table')).not.toContainText('Yours');
 });
 
+test('every figure and table names its data and carries the mark', async ({ page }) => {
+  for (const path of ['/', '/learn/population/', '/learn/carbon-intensity/']) {
+    await page.goto(path);
+    const credits = page.locator('.figure-credit');
+    expect(await credits.count()).toBeGreaterThan(1);
+    for (let index = 0; index < await credits.count(); index += 1) {
+      await expect(credits.nth(index).locator('img')).toBeVisible();
+      await expect(credits.nth(index).locator('.credit-data')).toContainText('Data:');
+    }
+  }
+});
+
 test('the masthead and the toolbar link out', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.masthead img')).toBeVisible();
@@ -106,7 +118,7 @@ test('the bibliography button reaches the bibliography and back', async ({ page 
   await expect(page.locator('.refs > li')).toHaveCount(16 + citedSources().length);
   await expect(page.locator('.cited-by').first()).toContainText('Cited by:');
   await expect(page.getByText('The Climate Fix')).toBeVisible();
-  await page.locator('.toolbar a', { hasText: 'Back to the scenario builder' }).click();
+  await page.locator('.toolbar a', { hasText: 'Back to the THB Scenario Builder' }).click();
   await expect(page.locator('h1')).toHaveText('Build your own emissions scenario');
 });
 
@@ -285,6 +297,12 @@ test('the PNG button under a figure downloads that figure', async ({ page }) => 
   const bytes = readFileSync((await download.path()) as string);
   expect(bytes.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
   expect(bytes.length).toBeGreaterThan(10_000);
+  // The band under the drawing carries the logo and the two credit lines, so
+  // the image stands taller than the figure's own viewBox.
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  expect(width).toBe(1360);
+  expect(height).toBeGreaterThan(800);
 });
 
 test('the XLS button downloads the numbers behind the figure', async ({ page }) => {
@@ -298,6 +316,7 @@ test('the XLS button downloads the numbers behind the figure', async ({ page }) 
   const text = readFileSync((await download.path()) as string, 'utf8');
   expect(text).toContain('<?mso-application progid="Excel.Sheet"?>');
   expect(text).toContain('UN medium');
+  expect(text).toContain('Data: UN World Population Prospects 2024');
   expect(text).toContain('Roger Pielke Jr.');
   // The years the chart draws have to be in the file the reader downloads.
   expect(text).toContain('<Data ss:Type="Number">1950</Data>');

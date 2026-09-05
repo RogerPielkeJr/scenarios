@@ -111,6 +111,27 @@ describe.each(LIVE_PAGES.map((page) => [page.title, page] as const))('%s', (_tit
     expect(document.documentElement.dataset['learnPage']).toBe(page.slug);
   });
 
+  it('puts the mark, the source and the credit under every figure and table', () => {
+    mountLearnPage(page);
+    const credits = [...document.querySelectorAll('.figure-credit')];
+    // Two for a page with one figure, three where a second figure sits under
+    // it: one per figure, plus the marker table.
+    expect(credits.length).toBe(document.querySelectorAll('.chart-figure').length + 1);
+    for (const credit of credits) {
+      expect(credit.querySelector('img')?.getAttribute('src')).toBe('/thb-logo.png');
+      expect(credit.querySelector('.credit-data')?.textContent).toMatch(/^Data: .{20,}/);
+      expect(credit.querySelector('.credit')?.textContent)
+        .toBe('Analysis by Roger Pielke Jr., The Honest Broker');
+    }
+  });
+
+  it('names a real source for each of its figures', () => {
+    expect(page.chart.dataSource.length).toBeGreaterThan(20);
+    if (page.chart.extra !== undefined) {
+      expect(page.chart.extra.dataSource.length).toBeGreaterThan(20);
+    }
+  });
+
   it('offers a PNG and a spreadsheet under every figure', () => {
     mountLearnPage(page);
     const figures = document.querySelectorAll('.chart-figure').length;

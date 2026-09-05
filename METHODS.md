@@ -169,6 +169,14 @@ pages share one scaffold (`src/ui/learn/page.ts`), one builder
 (`src/ui/learn/builder.ts`) and one plot component (`src/ui/plot.ts`), and each
 page module supplies only its own words, chart and arithmetic.
 
+### What every figure carries
+
+The mark, the source of its numbers and the analysis credit, in that order,
+under every chart and every table on every page. The downloaded PNG draws the
+same three in a band beneath the figure, and the downloaded workbook writes
+the source and the credit under the table, because a figure that travels has
+to answer for itself.
+
 ### The hand-off
 
 A link on the top page carries the reader's scenario to a page as

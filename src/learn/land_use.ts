@@ -173,6 +173,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     caption: `World land-use CO2, ${C.firstYear} to ${C.lastYear}, with the Global Carbon `
       + `Budget's one-sigma uncertainty of ±${C.uncertaintyGtCo2} GtCO2, then a straight line `
       + 'to the 2100 flux you set above. The seven CMIP7 markers sit as dots at 2100.',
+    dataSource: 'Global Carbon Budget 2024, land-use change CO2, via Our World in Data; ScenarioMIP CMIP7 markers',
     key: [
       { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
       { label: 'Published uncertainty, 1σ', color: 'var(--navy)' },
