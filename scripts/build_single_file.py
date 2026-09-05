@@ -54,7 +54,15 @@ def main() -> None:
     for i, arg in enumerate(sys.argv):
         if arg == '--page' and i + 1 < len(sys.argv):
             page = sys.argv[i + 1]
-    source = {'main': 'index.html', 'bibliography': 'bibliography.html'}[page]
+    sources = {
+        'main': 'index.html',
+        'bibliography': 'bibliography.html',
+        'learn': 'learn/index.html',
+        'learn-population': 'learn/population/index.html',
+    }
+    if page not in sources:
+        raise SystemExit(f'--page must be one of {", ".join(sources)}')
+    source = sources[page]
 
     print(f'building {source} on its own...')
     subprocess.run(['npx', 'vite', 'build'], cwd=ROOT, check=True,
@@ -65,7 +73,7 @@ def main() -> None:
     css_names = re.findall(r'<link rel="stylesheet"[^>]*href="/([^"]+\.css)"[^>]*>', html)
     js_names = re.findall(r'<script[^>]*src="/([^"]+\.js)"[^>]*></script>', html)
     if not css_names or not js_names:
-        raise SystemExit('could not find the built CSS and JS in dist/index.html')
+        raise SystemExit(f'could not find the built CSS and JS in {source}')
 
     logo = base64.b64encode((DIST / 'thb-logo.png').read_bytes()).decode('ascii')
     logo_uri = f'data:image/png;base64,{logo}'
