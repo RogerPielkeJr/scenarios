@@ -193,19 +193,32 @@ npm run test:visual:update
 
 ## Deploying to GitHub Pages
 
-The site is static with no backend. `public/CNAME` carries the custom domain and
-is copied into `dist/` by the build, matching how the other Honest Broker
-dashboards are published.
+The site is static with no backend. `public/CNAME` carries
+`scenarios.thehonestbroker.org` and the build copies it into `dist/`, matching
+how the other Honest Broker dashboards are published. The repository lives at
+`github.com/RogerPielkeJr/scenarios`, on `main`, which is the branch
+`.github/workflows/deploy.yml` fires on.
 
-First time:
+First time, in this order. The last step comes last for a reason: the
+decarbonization dashboard carries a commit that links here, and those links
+lead nowhere until the domain resolves.
 
-1. Create the repository and push.
-2. In the repository settings, under Pages, set the source to GitHub Actions.
-3. At Cloudflare, add a CNAME record for `scenarios` pointing at
-   `<user>.github.io`, DNS only, with the proxy off.
+```sh
+gh repo create RogerPielkeJr/scenarios --public --source . --push
+```
 
-After that every push to `main` builds and publishes through
-`.github/workflows/deploy.yml`.
+1. In the repository settings, under Pages, set the source to **GitHub
+   Actions**. The workflow runs typecheck and the Vitest suite, builds, and
+   deploys; it does not run Playwright, which needs browsers.
+2. At Cloudflare, add a CNAME record for `scenarios` pointing at
+   `rogerpielkejr.github.io`, **DNS only**, proxy off.
+3. Wait for the certificate, then check that
+   `https://scenarios.thehonestbroker.org` serves the front page and that
+   `/learn/population/` resolves as a clean URL.
+4. Only then `git -C ../decarbonization push`, which puts the reciprocal links
+   live on that site.
+
+After that, every push to `main` builds and publishes.
 
 To deploy by hand instead:
 
