@@ -1,0 +1,327 @@
+/**
+ * Learn More: methane.
+ *
+ * Every number comes from src/data/learn_methane.json, which
+ * scripts/build_methane.py writes from EDGAR, and from the emulator
+ * coefficients the tool already carries.
+ */
+import data from '../data/learn_methane.json';
+import { BASE, BASE_YEAR, END_YEAR, SPEC_BY_ID } from '../model/config.js';
+import { MARKERS, MARKER_BY_ID, markerValueFor } from '../model/markers.js';
+import { METHANE } from '../model/emulator.js';
+import type { PlotArea, PlotSpec } from '../ui/plot.js';
+import type { BuilderPart, LearnPageSpec } from './types.js';
+
+const C = data.constants;
+const SOURCES = C.sources;
+const SPEC = SPEC_BY_ID['methane'];
+
+const mt = (value: number) => `${Math.round(value)} Mt a year`;
+const pc = (value: number) => `${value.toFixed(0)}%`;
+const degrees = (value: number) => `${value.toFixed(2)} °C`;
+
+/**
+ * EDGAR's bottom-up inventory reaches a lower total than the atmospheric
+ * estimate the tool's base year uses. Scaling every source by the ratio
+ * keeps today's sources adding up to the number the slider starts from.
+ */
+const CALIBRATION = BASE.methaneMt / C.totals.last;
+
+function series(id: string) {
+  const found = data.series.find((candidate) => candidate.id === id);
+  if (found === undefined) throw new Error(`no series "${id}" in learn_methane.json`);
+  return found;
+}
+
+function source(id: string) {
+  const found = SOURCES.find((candidate) => candidate.id === id);
+  if (found === undefined) throw new Error(`no methane source "${id}"`);
+  return found;
+}
+
+const FOSSIL = source('fossil');
+const LIVESTOCK = source('livestock');
+const RICE = source('rice');
+const WASTE = source('waste');
+
+const SOURCE_COLORS: Record<string, string> = {
+  fossil: '#3d3936',
+  livestock: '#b8860b',
+  rice: '#1a7f37',
+  waste: '#7b3fa0',
+  other: '#5ab4ac',
+};
+
+/** Today's level for one source, on the scale the slider starts from. */
+function todayOf(id: string): number {
+  return source(id).last * CALIBRATION;
+}
+
+const SOURCE_PARTS: BuilderPart[] = SOURCES.map((entry) => ({
+  id: entry.id,
+  label: entry.label,
+  min: 0,
+  max: Math.ceil((entry.last * CALIBRATION * 2) / 10) * 10,
+  step: 1,
+  default: Math.round(entry.last * CALIBRATION),
+  decimals: 0,
+  unitSuffix: ' Mt',
+  note: `${pc(entry.share)} of anthropogenic methane today. This source ran `
+    + `${mt(entry.first * CALIBRATION)} in ${C.firstYear} and `
+    + `${mt(entry.last * CALIBRATION)} in ${C.lastYear}, a change of `
+    + `${entry.growth >= 0 ? '+' : '−'}${Math.abs(entry.growth).toFixed(2)}% a year.`,
+  marks: [
+    { value: Math.round(entry.first * CALIBRATION), label: String(C.firstYear), kind: 'low' },
+    { value: Math.round(entry.last * CALIBRATION), label: 'today', kind: 'observed' },
+  ],
+}));
+
+const HIGH = MARKER_BY_ID['H'];
+const VERY_LOW = MARKER_BY_ID['VL'];
+const HIGH_CH4 = HIGH === undefined ? 0 : markerValueFor(HIGH, 'methane') ?? 0;
+const VERY_LOW_CH4 = VERY_LOW === undefined ? 0 : markerValueFor(VERY_LOW, 'methane') ?? 0;
+
+/** What the emulator does with a methane figure, in degrees against today. */
+function warmingFrom(value: number): number {
+  return METHANE.k * (value - METHANE.refMt);
+}
+
+export const METHANE_PAGE: LearnPageSpec = {
+  slug: 'methane',
+  input: 'methane',
+  title: 'Methane',
+  standfirst: 'One slider sets how much methane the world emits in 2100. Methane leaves the '
+    + 'atmosphere within a couple of decades, which makes its 2100 level a question about '
+    + 'what the world emits that year rather than about everything emitted before it.',
+
+  definition: {
+    quantity: 'Anthropogenic methane emissions in 2100',
+    units: 'million tonnes of CH4 a year',
+    place: 'Alongside the four CO2 factors, reaching the warming figure through its own '
+      + 'coefficient',
+    today: `${mt(BASE.methaneMt)} (base year ${BASE_YEAR})`,
+    paragraphs: [
+      'Methane differs from CO2 in the one way that matters most here. A molecule of CO2 '
+      + 'emitted today still warms the planet in a century; a molecule of methane breaks down '
+      + 'within about a decade. Cumulative methane emissions therefore do little work, and '
+      + 'the flow in a given year does almost all of it.',
+      'That turns this slider into a level rather than a rate. The four CO2 factors set rates '
+      + 'of change and the tool adds up everything they emit. Methane asks one question: how '
+      + 'much is the world still emitting in 2100?',
+      `The tool converts that answer at ${degrees(METHANE.k * 100)} per 100 Mt a year against `
+      + `today's ${mt(METHANE.refMt)}. Moving the slider across its whole range, ${SPEC.min} `
+      + `to ${SPEC.max} Mt, changes the 2100 warming figure by `
+      + `${degrees(METHANE.k * (SPEC.max - SPEC.min))}.`,
+    ],
+  },
+
+  chart: {
+    heading: 'What the world has done',
+    note: 'Five anthropogenic sources, stacked.',
+    paragraphs: [
+      `Anthropogenic methane rose from ${mt(C.totals.first * CALIBRATION)} in ${C.firstYear} `
+      + `to ${mt(C.totals.last * CALIBRATION)} in ${C.lastYear} on EDGAR's inventory, `
+      + `${C.totals.growth >= 0 ? '+' : '−'}${Math.abs(C.totals.growth).toFixed(2)}% a year. `
+      + `Waste grew fastest at ${WASTE.growth >= 0 ? '+' : '−'}`
+      + `${Math.abs(WASTE.growth).toFixed(2)}% a year and rice alone fell, at `
+      + `${RICE.growth >= 0 ? '+' : '−'}${Math.abs(RICE.growth).toFixed(2)}%.`,
+      `Livestock supplies the largest share at ${pc(LIVESTOCK.share)}, fossil fuel production `
+      + `and distribution ${pc(FOSSIL.share)}, waste ${pc(WASTE.share)} and rice `
+      + `${pc(RICE.share)}. The first two carry most of the reductions the scenarios assume.`,
+      'Natural wetlands emit more than all of these together and sit outside both the chart '
+      + 'and the slider. The Global Methane Budget puts wetlands and inland fresh water at '
+      + '248 Tg a year against 369 Tg from direct anthropogenic sources, which is why a '
+      + 'scenario can cut human methane hard and still leave a large natural flux in place.',
+    ],
+    caption: `Anthropogenic methane by source, ${C.firstYear} to ${C.lastYear}, in million `
+      + 'tonnes a year, then a straight line to the 2100 total you build below. The seven '
+      + 'CMIP7 markers sit as dots at 2100.',
+    key: SOURCES.map((entry) => ({
+      label: entry.label,
+      color: SOURCE_COLORS[entry.id] ?? 'var(--dim)',
+    })),
+    spec(outcome): PlotSpec {
+      const values = outcome.values ?? {};
+      const forwardYears = [2030, 2040, 2050, 2060, 2070, 2080, 2090, END_YEAR];
+      const areas: PlotArea[] = SOURCES.map((entry) => {
+        const observed = series(entry.id);
+        const last = (observed.values[observed.values.length - 1] ?? 0) * CALIBRATION;
+        const target = values[entry.id] ?? last;
+        return {
+          id: entry.id,
+          label: entry.label,
+          years: [...observed.years, ...forwardYears],
+          values: [
+            ...observed.values.map((value) => value * CALIBRATION),
+            ...forwardYears.map((year) =>
+              last + (target - last) * ((year - C.lastYear) / (END_YEAR - C.lastYear))),
+          ],
+          color: SOURCE_COLORS[entry.id] ?? 'var(--dim)',
+        };
+      });
+      return {
+        xMin: C.firstYear,
+        xMax: END_YEAR,
+        xTicks: [C.firstYear, 2005, 2025, 2050, 2075, END_YEAR],
+        yLabel: 'Mt CH4 a year',
+        yDecimals: 0,
+        areas,
+        series: [],
+        points: MARKERS.flatMap((marker) => {
+          const value = markerValueFor(marker, 'methane');
+          return value === null ? [] : [{
+            id: marker.id,
+            label: marker.id,
+            year: END_YEAR,
+            value,
+            color: marker.color,
+          }];
+        }),
+        divider: { year: C.lastYear, label: 'your path' },
+        rightGutter: 92,
+      };
+    },
+  },
+
+  drivers: {
+    heading: 'What moves it',
+    note: 'A short life, and five sources with different politics.',
+    paragraphs: [
+      'A short atmospheric life cuts both ways. Methane emitted in the 2030s has stopped '
+      + 'warming the planet by 2100, so a scenario can emit a great deal along the way and '
+      + 'still land at a low 2100 level. A cut also delivers its cooling within two decades '
+      + 'rather than over centuries, which is why methane attracts attention out of '
+      + 'proportion to its share of emissions.',
+      'Fossil methane leaks from wells, pipelines, compressors and mines, and stopping it '
+      + 'often pays for itself in recovered gas. Satellites now find individual leaks, which '
+      + 'has moved this source from an estimate to an observation and revised inventories '
+      + 'upward in the process.',
+      'Livestock methane comes out of rumen fermentation and manure. It scales with herd '
+      + 'size, herd size scales with meat and dairy demand, and that demand rises with income '
+      + 'in exactly the countries where income is projected to rise. Feed additives, breeding '
+      + 'and manure management each shave a few percent off it; none of them halves it.',
+      `Rice paddies emit while flooded, and drainage regimes change that. Rice is the one `
+      + `source on this chart that fell between ${C.firstYear} and ${C.lastYear}, at `
+      + `${RICE.growth >= 0 ? '+' : '−'}${Math.abs(RICE.growth).toFixed(2)}% a year, while `
+      + `waste methane from landfills and wastewater grew fastest of the five at `
+      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both are `
+      + 'smaller than fossil fuels or livestock, and both are more tractable.',
+      'The Global Methane Budget records that direct anthropogenic methane has tracked the '
+      + 'scenarios assuming no or minimal mitigation policy since 2012. That describes the '
+      + 'past decade; the slider asks about the seven that follow.',
+    ],
+  },
+
+  markers: {
+    heading: 'What the CMIP7 markers assume',
+    note: 'The widest spread of any of the six sliders.',
+    paragraphs: [
+      `The markers run from ${mt(VERY_LOW_CH4)} in VERY LOW to ${mt(HIGH_CH4)} in HIGH, a `
+      + `spread of ${(HIGH_CH4 / VERY_LOW_CH4).toFixed(1)} times. HIGH assumes `
+      + `${((HIGH_CH4 / BASE.methaneMt - 1) * 100).toFixed(0)}% more than today; VERY LOW `
+      + `assumes ${((1 - VERY_LOW_CH4 / BASE.methaneMt) * 100).toFixed(0)}% less.`,
+      `That whole spread is worth ${degrees(METHANE.k * (HIGH_CH4 - VERY_LOW_CH4))} in this `
+      + 'tool, against the 1.65 °C that separates those two scenarios overall. Methane '
+      + 'matters here, and the CO2 factors decide the century.',
+      'Treat the coefficient with care. It comes from fitting a straight line to seven FaIR '
+      + 'runs, so it reproduces those seven and carries no information about a methane path '
+      + 'outside their range. It also ignores when the methane is emitted, which for a gas '
+      + 'with a decade-long life is a real simplification.',
+    ],
+  },
+
+  builder: {
+    heading: 'Build your value',
+    note: 'One control per source, added up.',
+    paragraphs: [
+      'Set each source’s emissions in 2100 and the builder adds them up. Every control opens '
+      + `at today’s level and carries a mark at where that source stood in ${C.firstYear}.`,
+      `EDGAR's inventory totals ${mt(C.totals.last)} for ${C.lastYear}, while the tool's base `
+      + `year uses ${mt(BASE.methaneMt)}, which sits inside the Global Methane Budget's `
+      + 'top-down estimate of 369 Tg a year for direct anthropogenic sources, range 350 to '
+      + `391. Each source here is scaled by ${CALIBRATION.toFixed(3)} so today's five add up `
+      + 'to the number the slider starts from.',
+    ],
+    action: 'Use this methane figure in my scenario',
+    modes: [{
+      id: 'sources',
+      label: 'By source',
+      parts: SOURCE_PARTS,
+      combine(values) {
+        const total = SOURCES.reduce(
+          (sum, entry) => sum + (values[entry.id] ?? todayOf(entry.id)), 0,
+        );
+        const change = total - BASE.methaneMt;
+        const fossil = values['fossil'] ?? todayOf('fossil');
+        const livestock = values['livestock'] ?? todayOf('livestock');
+        return {
+          value: total,
+          headline: `${mt(total)} in 2100`,
+          detail: [
+            Math.abs(change) < 1
+              ? `Level with today's ${mt(BASE.methaneMt)}`
+              : `${mt(Math.abs(change))} ${change > 0 ? 'more than' : 'less than'} today's `
+                + `${mt(BASE.methaneMt)}`,
+            `Fossil fuels ${pc((fossil / total) * 100)} of the total, livestock `
+            + `${pc((livestock / total) * 100)}`,
+            `Worth ${degrees(warmingFrom(total))} against today's level in this tool, on a `
+            + `coefficient of ${degrees(METHANE.k * 100)} per 100 Mt`,
+          ],
+        };
+      },
+    }],
+  },
+
+  sources: [
+    {
+      title: 'EDGAR: Emissions Database for Global Atmospheric Research, 2024 GHG release',
+      publisher: 'European Commission, Joint Research Centre',
+      vintage: '2024 release, CH4 by country and sector 1970 to 2023',
+      url: 'https://edgar.jrc.ec.europa.eu/dataset_ghg2024',
+      used: 'Anthropogenic methane by IPCC 2006 sector, summed to world totals and grouped '
+        + 'into the five sources on this page.',
+    },
+    {
+      title: 'Global Methane Budget 2000–2020',
+      publisher: 'Saunois and colleagues, Earth System Science Data 17',
+      vintage: '2025',
+      url: 'https://doi.org/10.5194/essd-17-1873-2025',
+      used: 'Total emissions of 575 Tg a year for 2010 to 2019, of which 369 Tg from direct '
+        + 'anthropogenic sources; wetlands and inland fresh water at 248 Tg; and the finding '
+        + 'that anthropogenic methane has tracked the minimal-mitigation scenarios since 2012.',
+    },
+    {
+      title: 'Short-lived Climate Forcers (Chapter 6, IPCC AR6 Working Group I)',
+      publisher: 'Intergovernmental Panel on Climate Change',
+      vintage: '2021',
+      url: 'https://doi.org/10.1017/9781009157896.008',
+      used: 'The atmospheric lifetime of methane, and what a 2100 level means for a gas that '
+        + 'leaves the atmosphere within a couple of decades.',
+    },
+    {
+      title: 'Global Carbon and Other Biogeochemical Cycles and Feedbacks (Chapter 5, IPCC '
+        + 'AR6 Working Group I)',
+      publisher: 'Intergovernmental Panel on Climate Change',
+      vintage: '2021',
+      url: 'https://doi.org/10.1017/9781009157896.007',
+      used: 'The methane budget inside the wider carbon cycle, including the natural sources '
+        + 'this slider does not cover.',
+    },
+    {
+      title: 'The Shared Socioeconomic Pathways and their energy, land use, and greenhouse '
+        + 'gas emissions implications: An overview',
+      publisher: 'Riahi and colleagues, Global Environmental Change 42',
+      vintage: '2017',
+      url: 'https://doi.org/10.1016/j.gloenvcha.2016.05.009',
+      used: 'How the marker scenarios set methane alongside their CO2 assumptions.',
+    },
+    {
+      title: 'Global Methane Pledge',
+      publisher: 'European Commission and the United States, with more than 150 participants',
+      vintage: 'launched 2021',
+      url: 'https://www.globalmethanepledge.org/',
+      used: 'The 30% reduction by 2030 against 2020 that participants have signed, for '
+        + 'comparison with what these controls imply.',
+    },
+  ],
+};

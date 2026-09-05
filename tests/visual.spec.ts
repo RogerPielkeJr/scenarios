@@ -161,7 +161,8 @@ test('the theme toggle overrides the system setting', async ({ page }) => {
   await expect(root).toHaveAttribute('data-theme', 'dark');
 });
 
-const LIVE_SLUGS = ['population', 'energy-intensity', 'carbon-intensity'];
+const LIVE_SLUGS = ['population', 'energy-intensity', 'carbon-intensity',
+  'income', 'methane', 'land-use'];
 
 for (const slug of LIVE_SLUGS) {
   for (const breakpoint of BREAKPOINTS) {

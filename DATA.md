@@ -13,6 +13,9 @@ a primary source on this machine.
 | `scripts/build_wpp.py` | `learn_population.json` | Yes, from the UN download |
 | `scripts/build_energy_intensity.py` | `learn_energy_intensity.json` | Yes, from the sources below |
 | `scripts/build_fuel_mix.py` | `learn_fuel_mix.json` | Yes, from the sources below |
+| `scripts/build_income.py` | `learn_income.json` | Yes, from the sources below |
+| `scripts/build_methane.py` | `learn_methane.json` | Yes, from the EDGAR download |
+| `scripts/build_land_use.py` | `learn_land_use.json` | Yes, from the cached Global Carbon Budget |
 | `scripts/extract_prototype.py` then `scripts/build_carried_data.py` | `config.json`, `emulator.json`, `markers.json`, `population.json`, `presets.json`, `notes.json` | No, carried from the prototype |
 
 ## Sources
@@ -330,6 +333,86 @@ between the Energy Institute and Global Carbon Budget inventories. Holding it
 where it stands puts a floor of 5.237 kgCO2 per GJ under any fuel mix, which
 caps the improvement this page can reach at −3.31%/yr.
 
+### `learn_income.json`
+
+World GDP per person 1965 to 2024, on the same spliced output series as the
+energy-intensity page, divided by World Bank world population, plus the three
+World Bank income groups from 1990.
+
+| | Level, 2024 | Growth since 1990 | Past decade | Share of people | Share of output |
+|---|---|---|---|---|---|
+| World | $21,393 | +1.90 %/yr | +2.02 %/yr | | |
+| High income | $58,645 | +1.53 %/yr | +1.53 %/yr | 17.4% | 47.8% |
+| Middle income | $15,025 | +3.51 %/yr | +3.21 %/yr | 73.4% | 51.5% |
+| Low income | $2,396 | +0.75 %/yr | +0.22 %/yr | 9.2% | 1.0% |
+
+The 2024 world figure reproduces `base.json` exactly. The three groups cover
+100.0% of world population and their population-weighted average comes to
+$21,464, 0.3% above the world figure; the builder scales by that ratio.
+
+The current World Bank classification is applied across the whole record, so no
+country moves group mid-series.
+
+### `learn_methane.json`
+
+World anthropogenic methane by source, 1990 to 2023, from EDGAR's 2024 release,
+summed from country and IPCC 2006 sector to five groups.
+
+| Source | 1990 | 2023 | Share | Growth |
+|---|---|---|---|---|
+| Fossil fuels | 87.6 Mt | 118.7 Mt | 34.0% | +0.93 %/yr |
+| Livestock | 102.2 Mt | 125.5 Mt | 35.9% | +0.63 %/yr |
+| Rice | 39.1 Mt | 36.8 Mt | 10.5% | -0.19 %/yr |
+| Waste | 42.7 Mt | 65.5 Mt | 18.7% | +1.31 %/yr |
+| Other anthropogenic | 1.7 Mt | 3.1 Mt | 0.9% | +1.87 %/yr |
+| **Total** | **273.2 Mt** | **349.6 Mt** | | **+0.75 %/yr** |
+
+Rice is the one source that fell.
+
+**EDGAR's inventory and the tool's base year differ.** EDGAR reaches 350 Mt for
+2023; the tool uses 380 Mt. The Global Methane Budget 2000–2020 puts direct
+anthropogenic emissions at 369 Tg a year for 2010–2019, range 350 to 391, so
+both numbers sit inside the published range. The page scales each source by
+1.086 so today's five reproduce the tool's base.
+
+Natural wetlands, which the Global Methane Budget puts at 248 Tg a year
+together with inland fresh water, sit outside the slider and outside this file.
+
+### `learn_land_use.json`
+
+The Global Carbon Budget land-use flux 1965 to 2024 with its uncertainty, its
+decomposition, and the forest growth rates the restoration control uses.
+
+| Field | Value |
+|---|---|
+| Flux, 1965 | 6.39 GtCO2/yr |
+| Flux, peak | 8.02 GtCO2/yr in 1997 |
+| Flux, 2024 | 4.59 GtCO2/yr |
+| Uncertainty | ±2.57 GtCO2/yr (±0.7 GtC, 1σ) |
+| Gross deforestation, 2014–2023 | 6.23 GtCO2/yr |
+| Regrowth, 2014–2023 | 4.40 GtCO2/yr |
+| Other transitions and peat | 2.20 GtCO2/yr (the remainder) |
+| Net, 2014–2023 | 4.03 GtCO2/yr |
+
+**Two figures for the same decade.** The Our World in Data redistribution
+drawn on the chart averages 5.21 GtCO2 over 2014–2023; the Global Carbon
+Budget 2024 paper reports 4.03 for that decade. The 1.18 GtCO2 between them,
+most likely a vintage difference, sits well inside the ±2.57 uncertainty. The
+page says so rather than choosing one silently.
+
+Forest growth rates come from IPCC 2006 Volume 4, Table 4.9, in tonnes of dry
+matter a hectare a year, converted at the 0.47 carbon fraction (Table 4.3) and
+44/12:
+
+| Stand | t d.m./ha/yr | tCO2/ha/yr |
+|---|---|---|
+| Tropical rain forest, South America, over 20 years | 3.1 | 5.3 |
+| Young regrowth, Africa | 10.0 | 17.2 |
+| Young regrowth, South America | 11.0 | 19.0 |
+| Young regrowth, insular Asia | 13.0 | 22.4 |
+
+Above-ground biomass only; below-ground carbon and soil add more.
+
 ### `analogues.json`
 
 66 economies, their 2024 CO2 and PPP GDP, and CO2 per dollar in kilograms.
@@ -352,4 +435,8 @@ state the prototype used, so the two can be diffed.
 | IIASA SSP database | v3.2, June 2025 release | 2026-09-04 |
 | UN World Population Prospects | 2024 revision, file dated 2024-12-13 | 2026-09-05 |
 | Maddison Project Database | 2023 release | 2026-09-05 |
+| EDGAR greenhouse gases | 2024 release, CH4 to 2023 | 2026-09-05 |
+| Global Methane Budget | 2000–2020, published 2025 | 2026-09-05 |
+| Global Carbon Budget paper | 2024, published 2025 | 2026-09-05 |
+| IPCC 2006 Guidelines | Volumes 2 and 4 | 2026-09-05 |
 | FaIR calibration | v2.2, fair-calibrate v1.4.1 | 2026-09-04 |

@@ -34,7 +34,7 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     linkText: 'Learn more about income per person',
     summary: 'What 75 years of compounding does, and how the models tie income '
       + 'to energy demand.',
-    status: 'forthcoming',
+    status: 'live',
   },
   {
     slug: 'energy-intensity',
@@ -61,7 +61,7 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     linkText: 'Learn more about land use CO2',
     summary: 'Deforestation minus regrowth, how wide the uncertainty runs, and '
       + 'what turns the term negative.',
-    status: 'forthcoming',
+    status: 'live',
   },
   {
     slug: 'methane',
@@ -70,7 +70,7 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     linkText: 'Learn more about methane',
     summary: 'A short-lived gas, five sources, and the difference between a '
       + 'level target and a rate target.',
-    status: 'forthcoming',
+    status: 'live',
   },
 ];
 

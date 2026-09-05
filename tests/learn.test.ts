@@ -6,6 +6,9 @@ import { mountLearnPage } from '../src/ui/learn/page.js';
 import { POPULATION_PAGE } from '../src/learn/population.js';
 import { ENERGY_INTENSITY_PAGE } from '../src/learn/energy_intensity.js';
 import { CARBON_INTENSITY_PAGE } from '../src/learn/carbon_intensity.js';
+import { INCOME_PAGE } from '../src/learn/income.js';
+import { METHANE_PAGE } from '../src/learn/methane.js';
+import { LAND_USE_PAGE } from '../src/learn/land_use.js';
 import { LEARN_ENTRIES } from '../src/learn/registry.js';
 import { decodeScenario, encodeScenario, type Scenario } from '../src/state.js';
 import { INPUT_IDS } from '../src/model/types.js';
@@ -34,7 +37,10 @@ function loadPage(search: string): void {
   window.history.replaceState(null, '', `/learn/population/${search}`);
 }
 
-const LIVE_PAGES = [POPULATION_PAGE, ENERGY_INTENSITY_PAGE, CARBON_INTENSITY_PAGE];
+const LIVE_PAGES = [
+  POPULATION_PAGE, ENERGY_INTENSITY_PAGE, CARBON_INTENSITY_PAGE, INCOME_PAGE,
+  METHANE_PAGE, LAND_USE_PAGE,
+];
 
 /** Every live page has to render, draw and hand back a value. */
 describe.each(LIVE_PAGES.map((page) => [page.title, page] as const))('%s', (_title, page) => {

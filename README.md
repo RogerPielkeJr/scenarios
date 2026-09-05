@@ -45,13 +45,26 @@ into the UI code. Two scripts write those files, split by where the numbers come
 from.
 
 ```sh
-npm run build:data                      # from primary sources
-python3 scripts/build_data.py --refresh # same, ignoring the cached downloads
-python3 scripts/build_wpp.py            # UN population, for the Learn More page
-python3 scripts/build_wpp.py --refresh  # same, fetching the UN files again
-python3 scripts/extract_prototype.py    # re-read the prototype's constants
-python3 scripts/build_carried_data.py   # write the carried-over data files
+npm run build:data                        # the front page, from primary sources
+python3 scripts/build_data.py --refresh   # same, ignoring the cached downloads
+python3 scripts/extract_prototype.py      # re-read the prototype's constants
+python3 scripts/build_carried_data.py     # write the carried-over data files
 ```
+
+One script per Learn More page, each cacheing its own download:
+
+```sh
+python3 scripts/build_wpp.py              # UN population, for /learn/population/
+python3 scripts/build_income.py           # World Bank income groups, for /learn/income/
+python3 scripts/build_energy_intensity.py # EI, World Bank and Maddison
+python3 scripts/build_fuel_mix.py         # EI fuel shares and IPCC emission factors
+python3 scripts/build_methane.py          # EDGAR methane by sector
+python3 scripts/build_land_use.py         # Global Carbon Budget land-use flux
+```
+
+Each takes `--refresh` to fetch again rather than read its cache. The raw
+downloads stay out of the repository; the extracted subsets are committed, so a
+build works offline.
 
 `build_data.py` reads the Energy Institute workbook at
 `/home/rpielke/EI-Stats-Review-2026.xlsx`, the World Bank API and the Global
@@ -74,6 +87,11 @@ is updated, then commit the changed JSON.
 | `/bibliography.html` | `bibliography.html` | The book, the scenarios work, the sources |
 | `/learn/` | `learn/index.html` | Index of the six Learn More pages |
 | `/learn/population/` | `learn/population/index.html` | Population |
+| `/learn/income/` | `learn/income/index.html` | Income per person |
+| `/learn/energy-intensity/` | `learn/energy-intensity/index.html` | Energy per dollar |
+| `/learn/carbon-intensity/` | `learn/carbon-intensity/index.html` | CO2 per unit of energy |
+| `/learn/land-use/` | `learn/land-use/index.html` | Land use CO2 |
+| `/learn/methane/` | `learn/methane/index.html` | Methane |
 
 Every page is a Vite entry point, carries the masthead and the toolbar, and is
 checked by `tests/pages.test.ts`. The `learn/…/index.html` layout gives clean
@@ -81,8 +99,8 @@ URLs on GitHub Pages with no rewrite rules.
 
 ## Adding a Learn More page
 
-Six pages are planned, one per slider. Population is finished; the other five
-are listed in `src/learn/registry.ts` as `forthcoming`. To add one:
+All six pages exist, one per slider, listed in `src/learn/registry.ts`. To add
+another, or to rebuild one from scratch:
 
 1. **Data.** Write a build script under `scripts/` that fetches from a primary
    source and writes `src/data/learn_<slug>.json` in the shared shape:

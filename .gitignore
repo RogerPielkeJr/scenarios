@@ -7,3 +7,6 @@ __pycache__/
 .DS_Store
 test-results/
 playwright-report/
+
+# Raw source downloads: large, and rebuildable from the build scripts.
+scripts/_mpd2023.xlsx

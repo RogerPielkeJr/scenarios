@@ -255,6 +255,51 @@ builder is the arithmetic rather than the answer. A mix with no fossil fuel in
 it still leaves step 3, so the fastest rate reachable with industrial CO2
 unchanged is −3.31%/yr.
 
+### The income per person builder
+
+Three modes.
+
+**Set a rate.** The level in 2100 is `21,393.2 x (1 + rate/100) ^ 75`.
+
+**Set a 2100 level.** The rate is the inverse: `((level / 21,393.2) ^ (1/75) - 1) x 100`.
+
+**By income group.** Each group's average compounds at its own rate from its
+own 2024 level, and the world average is the population-weighted sum, scaled by
+0.9967 so the three groups reproduce today's world figure. Population shares
+stay at today's values, which the page states, along with the direction of the
+bias: the UN projects the low-income share rising, so holding shares still
+overstates the world average a little.
+
+### The methane builder
+
+One control per source, added up. Each source's 2024 level is scaled by 1.086,
+the ratio between the tool's 380 Mt base year and EDGAR's 350 Mt inventory
+total, so today's five sources reproduce the number the slider starts from.
+DATA.md explains why the two differ and why both sit inside the published range.
+
+The page also reports what the answer is worth in the emulator, at 0.12 °C per
+100 Mt against a reference of 380 Mt, and says plainly what that coefficient
+cannot represent: it comes from a straight-line fit to seven FaIR runs and
+ignores when the methane is emitted.
+
+### The land use builder
+
+Four flows netted into one 2100 figure:
+
+    net = (deforestation + other transitions and peat) x scale
+        - existing regrowth x scale
+        - restored area x sequestration rate
+        - engineered removal
+
+with today's flows from the Global Carbon Budget: 6.23 GtCO2 of gross
+deforestation, 2.20 of other transitions and peat, and 4.40 of regrowth. The
+restoration term is a straight area-times-rate product, in millions of hectares
+times tonnes of CO2 a hectare a year, divided by a thousand to reach GtCO2.
+
+Engineered removal sits on this control because a product of four positive
+factors cannot go below zero. Every marker that reaches net negative CO2 does
+it through terms that land on this line.
+
 ## What a CMIP7 preset does and does not reproduce
 
 Loading a CMIP7 preset sets the six sliders to the Kaya factors that marker

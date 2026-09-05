@@ -4,6 +4,8 @@ const { a, b, c } = emulatorJson.coefficients;
 const { k, refMt } = emulatorJson.methane;
 
 export const ANCHORS = emulatorJson.anchors;
+/** The methane coefficient and the level it is measured against. */
+export const METHANE = emulatorJson.methane;
 export const MARKER_WARMING = emulatorJson.markerWarmingC;
 export const EMULATOR_FORM = emulatorJson.form;
 

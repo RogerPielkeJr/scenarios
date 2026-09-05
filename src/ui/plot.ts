@@ -96,6 +96,12 @@ export interface PlotSpec {
   /** Decimal places on the axis numbers. */
   yDecimals?: number;
   includeZero?: boolean;
+  /**
+   * A logarithmic vertical axis, for a quantity that compounds. It turns a
+   * constant growth rate into a straight line, which is the whole point of
+   * the income page, and keeps a 20-fold range legible at both ends.
+   */
+  yScale?: 'linear' | 'log';
   /** Pins the axis, for a quantity with fixed ends such as a share of 100. */
   yMin?: number;
   yMax?: number;
@@ -155,17 +161,50 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
     step: ((spec.yMax ?? computed.max) - (spec.yMin ?? computed.min)) / 5,
   };
   const decimals = spec.yDecimals ?? decimalsFor(scale.step);
+  const log = spec.yScale === 'log';
+
+  // On a log axis the ends come from the data, rounded out to the next power
+  // of ten, and the gridlines land on 1, 2 and 5 times each power.
+  const positive = values.filter((value) => value > 0);
+  /** The nearest 1, 2 or 5 times a power of ten, outward from the data. */
+  const roundLog = (value: number, direction: 'down' | 'up') => {
+    const power = 10 ** Math.floor(Math.log10(value));
+    const steps = [1, 2, 5, 10].map((step) => step * power);
+    return direction === 'down'
+      ? [...steps].reverse().find((step) => step <= value) ?? power
+      : steps.find((step) => step >= value) ?? power * 10;
+  };
+  const logMin = roundLog(Math.min(...positive), 'down');
+  const logMax = roundLog(Math.max(...positive), 'up');
+  const logLines: number[] = [];
+  if (log) {
+    for (let power = logMin; power <= logMax; power *= 10) {
+      for (const step of [1, 2, 5]) {
+        const value = power * step;
+        if (value >= logMin && value <= logMax) logLines.push(value);
+      }
+    }
+  }
 
   const xFor = (year: number) => PLOT.left
     + ((year - spec.xMin) / (spec.xMax - spec.xMin)) * (right - PLOT.left);
-  const yFor = (value: number) => PLOT.bottom
-    - ((value - scale.min) / (scale.max - scale.min)) * (PLOT.bottom - PLOT.top);
+  const yFor = (value: number) => {
+    if (log) {
+      const fraction = (Math.log10(Math.max(value, logMin)) - Math.log10(logMin))
+        / (Math.log10(logMax) - Math.log10(logMin));
+      return PLOT.bottom - fraction * (PLOT.bottom - PLOT.top);
+    }
+    return PLOT.bottom - ((value - scale.min) / (scale.max - scale.min))
+      * (PLOT.bottom - PLOT.top);
+  };
 
   let markup = '';
 
-  const lines = Math.round((scale.max - scale.min) / scale.step);
-  for (let i = 0; i <= lines; i += 1) {
-    const value = scale.min + i * scale.step;
+  const gridValues = log
+    ? logLines
+    : Array.from({ length: Math.round((scale.max - scale.min) / scale.step) + 1 },
+      (_unused, index) => scale.min + index * scale.step);
+  for (const value of gridValues) {
     const y = yFor(value);
     const weight = value === 0 && scale.min < 0 ? 1.6 : 0.7;
     markup += `<line x1="${PLOT.left}" x2="${right}" y1="${y}" y2="${y}" `
