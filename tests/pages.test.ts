@@ -153,3 +153,20 @@ describe('the bibliography against the Learn More pages', () => {
     expect(BIBLIOGRAPHY).toContain('Behind the Learn More pages');
   });
 });
+
+describe('the two sibling sites', () => {
+  it('links the front page and the bibliography to the decarbonization dashboard', () => {
+    for (const [name, html] of [['index.html', INDEX], ['bibliography.html', BIBLIOGRAPHY]] as const) {
+      expect(html, name).toContain('https://decarbonization.thehonestbroker.org');
+    }
+  });
+
+  // The two sites measure carbon intensity on different bases and publish
+  // different rates for it. Whichever page a reader lands on has to say so.
+  it('explains the figure that differs between them', async () => {
+    const { CARBON_INTENSITY_PAGE } = await import('../src/learn/carbon_intensity.js');
+    const prose = CARBON_INTENSITY_PAGE.definition.paragraphs.join(' ');
+    expect(prose).toContain('decarbonization.thehonestbroker.org');
+    expect(prose).toContain('Neither figure corrects the other');
+  });
+});

@@ -209,7 +209,14 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + `basis the world improved ${rate(C.rates.sliderBasis1990)} from 1990 to ${C.lastYear}; `
       + `measured on combustion alone, ${rate(C.rates.energyBasis1990)}. The calibration mark `
       + 'under the slider on the front page uses the first, so the mark and the slider measure '
-      + 'the same quantity. Work published before September 2026 quotes the second.',
+      + 'the same quantity.',
+      `The Honest Broker's <a href="https://decarbonization.thehonestbroker.org">decarbonization dashboard</a> measures the second, and `
+      + `reports the world falling from 64.4 to ${kg(C.levels.energyBasis2024)} between 1990 `
+      + `and ${C.lastYear} at ${rate(C.rates.energyBasis1990)}. Neither figure corrects the `
+      + 'other. That site tracks the emissions the world reports from burning fuel; this one '
+      + 'tracks the emissions the CMIP7 scenarios count, because it argues with those '
+      + 'scenarios. The gap between the two, cement most of it, is the '
+      + `${kg(C.nonCombustion.kgPerGj)} this page adds on top of any fuel mix.`,
     ],
   },
 
