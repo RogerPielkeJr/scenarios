@@ -156,7 +156,8 @@ export function renderBuilder(
   }
 
   function currentOutcome(): BuilderOutcome {
-    return active.combine({ ...activeValues() });
+    const current = { ...activeValues() };
+    return { ...active.combine(current), values: current };
   }
 
   function select(id: string): void {

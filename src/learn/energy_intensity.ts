@@ -11,7 +11,7 @@ import { MARKERS, MARKER_BY_ID, markerValueFor } from '../model/markers.js';
 import { cagr, compound } from '../model/rates.js';
 import { displayName } from '../state.js';
 import type { PlotSeries, PlotSpec, Point, StripSpec } from '../ui/plot.js';
-import type { BuilderPart, LearnPageSpec } from './types.js';
+import type { BuilderOutcome, BuilderPart, LearnPageSpec } from './types.js';
 
 const C = data.constants;
 const WINDOWS = data.windows;
@@ -247,12 +247,13 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
         divider: { year: C.lastYear, label: 'assumed' },
       };
     },
-    strip: {
+    extra: {
+      kind: 'strip',
       caption: `Every ${WINDOWS.span}-year window in the record, one tick each, from `
         + `${rate(WINDOWS.fastest.value)} in ${WINDOWS.fastest.from}-${WINDOWS.fastest.to} to `
         + `${rate(WINDOWS.slowest.value)} in ${WINDOWS.slowest.from}-${WINDOWS.slowest.to}. `
         + 'Faster improvement sits to the left.',
-      spec(outcome): StripSpec {
+      spec(outcome: BuilderOutcome): StripSpec {
         const chosen = outcome.value;
         const min = Math.min(-2.6, Math.floor((chosen - 0.3) * 2) / 2);
         const max = Math.max(0.2, Math.ceil((chosen + 0.3) * 2) / 2);

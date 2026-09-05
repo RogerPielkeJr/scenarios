@@ -78,6 +78,15 @@ export interface PlotPoint {
   color: string;
 }
 
+/** One band of a stacked area, given as a share in the same units as the axis. */
+export interface PlotArea {
+  id: string;
+  label: string;
+  years: readonly number[];
+  values: readonly number[];
+  color: string;
+}
+
 export interface PlotSpec {
   xMin: number;
   xMax: number;
@@ -87,7 +96,12 @@ export interface PlotSpec {
   /** Decimal places on the axis numbers. */
   yDecimals?: number;
   includeZero?: boolean;
+  /** Pins the axis, for a quantity with fixed ends such as a share of 100. */
+  yMin?: number;
+  yMax?: number;
   bands?: readonly PlotBand[];
+  /** Stacked from the bottom in the order given, each on top of the last. */
+  areas?: readonly PlotArea[];
   series: readonly PlotSeries[];
   points?: readonly PlotPoint[];
   /** A vertical rule, for the line between record and projection. */
@@ -123,10 +137,23 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
   for (const series of spec.series) values.push(...series.points.map((p) => p.value));
   for (const band of spec.bands ?? []) values.push(...band.lo, ...band.hi);
   for (const point of spec.points ?? []) values.push(point.value);
-  const scale = axisScale(
+  // A stack reaches the sum of its bands, which is the number the axis has
+  // to cover.
+  const areas = spec.areas ?? [];
+  const firstArea = areas[0];
+  if (firstArea !== undefined) {
+    values.push(0, ...firstArea.years.map((_year, index) => areas.reduce(
+      (total, area) => total + (area.values[index] ?? 0), 0)));
+  }
+  const computed = axisScale(
     Math.min(...values), Math.max(...values),
     { includeZero: spec.includeZero === true },
   );
+  const scale = spec.yMin === undefined && spec.yMax === undefined ? computed : {
+    min: spec.yMin ?? computed.min,
+    max: spec.yMax ?? computed.max,
+    step: ((spec.yMax ?? computed.max) - (spec.yMin ?? computed.min)) / 5,
+  };
   const decimals = spec.yDecimals ?? decimalsFor(scale.step);
 
   const xFor = (year: number) => PLOT.left
@@ -156,6 +183,26 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
       + `text-anchor="${anchor}" font-family="${SANS}" font-size="13" `
       + `fill="var(--dim)">${year}</text>`;
   });
+
+  // Stacked areas sit behind everything, each band drawn on the running total
+  // of the bands below it.
+  if (firstArea !== undefined) {
+    const running = firstArea.years.map(() => 0);
+    for (const area of areas) {
+      const upper = area.years.map((year, index) => {
+        const base = running[index] ?? 0;
+        const top = base + (area.values[index] ?? 0);
+        running[index] = top;
+        return { year, base, top };
+      });
+      const forward = upper.map((point, index) => `${index === 0 ? 'M' : 'L'}`
+        + `${xFor(point.year).toFixed(1)},${yFor(point.top).toFixed(1)}`).join('');
+      const back = [...upper].reverse().map((point) =>
+        `L${xFor(point.year).toFixed(1)},${yFor(point.base).toFixed(1)}`).join('');
+      markup += `<path d="${forward}${back}Z" fill="${area.color}" opacity="0.85" `
+        + `data-area="${area.id}"/>`;
+    }
+  }
 
   for (const band of spec.bands ?? []) {
     const top = band.years.map((year, i) => `${i === 0 ? 'M' : 'L'}`

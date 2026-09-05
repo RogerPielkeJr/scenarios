@@ -15,6 +15,7 @@ const PAGES: Record<string, string> = {
   learn: 'learn/index.html',
   'learn-population': 'learn/population/index.html',
   'learn-energy-intensity': 'learn/energy-intensity/index.html',
+  'learn-carbon-intensity': 'learn/carbon-intensity/index.html',
 };
 
 export default defineConfig({

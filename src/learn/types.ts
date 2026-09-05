@@ -39,18 +39,15 @@ export interface ChartBlock {
   paragraphs: string[];
   caption: string;
   /** Legend entries under the figure. */
-  key: Array<{ label: string; color: string; dash?: boolean; dot?: boolean }>;
+  key: KeyEntry[];
   /**
    * Built for each render, because the reader's own curve sits in it. Takes
    * the builder's current outcome, which carries the value the slider would
    * receive, so a chart never reproduces the builder's arithmetic.
    */
   spec(outcome: BuilderOutcome, scenario: Scenario): PlotSpec;
-  /** A second figure under the first, for a distribution the chart cannot show. */
-  strip?: {
-    caption: string;
-    spec(outcome: BuilderOutcome): StripSpec;
-  };
+  /** A second figure under the first, where one chart cannot carry the story. */
+  extra?: ExtraFigure;
 }
 
 /** One control in a builder. */
@@ -70,6 +67,18 @@ export interface BuilderPart {
 }
 
 /** What a builder makes of its parts. */
+/** The second figure: a distribution, or another time series. */
+export type ExtraFigure =
+  | { kind: 'strip'; caption: string; key?: KeyEntry[]; spec(outcome: BuilderOutcome): StripSpec }
+  | { kind: 'plot'; caption: string; key?: KeyEntry[]; spec(outcome: BuilderOutcome): PlotSpec };
+
+export interface KeyEntry {
+  label: string;
+  color: string;
+  dash?: boolean;
+  dot?: boolean;
+}
+
 export interface BuilderOutcome {
   /** In the slider's own units, before rounding or clamping. */
   value: number;
@@ -77,6 +86,12 @@ export interface BuilderOutcome {
   headline: string;
   /** Intermediate numbers worth showing, one line each. */
   detail: string[];
+  /**
+   * The part values behind it, attached by the builder rather than by the
+   * page, so a chart can draw the reader's own inputs without the page
+   * threading them through by hand.
+   */
+  values?: Readonly<Record<string, number>>;
 }
 
 /**

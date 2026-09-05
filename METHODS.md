@@ -235,6 +235,26 @@ slowly than the chosen rate, so a faster rate scores higher.
 The series behind all of it splices two sources at 1990; DATA.md gives the
 method and the size of the difference between them.
 
+### The CO2 per unit of energy builder
+
+Seven fuel shares for 2100 plus one control for industrial CO2, in four steps:
+
+1. **Normalise.** The seven shares are scaled to sum to 100, so only their
+   proportions matter.
+2. **Burn.** Each share meets its emission factor, and the sum is scaled by
+   0.9201, the calibration that makes the 2024 mix reproduce the 2024 observed
+   intensity. DATA.md explains where that factor comes from.
+3. **Add what does not burn.** 5.237 kgCO2 per GJ of cement, flaring and other
+   industrial CO2, times whatever the last control is set to.
+4. **Take the rate.** From 65.181 kgCO2 per GJ today to that number in 2100:
+
+       rate = ((intensity[2100] / 65.181) ^ (1 / 75) - 1) x 100
+
+The page shows every intermediate number, because the interesting part of this
+builder is the arithmetic rather than the answer. A mix with no fossil fuel in
+it still leaves step 3, so the fastest rate reachable with industrial CO2
+unchanged is −3.31%/yr.
+
 ## What a CMIP7 preset does and does not reproduce
 
 Loading a CMIP7 preset sets the six sliders to the Kaya factors that marker

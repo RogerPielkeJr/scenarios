@@ -553,7 +553,7 @@ footer a { color: inherit; }
   font-weight: 600;
 }
 .builder-mode-note { font-size: 14.5px; color: var(--dim); margin: 0 0 14px; }
-.strip-figure { margin-top: 22px; }
+.extra-figure { margin-top: 26px; }
 .builder-part { border-top: 1px solid var(--rule); padding: 14px 0 16px; }
 .builder-part:first-child { border-top: none; padding-top: 0; }
 .builder-part-head {

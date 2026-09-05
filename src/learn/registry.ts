@@ -52,7 +52,7 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     linkText: 'Learn more about CO2 per unit of energy',
     summary: 'The fuel mix, and the arithmetic of adding zero-carbon supply '
       + 'while total energy grows.',
-    status: 'forthcoming',
+    status: 'live',
   },
   {
     slug: 'land-use',

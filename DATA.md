@@ -12,6 +12,7 @@ a primary source on this machine.
 | `scripts/build_data.py` | `observed.json`, `analogues.json`, `base.json` | Yes, from the sources below |
 | `scripts/build_wpp.py` | `learn_population.json` | Yes, from the UN download |
 | `scripts/build_energy_intensity.py` | `learn_energy_intensity.json` | Yes, from the sources below |
+| `scripts/build_fuel_mix.py` | `learn_fuel_mix.json` | Yes, from the sources below |
 | `scripts/extract_prototype.py` then `scripts/build_carried_data.py` | `config.json`, `emulator.json`, `markers.json`, `population.json`, `presets.json`, `notes.json` | No, carried from the prototype |
 
 ## Sources
@@ -126,6 +127,27 @@ Africa is split into sub-Saharan Africa (an SDG region in the UN's own
 hierarchy) and northern Africa (a subregion), which sum exactly to the UN's
 Africa figure at every variant. That keeps the region carrying most of the
 remaining growth on a control of its own.
+
+### IPCC 2006 Guidelines, default carbon content
+
+`Volume 2 (Energy), Chapter 1, Table 1.3`, read from the published PDF. Values
+in kilograms of carbon per gigajoule, converted to CO2 at 44/12:
+
+| Fuel | kgC/GJ | kgCO2/GJ |
+|---|---|---|
+| Other bituminous coal | 25.8 | 94.6 |
+| Crude oil | 20.0 | 73.3 |
+| Natural gas | 15.3 | 56.1 |
+
+Nuclear, hydro, wind and solar carry none. Bioenergy carries none in
+energy-sector accounting, where biogenic CO2 is reported under land use, which
+is also how the Energy Institute's CO2 series treats it.
+
+**Applied raw, these overstate what the world emits.** The 2024 mix gives
+65.15 kgCO2 per GJ against the 59.94 the Energy Institute reports from energy
+that year, mostly because part of the oil supply becomes plastics, lubricants
+and bitumen rather than exhaust. `build_fuel_mix.py` records the ratio, 0.9201,
+and the page applies it so today's mix reproduces today's intensity.
 
 ### Maddison Project Database 2023
 
@@ -272,6 +294,41 @@ The 35 windows of 25 years run from **−1.5675 %/yr (1996 to 2021)** to
 **−0.4786 %/yr (1965 to 1990)**, with a median of −1.07. CMIP7 HIGH's −0.66
 sits slower than 31 of the 35. The tool's own "Trend continues" rate of −1.62
 sits faster than all 35.
+
+### `learn_fuel_mix.json`
+
+Shares of world primary energy by fuel, 1965 to 2024, the emission factors
+above, and the two carbon-intensity series.
+
+| Share of primary energy | 1965 | 2024 |
+|---|---|---|
+| Coal | 38.9% | 27.9% |
+| Oil | 43.3% | 33.6% |
+| Gas | 15.2% | 25.1% |
+| Nuclear | 0.2% | 5.2% |
+| Hydro | 2.2% | 2.7% |
+| Wind and solar | 0.0% | 2.9% |
+| Bioenergy and other | 0.2% | 2.6% |
+
+Whatever the named fuels miss, biofuels most of it, joins bioenergy and other,
+so the shares add to the total energy supply exactly. The build exits if they
+do not sum to 100 in any year.
+
+**Two intensities, and they differ.** On the basis the slider measures, which
+includes cement, flaring and other industrial CO2 as the CMIP7 markers do, the
+world ran 75.56 kgCO2 per GJ in 1965 and 65.18 in 2024. On combustion alone,
+74.79 and 59.94. The 2024 slider-basis figure reproduces `base.json` exactly.
+
+That gap changes the rate as well as the level: **−0.15%/yr from 1990 to 2024
+on the slider's basis, −0.21%/yr on combustion alone**. The calibration mark
+under the front page's slider uses −0.21, which measures a slightly different
+quantity from the one the slider moves. Flagged, not silently changed.
+
+The non-combustion term, 5.237 kgCO2 per GJ in 2024, breaks down as cement
+2.487, other industry 0.717, flaring 0.702, and 1.331 for the difference
+between the Energy Institute and Global Carbon Budget inventories. Holding it
+where it stands puts a floor of 5.237 kgCO2 per GJ under any fuel mix, which
+caps the improvement this page can reach at −3.31%/yr.
 
 ### `analogues.json`
 

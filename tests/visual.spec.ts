@@ -161,7 +161,7 @@ test('the theme toggle overrides the system setting', async ({ page }) => {
   await expect(root).toHaveAttribute('data-theme', 'dark');
 });
 
-const LIVE_SLUGS = ['population', 'energy-intensity'];
+const LIVE_SLUGS = ['population', 'energy-intensity', 'carbon-intensity'];
 
 for (const slug of LIVE_SLUGS) {
   for (const breakpoint of BREAKPOINTS) {
@@ -170,7 +170,7 @@ for (const slug of LIVE_SLUGS) {
         await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
         await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
         await page.goto(`/learn/${slug}/`);
-        await page.waitForSelector('#learn-chart [data-series="reader"]');
+        await page.waitForSelector('#learn-chart path');
         await page.evaluate(() => document.fonts.ready);
         await expect(page).toHaveScreenshot(`learn-${slug}-${breakpoint.name}-${theme}.png`,
           { fullPage: true });

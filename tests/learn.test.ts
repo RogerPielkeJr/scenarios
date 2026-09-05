@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { mountLearnPage } from '../src/ui/learn/page.js';
 import { POPULATION_PAGE } from '../src/learn/population.js';
 import { ENERGY_INTENSITY_PAGE } from '../src/learn/energy_intensity.js';
+import { CARBON_INTENSITY_PAGE } from '../src/learn/carbon_intensity.js';
 import { LEARN_ENTRIES } from '../src/learn/registry.js';
 import { decodeScenario, encodeScenario, type Scenario } from '../src/state.js';
 import { INPUT_IDS } from '../src/model/types.js';
@@ -33,7 +34,7 @@ function loadPage(search: string): void {
   window.history.replaceState(null, '', `/learn/population/${search}`);
 }
 
-const LIVE_PAGES = [POPULATION_PAGE, ENERGY_INTENSITY_PAGE];
+const LIVE_PAGES = [POPULATION_PAGE, ENERGY_INTENSITY_PAGE, CARBON_INTENSITY_PAGE];
 
 /** Every live page has to render, draw and hand back a value. */
 describe.each(LIVE_PAGES.map((page) => [page.title, page] as const))('%s', (_title, page) => {
@@ -50,9 +51,17 @@ describe.each(LIVE_PAGES.map((page) => [page.title, page] as const))('%s', (_tit
       .map((p) => `${p.name}: ${p.error}`)).toEqual([]);
   });
 
-  it('draws a chart with the reader\'s own line in it', () => {
+  // Whatever the reader sets has to reach the figures, whether the page draws
+  // it as a line, an area or a mark on a distribution.
+  it('redraws its figures when the builder moves', () => {
     const mounted = mountLearnPage(page);
-    expect(mounted.chart.innerHTML).toContain('data-series="reader"');
+    const figures = () => mounted.chart.innerHTML
+      + (document.getElementById('learn-extra')?.innerHTML ?? '');
+    const before = figures();
+    const first = page.builder.modes[0]?.parts[0];
+    if (first === undefined) throw new Error('builder has no parts');
+    mounted.builder.set(first.id, first.min === first.default ? first.max : first.min);
+    expect(figures()).not.toBe(before);
   });
 
   it('hands back one field and leaves the other five', () => {

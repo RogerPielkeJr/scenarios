@@ -9,7 +9,7 @@ import { MARKERS, markerValueFor } from '../../model/markers.js';
 import { SPEC_BY_ID } from '../../model/config.js';
 import { formatInput } from '../../format.js';
 import { LEARN_ENTRIES } from '../../learn/registry.js';
-import type { LearnPageSpec, ProseBlock, Source } from '../../learn/types.js';
+import type { KeyEntry, LearnPageSpec, ProseBlock, Source } from '../../learn/types.js';
 import { decodeScenario, defaultScenario, hashFor, type Scenario } from '../../state.js';
 import { renderPlot, renderStrip } from '../plot.js';
 import { installThemeToggle } from '../theme.js';
@@ -77,6 +77,21 @@ function markerTable(root: Document, spec: LearnPageSpec): HTMLTableElement {
     + '<th scope="col">Assumes</th><th scope="col">Units</th></tr></thead>'
     + `<tbody>${rows}</tbody>`;
   return table;
+}
+
+/** The key under a figure, in the same shape as the top page's legend. */
+function buildKey(root: Document, entries: readonly KeyEntry[]): HTMLElement {
+  const key = element(root, 'div', 'legend chart-key');
+  for (const item of entries) {
+    const entry = element(root, 'div', 'legend-item');
+    const swatch = element(root, 'span', item.dot === true ? 'swatch swatch-dot'
+      : (item.dash === true ? 'swatch swatch-dash' : 'swatch'));
+    swatch.style.background = item.color;
+    entry.appendChild(swatch);
+    entry.appendChild(element(root, 'b', undefined, item.label));
+    key.appendChild(entry);
+  }
+  return key;
 }
 
 function sourceList(root: Document, sources: readonly Source[]): HTMLElement {
@@ -209,34 +224,27 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   figure.appendChild(caption);
   record.body.appendChild(figure);
 
-  const key = element(root, 'div', 'legend chart-key');
-  for (const item of spec.chart.key) {
-    const entry = element(root, 'div', 'legend-item');
-    const swatch = element(root, 'span', item.dot === true ? 'swatch swatch-dot'
-      : (item.dash === true ? 'swatch swatch-dash' : 'swatch'));
-    swatch.style.background = item.color;
-    entry.appendChild(swatch);
-    entry.appendChild(element(root, 'b', undefined, item.label));
-    key.appendChild(entry);
-  }
-  record.body.appendChild(key);
+  record.body.appendChild(buildKey(root, spec.chart.key));
 
-  // A second figure, for a distribution the time series cannot show.
-  let strip: SVGSVGElement | null = null;
-  if (spec.chart.strip !== undefined) {
-    const stripFigure = element(root, 'figure', 'chart-figure strip-figure');
-    strip = root.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    strip.id = 'learn-strip';
-    strip.setAttribute('role', 'img');
-    strip.setAttribute('aria-label', spec.chart.strip.caption);
-    stripFigure.appendChild(strip);
-    const stripCaption = element(root, 'figcaption', 'caption');
-    const stripText = element(root, 'span', undefined, spec.chart.strip.caption);
-    stripText.id = 'strip-caption';
-    stripCaption.appendChild(stripText);
-    stripCaption.appendChild(element(root, 'span', 'credit', CREDIT));
-    stripFigure.appendChild(stripCaption);
-    record.body.appendChild(stripFigure);
+  // A second figure, where one chart cannot carry the story: a distribution
+  // on one page, a second time series on another.
+  let extra: SVGSVGElement | null = null;
+  if (spec.chart.extra !== undefined) {
+    const block = spec.chart.extra;
+    const figure = element(root, 'figure', 'chart-figure extra-figure');
+    extra = root.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    extra.id = 'learn-extra';
+    extra.setAttribute('role', 'img');
+    extra.setAttribute('aria-label', block.caption);
+    figure.appendChild(extra);
+    const extraCaption = element(root, 'figcaption', 'caption');
+    const extraText = element(root, 'span', undefined, block.caption);
+    extraText.id = 'extra-caption';
+    extraCaption.appendChild(extraText);
+    extraCaption.appendChild(element(root, 'span', 'credit', CREDIT));
+    figure.appendChild(extraCaption);
+    record.body.appendChild(figure);
+    if (block.key !== undefined) record.body.appendChild(buildKey(root, block.key));
   }
   main.appendChild(record.section);
 
@@ -273,10 +281,12 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
     panel(results, 'chart', chart, () => {
       renderPlot(chart, spec.chart.spec(outcome, scenario));
     });
-    if (strip !== null && spec.chart.strip !== undefined) {
-      const draw = spec.chart.strip;
-      panel(results, 'strip', strip, () => {
-        if (strip !== null) renderStrip(strip, draw.spec(outcome));
+    if (extra !== null && spec.chart.extra !== undefined) {
+      const block = spec.chart.extra;
+      panel(results, 'extra', extra, () => {
+        if (extra === null) return;
+        if (block.kind === 'strip') renderStrip(extra, block.spec(outcome));
+        else renderPlot(extra, block.spec(outcome));
       });
     }
     report = { panels: results, outputs: collectOutputs(root, OUTPUT_IDS) };
