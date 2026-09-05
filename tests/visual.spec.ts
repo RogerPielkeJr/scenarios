@@ -1,11 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { citedSources } from '../src/learn/sources/index.js';
 
+// Three widths, not four. 1280 and 1600 exercised the same layout, because
+// .wrap caps at 1180px, and every regenerated baseline costs the repository
+// its full size forever.
 const BREAKPOINTS = [
   { name: '360', width: 360, height: 1400 },
   { name: '768', width: 768, height: 1400 },
   { name: '1280', width: 1280, height: 1100 },
-  { name: '1600', width: 1600, height: 1100 },
 ];
 
 const THEMES = ['light', 'dark'] as const;
