@@ -535,6 +535,25 @@ footer a { color: inherit; }
 
 /* --- the builder --------------------------------------------------------- */
 .builder { margin-top: 22px; }
+.builder-modes { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 8px; }
+.mode-button {
+  font-family: var(--sans);
+  font-size: 14px;
+  padding: 8px 13px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 2px;
+}
+.mode-button:hover { border-color: var(--navy); }
+.mode-button[aria-pressed='true'] {
+  border-color: var(--navy);
+  background: color-mix(in srgb, var(--navy) 12%, transparent);
+  font-weight: 600;
+}
+.builder-mode-note { font-size: 14.5px; color: var(--dim); margin: 0 0 14px; }
+.strip-figure { margin-top: 22px; }
 .builder-part { border-top: 1px solid var(--rule); padding: 14px 0 16px; }
 .builder-part:first-child { border-top: none; padding-top: 0; }
 .builder-part-head {

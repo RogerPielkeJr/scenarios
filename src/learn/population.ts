@@ -177,7 +177,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
       { label: 'Your value', color: 'var(--you)' },
       { label: 'The seven CMIP7 markers at 2100', color: 'var(--dim)', dot: true },
     ],
-    spec(values, scenario): PlotSpec {
+    spec(outcome, scenario): PlotSpec {
       const band = data.bands[0];
       if (band === undefined) throw new Error('learn_population.json has no band');
       return {
@@ -212,7 +212,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
             labelAtEnd: true,
           },
           ...sspSeries(),
-          readerSeries(total(values), scenario.name === '' ? 'Your value'
+          readerSeries(outcome.value, scenario.name === '' ? 'Your value'
             : displayName(scenario.name)),
         ],
         points: markerPoints(),
@@ -280,27 +280,31 @@ export const POPULATION_PAGE: LearnPageSpec = {
       + `figure of ${bn(C.world2100.lo95)}, because the regions do not all land at the bottom of `
       + 'their own ranges in the same century.',
     ],
-    parts: BUILDER_PARTS,
     action: 'Use this population in my scenario',
-    combine(values) {
-      const world = total(values);
-      const ssa = values[SSA.id] ?? SSA.default;
-      const change = world - C.today.worldBn;
-      const versusMedium = world - C.world2100.medium;
-      return {
-        value: world,
-        headline: `${bn(world)} people in 2100`,
-        detail: [
-          `${bn(Math.abs(change))} ${change >= 0 ? 'more' : 'fewer'} than the `
-          + `${bn(C.today.worldBn)} alive in ${C.today.year}`,
-          Math.abs(versusMedium) < 0.005
-            ? `level with the UN medium of ${bn(C.world2100.medium)}`
-            : `${versusMedium > 0 ? '+' : '−'}${Math.abs(versusMedium).toFixed(2)} billion `
-              + `against the UN medium of ${bn(C.world2100.medium)}`,
-          `Sub-Saharan Africa: ${bn(ssa)}, ${one((ssa / world) * 100)}% of the world total`,
-        ],
-      };
-    },
+    modes: [{
+      id: 'by-region',
+      label: 'Region by region',
+      parts: BUILDER_PARTS,
+      combine(values) {
+        const world = total(values);
+        const ssa = values[SSA.id] ?? SSA.default;
+        const change = world - C.today.worldBn;
+        const versusMedium = world - C.world2100.medium;
+        return {
+          value: world,
+          headline: `${bn(world)} people in 2100`,
+          detail: [
+            `${bn(Math.abs(change))} ${change >= 0 ? 'more' : 'fewer'} than the `
+            + `${bn(C.today.worldBn)} alive in ${C.today.year}`,
+            Math.abs(versusMedium) < 0.005
+              ? `level with the UN medium of ${bn(C.world2100.medium)}`
+              : `${versusMedium > 0 ? '+' : '−'}${Math.abs(versusMedium).toFixed(2)} billion `
+                + `against the UN medium of ${bn(C.world2100.medium)}`,
+            `Sub-Saharan Africa: ${bn(ssa)}, ${one((ssa / world) * 100)}% of the world total`,
+          ],
+        };
+      },
+    }],
   },
 
   sources: [

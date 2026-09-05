@@ -161,18 +161,31 @@ test('the theme toggle overrides the system setting', async ({ page }) => {
   await expect(root).toHaveAttribute('data-theme', 'dark');
 });
 
-for (const breakpoint of BREAKPOINTS) {
-  for (const theme of THEMES) {
-    test(`the population page at ${breakpoint.name}px, ${theme}`, async ({ page }) => {
-      await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
-      await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
-      await page.goto('/learn/population/');
-      await page.waitForSelector('#learn-chart [data-series="reader"]');
-      await page.evaluate(() => document.fonts.ready);
-      await expect(page).toHaveScreenshot(`learn-population-${breakpoint.name}-${theme}.png`,
-        { fullPage: true });
-    });
+const LIVE_SLUGS = ['population', 'energy-intensity'];
+
+for (const slug of LIVE_SLUGS) {
+  for (const breakpoint of BREAKPOINTS) {
+    for (const theme of THEMES) {
+      test(`the ${slug} page at ${breakpoint.name}px, ${theme}`, async ({ page }) => {
+        await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
+        await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
+        await page.goto(`/learn/${slug}/`);
+        await page.waitForSelector('#learn-chart [data-series="reader"]');
+        await page.evaluate(() => document.fonts.ready);
+        await expect(page).toHaveScreenshot(`learn-${slug}-${breakpoint.name}-${theme}.png`,
+          { fullPage: true });
+      });
+    }
   }
+
+  test(`the ${slug} page hands a value back`, async ({ page }) => {
+    await page.goto(`/learn/${slug}/?s=11.3_2.2_-1.9_-0.7_-1.5_240&n=Held%20steady`);
+    await page.locator('.use-button').click();
+    await expect(page).toHaveURL(/#s=/);
+    await expect(page).toHaveURL(/n=Held%20steady/);
+    await expect(page.locator('.handoff')).toBeVisible();
+    await expect(page.locator('#scenario-name')).toHaveValue('Held steady');
+  });
 }
 
 for (const breakpoint of [BREAKPOINTS[0], BREAKPOINTS[2]]) {
@@ -261,8 +274,8 @@ test('a named scenario names its download', async ({ page }) => {
 test('the learn index opens every finished page', async ({ page }) => {
   await page.goto('/learn/');
   await expect(page.locator('.learn-index > li')).toHaveCount(6);
-  await expect(page.locator('.learn-index a')).toHaveCount(1);
-  await expect(page.locator('.forthcoming-tag')).toHaveCount(5);
-  await page.locator('.learn-index a').click();
+  await expect(page.locator('.learn-index a')).toHaveCount(LIVE_SLUGS.length);
+  await expect(page.locator('.forthcoming-tag')).toHaveCount(6 - LIVE_SLUGS.length);
+  await page.locator('.learn-index a').first().click();
   await expect(page.locator('h1')).toHaveText('Population');
 });

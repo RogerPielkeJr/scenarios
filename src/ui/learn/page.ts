@@ -11,7 +11,7 @@ import { formatInput } from '../../format.js';
 import { LEARN_ENTRIES } from '../../learn/registry.js';
 import type { LearnPageSpec, ProseBlock, Source } from '../../learn/types.js';
 import { decodeScenario, defaultScenario, hashFor, type Scenario } from '../../state.js';
-import { renderPlot } from '../plot.js';
+import { renderPlot, renderStrip } from '../plot.js';
 import { installThemeToggle } from '../theme.js';
 import { collectOutputs, panel, type RenderReport } from '../report.js';
 import { buildIdentity } from './identity.js';
@@ -220,6 +220,24 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
     key.appendChild(entry);
   }
   record.body.appendChild(key);
+
+  // A second figure, for a distribution the time series cannot show.
+  let strip: SVGSVGElement | null = null;
+  if (spec.chart.strip !== undefined) {
+    const stripFigure = element(root, 'figure', 'chart-figure strip-figure');
+    strip = root.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    strip.id = 'learn-strip';
+    strip.setAttribute('role', 'img');
+    strip.setAttribute('aria-label', spec.chart.strip.caption);
+    stripFigure.appendChild(strip);
+    const stripCaption = element(root, 'figcaption', 'caption');
+    const stripText = element(root, 'span', undefined, spec.chart.strip.caption);
+    stripText.id = 'strip-caption';
+    stripCaption.appendChild(stripText);
+    stripCaption.appendChild(element(root, 'span', 'credit', CREDIT));
+    stripFigure.appendChild(stripCaption);
+    record.body.appendChild(stripFigure);
+  }
   main.appendChild(record.section);
 
   main.appendChild(proseBlock(root, spec.drivers));
@@ -248,14 +266,19 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   let report: RenderReport | null = null;
   let builder: BuilderHandle | null = null;
 
-  function drawChart(): void {
-    const values = builder?.values() ?? {};
-    renderPlot(chart, spec.chart.spec(values, scenario));
-  }
-
   function render(): RenderReport {
     const results: RenderReport['panels'] = [];
-    panel(results, 'chart', chart, drawChart);
+    const outcome = builder?.outcome();
+    if (outcome === undefined) return { panels: results, outputs: {} };
+    panel(results, 'chart', chart, () => {
+      renderPlot(chart, spec.chart.spec(outcome, scenario));
+    });
+    if (strip !== null && spec.chart.strip !== undefined) {
+      const draw = spec.chart.strip;
+      panel(results, 'strip', strip, () => {
+        if (strip !== null) renderStrip(strip, draw.spec(outcome));
+      });
+    }
     report = { panels: results, outputs: collectOutputs(root, OUTPUT_IDS) };
     return report;
   }

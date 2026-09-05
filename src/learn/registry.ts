@@ -43,7 +43,7 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     linkText: 'Learn more about energy per dollar',
     summary: 'Efficiency, structural change and sectoral mix, and the term that '
       + 'has carried most of the decarbonisation on record.',
-    status: 'forthcoming',
+    status: 'live',
   },
   {
     slug: 'carbon-intensity',

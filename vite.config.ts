@@ -14,6 +14,7 @@ const PAGES: Record<string, string> = {
   // /learn/population/ as clean URLs with no rewrite rules.
   learn: 'learn/index.html',
   'learn-population': 'learn/population/index.html',
+  'learn-energy-intensity': 'learn/energy-intensity/index.html',
 };
 
 export default defineConfig({

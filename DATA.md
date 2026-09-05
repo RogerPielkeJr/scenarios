@@ -11,6 +11,7 @@ a primary source on this machine.
 |---|---|---|
 | `scripts/build_data.py` | `observed.json`, `analogues.json`, `base.json` | Yes, from the sources below |
 | `scripts/build_wpp.py` | `learn_population.json` | Yes, from the UN download |
+| `scripts/build_energy_intensity.py` | `learn_energy_intensity.json` | Yes, from the sources below |
 | `scripts/extract_prototype.py` then `scripts/build_carried_data.py` | `config.json`, `emulator.json`, `markers.json`, `population.json`, `presets.json`, `notes.json` | No, carried from the prototype |
 
 ## Sources
@@ -126,6 +127,29 @@ hierarchy) and northern Africa (a subregion), which sum exactly to the UN's
 Africa figure at every variant. That keeps the region carrying most of the
 remaining growth on a control of its own.
 
+### Maddison Project Database 2023
+
+Downloaded from the Dataverse copy the Groningen Growth and Development Centre
+publishes, cached as `scripts/_mpd2023.xlsx` (5 MB, not committed) with the
+extracted world series in `scripts/_maddison_cache.json` (committed).
+
+Used for one thing: world output before 1990, where the World Bank's
+purchasing-power series does not reach. The `Full data` sheet gives GDP per
+capita and population by country and year. The build sums GDP over the **151
+countries with an unbroken 1965 to 2022 record**, 96.5% of world GDP in 1990,
+so each year compares the same economies as the last rather than a growing
+sample.
+
+Only the growth rates are used. The World Bank level in 1990 is carried
+backwards on them, so every level from 1990 onward rests on the World Bank
+alone.
+
+**How much that choice decides.** Over the 32 years the two sources share, the
+Maddison sample grows 3.46% a year and the World Bank series 3.19%. Carrying
+the level back on growth rates adjusted to close that gap gives a 1965 energy
+intensity of 5.86 MJ per dollar instead of 6.25, and a whole-record improvement
+of −0.92% a year instead of −1.03%. Both figures appear on the page.
+
 ### IIASA SSP database v3.2 (June 2025 release)
 
 World population trajectories for SSP1, SSP2 and SSP3, five-yearly 2025 to 2100,
@@ -223,6 +247,32 @@ and the SSPs on that chart. The IHME data portal was unavailable when the page
 was built, so the chart carries a line saying the projection joins it in a
 later revision. Nothing on the page reports an IHME number.
 
+### `learn_energy_intensity.json`
+
+World energy intensity 1965 to 2024, and the rate of every 25-year window
+inside it.
+
+| Field | Value | Units |
+|---|---|---|
+| Intensity, 1965 | 6.2506 | MJ per dollar |
+| Intensity, 1990 | 5.5442 | MJ per dollar |
+| Intensity, 2024 | 3.4002 | MJ per dollar |
+| Rate, 1965 to 2024 | −1.03 | %/yr |
+| Rate, 1990 to 2024 | −1.43 | %/yr |
+| Rate, 2015 to 2024 | −1.62 | %/yr |
+| Primary energy, 1965 and 2024 | 149.7 and 592.2 | EJ |
+| Energy growth, 1965 to 2024 | +2.36 | %/yr |
+| Output growth, 1965 to 2024 | +3.42 | %/yr |
+
+The 2024 intensity of 3.4002 MJ per dollar reproduces `base.json` exactly, and
+the 1990 to 2024 rate of −1.4277 reproduces `observed.json`, because both rest
+on the same World Bank series over those years.
+
+The 35 windows of 25 years run from **−1.5675 %/yr (1996 to 2021)** to
+**−0.4786 %/yr (1965 to 1990)**, with a median of −1.07. CMIP7 HIGH's −0.66
+sits slower than 31 of the 35. The tool's own "Trend continues" rate of −1.62
+sits faster than all 35.
+
 ### `analogues.json`
 
 66 economies, their 2024 CO2 and PPP GDP, and CO2 per dollar in kilograms.
@@ -244,4 +294,5 @@ state the prototype used, so the two can be diffed.
 | ScenarioMIP CMIP7 markers | as carried in the prototype | 2026-09-04 |
 | IIASA SSP database | v3.2, June 2025 release | 2026-09-04 |
 | UN World Population Prospects | 2024 revision, file dated 2024-12-13 | 2026-09-05 |
+| Maddison Project Database | 2023 release | 2026-09-05 |
 | FaIR calibration | v2.2, fair-calibrate v1.4.1 | 2026-09-04 |

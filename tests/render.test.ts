@@ -6,6 +6,7 @@ import { mountApp, type RenderReport } from '../src/app.js';
 import { PRESETS } from '../src/model/bounds.js';
 import { INPUT_SPECS } from '../src/model/config.js';
 import { MARKERS } from '../src/model/markers.js';
+import { LEARN_ENTRIES } from '../src/learn/registry.js';
 
 // import.meta.url is an http URL under the jsdom environment, so the page
 // is read relative to the project root instead.
@@ -179,11 +180,11 @@ describe('the learn link on a slider', () => {
     expect(href).toContain('n=Crowded%20century');
   });
 
-  it('appears only for the sliders whose pages exist', () => {
+  it('appears for every slider whose page exists, and no others', () => {
     mountApp();
-    const links = document.querySelectorAll('.learn-link');
-    expect(links).toHaveLength(1);
-    expect(links[0]?.textContent).toBe('Learn more about population');
+    const links = [...document.querySelectorAll('.learn-link')];
+    const live = LEARN_ENTRIES.filter((entry) => entry.status === 'live');
+    expect(links.map((link) => link.textContent)).toEqual(live.map((entry) => entry.linkText));
   });
 });
 

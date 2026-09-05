@@ -1,12 +1,8 @@
 import { BASE, BASE_YEAR, END_YEAR } from './config.js';
+import { compound } from './rates.js';
 import { populationAt } from './population.js';
 import type { PathPoint, ScenarioInputs, ScenarioPath } from './types.js';
 import { at } from './types.js';
-
-/** Value of a quantity compounding at `ratePercent` %/yr for `years` years. */
-function compound(base: number, ratePercent: number, years: number): number {
-  return base * (1 + ratePercent / 100) ** years;
-}
 
 /**
  * Land use CO2 in a given year: straight line from today's value to the

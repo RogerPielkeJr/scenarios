@@ -225,3 +225,72 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
 }
 
 export const PLOT_GEOMETRY = { VIEW, PLOT };
+
+/**
+ * A one-dimensional distribution: every value on a record laid along an
+ * axis, with the reader's own choice and any reference values called out.
+ *
+ * The energy-intensity page uses it to put a candidate rate among the rates
+ * of every 25-year window the world has actually run.
+ */
+export interface StripSpec {
+  /** Every observation, drawn as a tick. */
+  values: readonly number[];
+  /** Named values drawn above the axis. */
+  highlights: ReadonlyArray<{ id: string; label: string; value: number; color: string }>;
+  min: number;
+  max: number;
+  ticks: readonly number[];
+  axisLabel: string;
+  /** Decimals on the axis numbers. */
+  decimals?: number;
+}
+
+const STRIP = { width: 680, height: 156, left: 16, right: 610, axis: 88 };
+
+export function renderStrip(svg: SVGSVGElement, spec: StripSpec): void {
+  const xFor = (value: number) => STRIP.left
+    + ((value - spec.min) / (spec.max - spec.min)) * (STRIP.right - STRIP.left);
+  const decimals = spec.decimals ?? 2;
+  let markup = `<line x1="${STRIP.left}" x2="${STRIP.right}" y1="${STRIP.axis}" `
+    + `y2="${STRIP.axis}" stroke="var(--rule)" stroke-width="1"/>`;
+
+  for (const value of spec.values) {
+    const x = xFor(value).toFixed(1);
+    markup += `<line x1="${x}" x2="${x}" y1="${STRIP.axis - 13}" y2="${STRIP.axis + 13}" `
+      + 'stroke="var(--ink)" stroke-width="2" opacity="0.22" data-window="1"/>';
+  }
+
+  for (const tick of spec.ticks) {
+    const x = xFor(tick).toFixed(1);
+    markup += `<text x="${x}" y="${STRIP.axis + 30}" text-anchor="middle" `
+      + `font-family="${SANS}" font-size="12" fill="var(--dim)">`
+      + `${tick.toFixed(decimals)}</text>`;
+  }
+  // Below the tick numbers, never beside them.
+  markup += `<text x="${STRIP.left}" y="${STRIP.axis + 58}" font-family="${SANS}" `
+    + `font-size="12.5" fill="var(--dim)">${escapeText(spec.axisLabel)}</text>`;
+
+  // Highlights are spread the same way the chart spreads its end labels, so
+  // two rates a whisker apart still read as two names. The gap comes from the
+  // longest label, because these labels are centred on their own tick and two
+  // of them can sit on the same value.
+  const widest = Math.max(...spec.highlights.map((item) => item.label.length), 6);
+  const placed = spreadLabels(
+    spec.highlights.map((item) => ({ value: item, at: xFor(item.value) })),
+    widest * 6.9 + 14,
+  );
+  for (const { value: item, anchor, at } of placed) {
+    markup += `<line x1="${anchor.toFixed(1)}" x2="${anchor.toFixed(1)}" `
+      + `y1="${STRIP.axis - 20}" y2="${STRIP.axis + 20}" stroke="${item.color}" `
+      + `stroke-width="2.4" data-highlight="${item.id}"/>`
+      + `<line x1="${anchor.toFixed(1)}" x2="${at.toFixed(1)}" y1="${STRIP.axis - 20}" `
+      + `y2="${STRIP.axis - 30}" stroke="${item.color}" stroke-width="1" opacity="0.5"/>`
+      + `<text x="${at.toFixed(1)}" y="${STRIP.axis - 36}" text-anchor="middle" `
+      + `font-family="${SANS}" font-size="12" font-weight="600" fill="${item.color}">`
+      + `${escapeText(item.label)}</text>`;
+  }
+
+  svg.setAttribute('viewBox', `0 0 ${STRIP.width} ${STRIP.height}`);
+  svg.innerHTML = markup;
+}

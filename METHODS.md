@@ -212,6 +212,29 @@ The reader's curve on that page comes from `populationAt` in
 `src/model/population.js`, the same function the scenario itself uses, so the
 shape on the Learn More page and the shape behind the top page agree.
 
+### The energy per dollar builder
+
+Two modes, both producing a rate in %/yr.
+
+**A window from the record.** The reader picks two years and the builder takes
+the compound rate between the observed intensities of those years:
+
+    rate = ((intensity[end] / intensity[start]) ^ (1 / (end - start)) - 1) x 100
+
+The second year is held at least ten years after the first, because a shorter
+window measures a business cycle rather than a trend.
+
+**A multiple of the observed rate.** The rate observed from 1990 to 2024,
+−1.4277 %/yr, times a multiple the reader sets between 0 and 3.
+
+Both modes report where the answer falls among the 35 windows of 25 years in
+the record, as a count and as a percentile, and what today's 3.40 MJ per dollar
+becomes by 2100 at that rate. The percentile counts windows that improved more
+slowly than the chosen rate, so a faster rate scores higher.
+
+The series behind all of it splices two sources at 1990; DATA.md gives the
+method and the size of the difference between them.
+
 ## What a CMIP7 preset does and does not reproduce
 
 Loading a CMIP7 preset sets the six sliders to the Kaya factors that marker

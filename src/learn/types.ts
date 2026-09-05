@@ -1,5 +1,5 @@
 import type { InputId } from '../model/types.js';
-import type { PlotSpec } from '../ui/plot.js';
+import type { PlotSpec, StripSpec } from '../ui/plot.js';
 import type { Scenario } from '../state.js';
 
 /** One entry in the source list at the foot of a page. */
@@ -40,8 +40,17 @@ export interface ChartBlock {
   caption: string;
   /** Legend entries under the figure. */
   key: Array<{ label: string; color: string; dash?: boolean; dot?: boolean }>;
-  /** Built for each render, because the reader's own curve sits in it. */
-  spec(inputs: Readonly<Record<string, number>>, scenario: Scenario): PlotSpec;
+  /**
+   * Built for each render, because the reader's own curve sits in it. Takes
+   * the builder's current outcome, which carries the value the slider would
+   * receive, so a chart never reproduces the builder's arithmetic.
+   */
+  spec(outcome: BuilderOutcome, scenario: Scenario): PlotSpec;
+  /** A second figure under the first, for a distribution the chart cannot show. */
+  strip?: {
+    caption: string;
+    spec(outcome: BuilderOutcome): StripSpec;
+  };
 }
 
 /** One control in a builder. */
@@ -70,13 +79,30 @@ export interface BuilderOutcome {
   detail: string[];
 }
 
+/**
+ * One way of assembling the value.
+ *
+ * Most pages offer a single mode. Where a quantity can be approached from
+ * either end - set a rate and read the level, or set the level and read the
+ * rate - each way becomes a mode and the reader picks between them.
+ */
+export interface BuilderMode {
+  id: string;
+  /** The label on the mode switch. */
+  label: string;
+  /** A line under the switch saying what this mode asks for. */
+  note?: string;
+  parts: BuilderPart[];
+  /** Turns this mode's part values into a slider value. */
+  combine(values: Readonly<Record<string, number>>): BuilderOutcome;
+}
+
 export interface BuilderBlock {
   heading: string;
   note?: string;
   paragraphs: string[];
-  parts: BuilderPart[];
-  /** Turns the part values into a slider value. */
-  combine(values: Readonly<Record<string, number>>): BuilderOutcome;
+  /** One or more ways to assemble the value. A single mode hides the switch. */
+  modes: BuilderMode[];
   /** The label on the button, e.g. "Use this population in my scenario". */
   action: string;
 }
