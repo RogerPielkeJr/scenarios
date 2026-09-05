@@ -333,6 +333,30 @@ The chart brings the named marker's own published path forward whenever one of
 those presets is loaded, so the divergence sits in front of the reader rather
 than in a footnote.
 
+## The corrected carbon-intensity rate
+
+Until 2026-09-05 the mark under the CO2-per-energy slider read −0.21 %/yr,
+which measures CO2 from energy over total energy supply. The slider itself
+moves a wider quantity: the fossil and industrial CO2 the CMIP7 markers count,
+cement included. On that basis the world improved **−0.15 %/yr** from 1990 to
+2024, and the mark, the observed rate the notes compare against, and the "Kaya
+at observed rates" preset now all use it.
+
+What moved with it:
+
+| | Before | After |
+|---|---|---|
+| Mark under the slider | −0.21 %/yr | −0.15 %/yr |
+| "Kaya at observed rates", cumulative | 4,083.9 GtCO2 | 4,177.7 GtCO2 |
+| "Kaya at observed rates", warming | 3.19 °C | 3.21 °C |
+
+`config.json` keeps the old figure under `supersededRates` and the preset keeps
+its old totals under `expected.superseded`, so anything published against the
+earlier numbers can be traced. The two technology bounds still use window rates
+measured on combustion alone, which `observed.json` derives from the Energy
+Institute series; moving those would change the bounds themselves, and that has
+not been done.
+
 ## How far the marker factors can be checked
 
 The seven markers' Kaya factors arrived with the prototype and have no primary

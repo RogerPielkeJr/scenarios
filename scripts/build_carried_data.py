@@ -46,7 +46,12 @@ SCENARIOS = [
 # less, because the emulator is logarithmic in cumulative CO2: the slow
 # bound went from 3.4 to 3.47 degC and the fast bound from 2.2 to 2.22.
 DOCUMENTED = {
-    'Kaya at observed rates':     {'cumulative_gt': 4083.9, 'warming_c': 3.19},
+    # Re-frozen 2026-09-05, when the CO2-per-energy rate moved from -0.21 to
+    # -0.15 to measure the same quantity the slider moves. See METHODS.md.
+    'Kaya at observed rates':     {'cumulative_gt': 4177.7, 'warming_c': 3.21,
+                                   'superseded': {'cumulative_gt': 4083.9, 'warming_c': 3.19,
+                                                  'why': 'the rate measured combustion CO2 '
+                                                         'alone, at -0.21%/yr'}},
     'Trend continues':            {'cumulative_gt': 3408.7, 'warming_c': 2.94},
     'Slowest technical progress': {'cumulative_gt': 5047.2, 'warming_c': 3.47,
                                    'brief_stated': {'cumulative_gt': 4600, 'warming_c': 3.4}},
@@ -105,6 +110,19 @@ def main() -> None:
     # --- config.json --------------------------------------------------------
     default_values = dict(next(values for label, values in C['PRE'] if label == DEFAULT_PRESET))
 
+    # One correction to what the prototype carried. The CO2-per-energy slider
+    # moves the quantity the CMIP7 markers count, cement and other industrial
+    # CO2 included, and on that basis the world improved 0.15% a year from
+    # 1990 to 2024, not the 0.21% that measures combustion alone. The mark
+    # under the slider, the observed rate the notes compare against, and the
+    # "Kaya at observed rates" preset all now use the same basis as the slider.
+    # src/data/learn_fuel_mix.json carries both figures and the page prints
+    # them side by side. See METHODS.md.
+    slider_basis = json.loads(
+        (OUT / 'learn_fuel_mix.json').read_text())['constants']['rates']
+    ci_observed = round(slider_basis['sliderBasis1990'], 2)
+    ci_decade = round(slider_basis['sliderBasisDecade'], 2)
+
     inputs = []
     for c in C['CTRL']:
         key, kind, units = INPUT_META[c['id']]
@@ -119,8 +137,17 @@ def main() -> None:
             'prototypeDefault': c['val'],
             'unitSuffix': c['unit'], 'units': units,
             'signed': kind == 'rate',
-            'reference': {'value': c['hist'], 'label': c['histL']},
+            'reference': {
+                'value': ci_observed if key == 'co2PerEnergy' else c['hist'],
+                'label': c['histL'],
+            },
         })
+    for spec in inputs:
+        if spec['id'] == 'co2PerEnergy':
+            spec['help'] = (
+                f'The fuel mix improved only {abs(ci_observed):.2f}% a year since 1990, and '
+                f'{abs(ci_decade):.2f}% over the past decade, counting the cement and '
+                'industrial CO2 the scenarios count.')
     config = {
         'meta': {'generated_by': 'scripts/build_carried_data.py', 'provenance': provenance},
         'baseYear': BASE['year'], 'endYear': D['popyears'][-1],
@@ -137,7 +164,11 @@ def main() -> None:
             'methaneMt': D['ch4ref'],
         },
         'observedRates': {'income': C['OBS']['gdppc'], 'energyPerDollar': C['OBS']['ei'],
-                          'co2PerEnergy': C['OBS']['ci'], 'population': C['OBS']['pop']},
+                          'co2PerEnergy': ci_observed, 'population': C['OBS']['pop']},
+        # What the prototype used, kept so the change above can be checked.
+        'supersededRates': {'co2PerEnergy': C['OBS']['ci'],
+                            'why': 'CO2 from energy over total energy supply, which leaves '
+                                   'out the cement and industrial CO2 the slider carries'},
         'inputs': inputs,
     }
 
@@ -199,11 +230,16 @@ def main() -> None:
     # --- presets.json -------------------------------------------------------
     presets = []
     for label, values in C['PRE']:
+        inputs = {INPUT_META[k][0]: v for k, v in values.items()}
+        # This preset takes the observed rates, so it follows the corrected
+        # carbon-intensity rate rather than the prototype's.
+        if label == 'Kaya at observed rates':
+            inputs['co2PerEnergy'] = ci_observed
         entry = {
             'id': label.lower().replace(' ', '-').replace(',', ''),
             'label': label,
             'documented': label in DOCUMENTED,
-            'inputs': {INPUT_META[k][0]: v for k, v in values.items()},
+            'inputs': inputs,
         }
         if label in DOCUMENTED:
             entry['expected'] = DOCUMENTED[label]

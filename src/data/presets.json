@@ -8,13 +8,18 @@
     "population": 10.2,
     "income": 1.91,
     "energyPerDollar": -1.43,
-    "co2PerEnergy": -0.21,
+    "co2PerEnergy": -0.15,
     "methane": 380,
     "landUse": 2.0
    },
    "expected": {
-    "cumulative_gt": 4083.9,
-    "warming_c": 3.19,
+    "cumulative_gt": 4177.7,
+    "warming_c": 3.21,
+    "superseded": {
+     "cumulative_gt": 4083.9,
+     "warming_c": 3.19,
+     "why": "the rate measured combustion CO2 alone, at -0.21%/yr"
+    },
     "tolerance_gt": 0.5,
     "tolerance_c": 0.01,
     "source": "frozen from this model after the base-year recalibration"

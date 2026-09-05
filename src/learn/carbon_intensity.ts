@@ -208,7 +208,8 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       `The difference matters for the rate as well as the level. Measured on the slider's own `
       + `basis the world improved ${rate(C.rates.sliderBasis1990)} from 1990 to ${C.lastYear}; `
       + `measured on combustion alone, ${rate(C.rates.energyBasis1990)}. The calibration mark `
-      + 'under the slider on the front page uses the second of those.',
+      + 'under the slider on the front page uses the first, so the mark and the slider measure '
+      + 'the same quantity. Work published before September 2026 quotes the second.',
     ],
   },
 

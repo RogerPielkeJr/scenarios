@@ -15,6 +15,8 @@ export interface Preset {
     source: string;
     /** What the brief stated before the base-year recalibration, where it did. */
     brief_stated?: { cumulative_gt: number; warming_c: number };
+    /** What this preset produced before a rate it depends on was corrected. */
+    superseded?: { cumulative_gt: number; warming_c: number; why: string };
   };
 }
 

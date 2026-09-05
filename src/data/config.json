@@ -17,8 +17,12 @@
  "observedRates": {
   "income": 1.91,
   "energyPerDollar": -1.43,
-  "co2PerEnergy": -0.21,
+  "co2PerEnergy": -0.15,
   "population": 0.99
+ },
+ "supersededRates": {
+  "co2PerEnergy": -0.21,
+  "why": "CO2 from energy over total energy supply, which leaves out the cement and industrial CO2 the slider carries"
  },
  "inputs": [
   {
@@ -86,7 +90,7 @@
    "legacyId": "ci",
    "kind": "rate",
    "label": "Carbon per unit of energy",
-   "help": "The fuel mix improved only 0.21% a year since 1990, and 0.48% over the past decade.",
+   "help": "The fuel mix improved only 0.15% a year since 1990, and 0.40% over the past decade, counting the cement and industrial CO2 the scenarios count.",
    "min": -4,
    "max": 0.5,
    "step": 0.01,
@@ -97,7 +101,7 @@
    "units": "%/yr",
    "signed": true,
    "reference": {
-    "value": -0.21,
+    "value": -0.15,
     "label": "observed"
    }
   },

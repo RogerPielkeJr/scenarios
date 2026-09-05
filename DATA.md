@@ -324,8 +324,9 @@ world ran 75.56 kgCO2 per GJ in 1965 and 65.18 in 2024. On combustion alone,
 
 That gap changes the rate as well as the level: **−0.15%/yr from 1990 to 2024
 on the slider's basis, −0.21%/yr on combustion alone**. The calibration mark
-under the front page's slider uses −0.21, which measures a slightly different
-quantity from the one the slider moves. Flagged, not silently changed.
+under the front page's slider used −0.21 until 2026-09-05 and now uses −0.15,
+so the mark and the slider measure the same quantity; `config.json` keeps the
+old figure under `supersededRates`. METHODS.md records what moved with it.
 
 The non-combustion term, 5.237 kgCO2 per GJ in 2024, breaks down as cement
 2.487, other industry 0.717, flaring 0.702, and 1.331 for the difference

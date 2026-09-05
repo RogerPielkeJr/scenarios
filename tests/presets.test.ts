@@ -3,7 +3,9 @@ import { DOCUMENTED_PRESETS, PRESETS, presetByLabel } from '../src/model/bounds.
 import { warming } from '../src/model/emulator.js';
 import { computePath } from '../src/model/kaya.js';
 import { INPUT_IDS } from '../src/model/types.js';
-import { DEFAULT_PRESET, SPEC_BY_ID, defaultInputs } from '../src/model/config.js';
+import {
+  DEFAULT_PRESET, INPUT_SPECS, OBSERVED_RATES, SPEC_BY_ID, defaultInputs,
+} from '../src/model/config.js';
 import { MARKER_BY_ID } from '../src/model/markers.js';
 
 describe('presets', () => {
@@ -106,5 +108,28 @@ describe('presets', () => {
       expect(path.cumulativeGt / stated.cumulative_gt).toBeLessThan(1.14);
       expect(Math.abs(t - stated.warming_c)).toBeLessThan(0.08);
     }
+  });
+});
+
+describe('the corrected carbon-intensity rate', () => {
+  it('marks the slider with the basis the slider measures', () => {
+    const spec = INPUT_SPECS.find((input) => input.id === 'co2PerEnergy');
+    expect(spec?.reference.value).toBeCloseTo(-0.15, 2);
+    expect(OBSERVED_RATES.co2PerEnergy).toBeCloseTo(-0.15, 2);
+  });
+
+  it('reproduces the rate from the fuel mix data rather than restating it', async () => {
+    const fuelMix = (await import('../src/data/learn_fuel_mix.json')).default;
+    expect(OBSERVED_RATES.co2PerEnergy)
+      .toBeCloseTo(Number(fuelMix.constants.rates.sliderBasis1990.toFixed(2)), 6);
+  });
+
+  // Anything published against the old figure has to stay traceable.
+  it('keeps what the rate and the preset were before the correction', async () => {
+    const config = (await import('../src/data/config.json')).default;
+    expect(config.supersededRates.co2PerEnergy).toBeCloseTo(-0.21, 2);
+    const observed = PRESETS.find((preset) => preset.id === 'kaya-at-observed-rates');
+    expect(observed?.expected?.superseded?.cumulative_gt).toBeCloseTo(4083.9, 1);
+    expect(observed?.inputs.co2PerEnergy).toBeCloseTo(-0.15, 2);
   });
 });
