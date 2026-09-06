@@ -818,3 +818,67 @@ footer a { color: inherit; }
   border-color: var(--accent-ink);
   background: var(--accent-wash);
 }
+
+/* ---------------------------------------------------------------------------
+   The library. One card per post: the cover, the date it went out, the title
+   and what a reader finds inside. The covers arrive in every shape Substack
+   holds, portrait through wide, so each sits whole on its own ground rather
+   than cropped to a common box.
+   --------------------------------------------------------------------------- */
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(206px, 1fr));
+  gap: 20px;
+}
+
+.library-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.library-card:hover { border-color: var(--navy); }
+
+.library-card:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+.library-cover {
+  display: block;
+  width: 100%;
+  height: 158px;
+  object-fit: contain;
+  background: var(--field);
+  border-bottom: 1px solid var(--rule);
+}
+
+.library-body { padding: 13px 15px 16px; display: grid; gap: 5px; }
+
+.library-date {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.library-body h3 {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 17.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--navy);
+}
+
+.library-card:hover .library-body h3 {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.library-body .gloss { font-size: 15.5px; line-height: 1.5; }

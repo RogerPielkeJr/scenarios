@@ -5,7 +5,7 @@ import { MARKERS, MARKER_BY_ID, MARKER_YEARS, publishedPath } from './model/mark
 import { defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import {
-  ScenarioState, decodeScenario, displayName, learnIndexHref, pathWithScenario,
+  ScenarioState, decodeScenario, displayName, pathWithScenario,
 } from './state.js';
 import { renderChart } from './ui/chart.js';
 import { downloadScenarioPdf, downloadScenarioPng } from './ui/export.js';
@@ -17,6 +17,7 @@ import { installShare, syncHash } from './ui/share.js';
 import { renderStats, type StatTiles } from './ui/stats.js';
 import { renderTable } from './ui/table.js';
 import { installThemeToggle } from './ui/theme.js';
+import { linkToolbar } from './ui/toolbar.js';
 import { collectOutputs, panel, type PanelResult, type RenderReport } from './ui/report.js';
 
 export type { PanelResult, RenderReport } from './ui/report.js';
@@ -179,12 +180,9 @@ export function mountApp(root: Document = document): App {
     panel(results, 'model', null, () => { path = computePath(inputs); });
 
     panel(results, 'sliders', null, () => sliders?.update(scenario));
-    // The toolbar route into Learn More has to carry the scenario too; a bare
-    // /learn/ sends the reader to the six pages holding the defaults.
-    panel(results, 'learn-toolbar', null, () => {
-      const link = root.getElementById('learn-toolbar');
-      if (link instanceof HTMLAnchorElement) link.href = learnIndexHref(scenario);
-    });
+    // The toolbar routes off this page have to carry the scenario too; a bare
+    // /learn/ or /library.html sends the reader on holding the defaults.
+    panel(results, 'toolbar', null, () => linkToolbar(root, scenario));
     panel(results, 'presets', null, () => presets?.update(presetId));
     panel(results, 'legend', legend, () => buildLegend(legend, label));
     panel(results, 'chart', chart, () => {

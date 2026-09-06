@@ -5,10 +5,11 @@
 import '../styles.css';
 import { LEARN_ENTRIES } from './registry.js';
 import {
-  decodeScenario, defaultScenario, hashFor, learnHref, learnIndexHref,
+  decodeScenario, defaultScenario, hashFor, learnHref,
 } from '../state.js';
 import { buildIdentity } from '../ui/learn/identity.js';
 import { installThemeToggle } from '../ui/theme.js';
+import { linkToolbar } from '../ui/toolbar.js';
 
 const STANDFIRST = 'Six assumptions decide any emissions future. Each page below explains one '
   + 'of them: what it measures, what the world has done with it, what the CMIP7 scenarios '
@@ -38,12 +39,7 @@ function mount(): void {
 
   const standfirst = document.getElementById('learn-standfirst');
   if (standfirst !== null) standfirst.textContent = STANDFIRST;
-  const toolbarBack = document.getElementById('back-toolbar');
-  if (toolbarBack instanceof HTMLAnchorElement) toolbarBack.href = `/${hashFor(scenario)}`;
-  const toolbarIndex = document.getElementById('learn-toolbar');
-  if (toolbarIndex instanceof HTMLAnchorElement) {
-    toolbarIndex.href = learnIndexHref(scenario);
-  }
+  linkToolbar(document, scenario);
 
   const main = document.getElementById('learn-main');
   if (main === null) throw new Error('missing element #learn-main');

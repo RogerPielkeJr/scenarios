@@ -1,11 +1,16 @@
 import './styles.css';
 import { installThemeToggle } from './ui/theme.js';
+import { linkToolbar } from './ui/toolbar.js';
+import { decodeScenario, defaultScenario } from './state.js';
 import { LEARN_ENTRIES } from './learn/registry.js';
 import { citedSources } from './learn/sources/index.js';
 
 const button = document.getElementById('theme-toggle');
 const label = document.getElementById('theme-label');
 if (button !== null && label !== null) installThemeToggle(button, label);
+
+// This page held the one route back that dropped the reader's scenario.
+linkToolbar(document, decodeScenario(window.location.search) ?? defaultScenario());
 
 function render(): void {
   const list = document.getElementById('learn-sources');

@@ -85,6 +85,7 @@ is updated, then commit the changed JSON.
 |---|---|---|
 | `/` | `index.html` | The THB Scenario Builder |
 | `/bibliography.html` | `bibliography.html` | The book, the scenarios work, the sources |
+| `/library.html` | `library.html` | The Honest Broker posts on scenarios, in `src/library/entries.ts` |
 | `/learn/` | `learn/index.html` | Index of the six Learn More pages |
 | `/learn/population/` | `learn/population/index.html` | Population |
 | `/learn/income/` | `learn/income/index.html` | Income per person |
@@ -96,6 +97,10 @@ is updated, then commit the changed JSON.
 Every page is a Vite entry point, carries the masthead and the toolbar, and is
 checked by `tests/pages.test.ts`. The `learn/…/index.html` layout gives clean
 URLs on GitHub Pages with no rewrite rules.
+
+Every toolbar link off a page goes through `linkToolbar` in `src/ui/toolbar.ts`,
+which writes the reader's scenario into the href. A link the function cannot
+find by id keeps its bare path and hands the next page the defaults.
 
 ## Adding a Learn More page
 

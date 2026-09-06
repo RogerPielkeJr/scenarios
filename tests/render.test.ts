@@ -204,6 +204,25 @@ describe('the learn link on a slider', () => {
   });
 });
 
+describe('the toolbar routes off the front page', () => {
+  beforeEach(() => { loadPage(); });
+
+  // Every one of them lands on a page that offers a way back. A bare href
+  // here would hand that page the defaults instead of the reader's own.
+  it('carries the current scenario to the library, the pages and the sources', () => {
+    const app = mountApp();
+    app.state.set('population', 11.3);
+    app.state.setName('Crowded century');
+    for (const [id, path] of [['learn-toolbar', '/learn/'],
+      ['library-toolbar', '/library.html'],
+      ['bibliography-toolbar', '/bibliography.html']] as const) {
+      const href = document.getElementById(id)?.getAttribute('href') ?? '';
+      expect(href.startsWith(`${path}?s=11.3_`), id).toBe(true);
+      expect(href, id).toContain('n=Crowded%20century');
+    }
+  });
+});
+
 describe('a published scenario on screen', () => {
   beforeEach(() => { loadPage(); });
 

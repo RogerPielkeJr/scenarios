@@ -11,12 +11,13 @@ import { formatInput } from '../../format.js';
 import { LEARN_ENTRIES } from '../../learn/registry.js';
 import type { KeyEntry, LearnPageSpec, ProseBlock, Source } from '../../learn/types.js';
 import {
-  decodeScenario, defaultScenario, hashFor, learnHref, learnIndexHref,
+  decodeScenario, defaultScenario, hashFor, learnHref,
   type Scenario,
 } from '../../state.js';
 import { plotTable, renderPlot, renderStrip, stripTable } from '../plot.js';
 import { attachFigureButtons, type FigureButtons } from '../figure.js';
 import { installThemeToggle } from '../theme.js';
+import { linkToolbar } from '../toolbar.js';
 import { collectOutputs, panel, type RenderReport } from '../report.js';
 import { buildIdentity } from './identity.js';
 import { renderBuilder, type BuilderHandle } from './builder.js';
@@ -212,12 +213,7 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   const standfirst = root.getElementById('learn-standfirst');
   if (standfirst !== null) standfirst.textContent = spec.standfirst;
 
-  const toolbarBack = root.getElementById('back-toolbar');
-  if (toolbarBack instanceof HTMLAnchorElement) toolbarBack.href = `/${hashFor(scenario)}`;
-  const toolbarIndex = root.getElementById('learn-toolbar');
-  if (toolbarIndex instanceof HTMLAnchorElement) {
-    toolbarIndex.href = learnIndexHref(scenario);
-  }
+  linkToolbar(root, scenario);
 
   main.appendChild(backLink(root, scenario, fresh));
 

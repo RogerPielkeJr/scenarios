@@ -116,6 +116,15 @@ export function learnIndexHref(scenario: Scenario): string {
   return `/learn/?${encodeScenario(scenario)}`;
 }
 
+/** The library and the bibliography carry the scenario the same way. */
+export function libraryHref(scenario: Scenario): string {
+  return `/library.html?${encodeScenario(scenario)}`;
+}
+
+export function bibliographyHref(scenario: Scenario): string {
+  return `/bibliography.html?${encodeScenario(scenario)}`;
+}
+
 /**
  * The link back to the THB Scenario Builder. `applied` names the one field a
  * builder replaced, which the top page uses to say where the value came

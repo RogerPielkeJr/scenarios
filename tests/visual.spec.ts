@@ -39,6 +39,31 @@ for (const breakpoint of [BREAKPOINTS[0], BREAKPOINTS[2]]) {
   });
 }
 
+for (const breakpoint of [BREAKPOINTS[0], BREAKPOINTS[2]]) {
+  test(`library at ${breakpoint?.name}px`, async ({ page }) => {
+    if (!breakpoint) return;
+    await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
+    await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+    await page.goto('/library.html');
+    // The covers load lazily and arrive from Substack's CDN at their own
+    // pace. A full-page shot reaches past the viewport without scrolling,
+    // so walking the page first is what puts an image in each card.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.body.scrollHeight; y += window.innerHeight) {
+        window.scrollTo(0, y);
+        await new Promise((resolve) => setTimeout(resolve, 80));
+      }
+      window.scrollTo(0, 0);
+    });
+    await page.waitForFunction(
+      () => Array.from(document.images).every((img) => img.complete && img.naturalWidth > 0),
+      null, { timeout: 20_000 },
+    );
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page).toHaveScreenshot(`library-${breakpoint.name}.png`, { fullPage: true });
+  });
+}
+
 test('every tile is filled and nothing failed to render', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', (message) => {
@@ -113,7 +138,9 @@ test('the masthead and the toolbar link out', async ({ page }) => {
 test('the bibliography button reaches the bibliography and back', async ({ page }) => {
   await page.goto('/');
   await page.locator('.toolbar a', { hasText: 'Bibliography' }).click();
-  await expect(page).toHaveURL(/bibliography\.html$/);
+  // The scenario rides along in the query string, so the path is not the
+  // whole URL any more.
+  await expect(page).toHaveURL(/bibliography\.html\?s=/);
   await expect(page.locator('h1')).toHaveText('Bibliography');
   // Sixteen hand-written entries, plus one per work the Learn More pages cite.
   await expect(page.locator('#learn-sources > li')).toHaveCount(citedSources().length);

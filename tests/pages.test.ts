@@ -10,11 +10,13 @@ const read = (name: string) => readFileSync(resolve(process.cwd(), name), 'utf8'
 const INDEX = read('index.html');
 const BIBLIOGRAPHY = read('bibliography.html');
 const LEARN_INDEX = read('learn/index.html');
+const LIBRARY = read('library.html');
 const LEARN_POPULATION = read('learn/population/index.html');
 const VITE_CONFIG = read('vite.config.ts');
 const PAGES = [
   ['index.html', INDEX],
   ['bibliography.html', BIBLIOGRAPHY],
+  ['library.html', LIBRARY],
   ['learn/index.html', LEARN_INDEX],
   ['learn/population/index.html', LEARN_POPULATION],
 ] as const;
@@ -40,6 +42,23 @@ describe('both pages', () => {
     expect(INDEX).toContain('href="/learn/"');
     expect(BIBLIOGRAPHY).toContain('href="/"');
     expect(LEARN_POPULATION).toContain('href="/learn/"');
+  });
+
+  // The scenario travels in the query string, which only a script can write.
+  // A link the script cannot find keeps the bare href and resets the reader's
+  // six numbers, so every route off a page has to carry an id.
+  it.each(PAGES)('%s reaches the library, and the library is reachable', (_name, html) => {
+    if (html === LIBRARY) {
+      expect(html).toContain('id="back-toolbar"');
+      expect(html).toContain('id="bibliography-toolbar"');
+    } else {
+      expect(html).toContain('id="library-toolbar"');
+      expect(html).toContain('href="/library.html"');
+    }
+  });
+
+  it('builds the library as its own entry point', () => {
+    expect(VITE_CONFIG).toContain("library: 'library.html'");
   });
 
   it.each(PAGES)('%s gives the logo explicit dimensions so it cannot reflow', (_name, html) => {
