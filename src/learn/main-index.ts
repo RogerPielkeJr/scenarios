@@ -4,7 +4,9 @@
  */
 import '../styles.css';
 import { LEARN_ENTRIES } from './registry.js';
-import { decodeScenario, defaultScenario, hashFor, learnHref } from '../state.js';
+import {
+  decodeScenario, defaultScenario, hashFor, learnHref, learnIndexHref,
+} from '../state.js';
 import { buildIdentity } from '../ui/learn/identity.js';
 import { installThemeToggle } from '../ui/theme.js';
 
@@ -38,6 +40,10 @@ function mount(): void {
   if (standfirst !== null) standfirst.textContent = STANDFIRST;
   const toolbarBack = document.getElementById('back-toolbar');
   if (toolbarBack instanceof HTMLAnchorElement) toolbarBack.href = `/${hashFor(scenario)}`;
+  const toolbarIndex = document.getElementById('learn-toolbar');
+  if (toolbarIndex instanceof HTMLAnchorElement) {
+    toolbarIndex.href = learnIndexHref(scenario);
+  }
 
   const main = document.getElementById('learn-main');
   if (main === null) throw new Error('missing element #learn-main');

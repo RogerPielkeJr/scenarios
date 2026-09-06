@@ -10,7 +10,10 @@ import { SPEC_BY_ID } from '../../model/config.js';
 import { formatInput } from '../../format.js';
 import { LEARN_ENTRIES } from '../../learn/registry.js';
 import type { KeyEntry, LearnPageSpec, ProseBlock, Source } from '../../learn/types.js';
-import { decodeScenario, defaultScenario, hashFor, type Scenario } from '../../state.js';
+import {
+  decodeScenario, defaultScenario, hashFor, learnHref, learnIndexHref,
+  type Scenario,
+} from '../../state.js';
 import { plotTable, renderPlot, renderStrip, stripTable } from '../plot.js';
 import { attachFigureButtons, type FigureButtons } from '../figure.js';
 import { installThemeToggle } from '../theme.js';
@@ -140,7 +143,7 @@ function sourceList(root: Document, sources: readonly Source[]): HTMLElement {
   return list;
 }
 
-function siblingNav(root: Document, slug: string): HTMLElement {
+function siblingNav(root: Document, slug: string, scenario: Scenario): HTMLElement {
   const nav = element(root, 'nav', 'siblings banded');
   nav.setAttribute('aria-label', 'The other assumptions');
   const left = element(root, 'div', 'band-left');
@@ -152,7 +155,10 @@ function siblingNav(root: Document, slug: string): HTMLElement {
     const item = root.createElement('li');
     if (entry.status === 'live') {
       const link = root.createElement('a');
-      link.href = `/learn/${entry.slug}/`;
+      // learnHref, never a bare path: a bare one drops the reader's six
+      // numbers and their name, and the next Use button then carries the
+      // defaults back to the builder over everything they had set.
+      link.href = learnHref(entry.slug, scenario);
       link.textContent = entry.title;
       item.appendChild(link);
     } else {
@@ -208,6 +214,10 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
 
   const toolbarBack = root.getElementById('back-toolbar');
   if (toolbarBack instanceof HTMLAnchorElement) toolbarBack.href = `/${hashFor(scenario)}`;
+  const toolbarIndex = root.getElementById('learn-toolbar');
+  if (toolbarIndex instanceof HTMLAnchorElement) {
+    toolbarIndex.href = learnIndexHref(scenario);
+  }
 
   main.appendChild(backLink(root, scenario, fresh));
 
@@ -314,7 +324,7 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   sources.body.appendChild(sourceList(root, spec.sources));
   main.appendChild(sources.section);
 
-  main.appendChild(siblingNav(root, spec.slug));
+  main.appendChild(siblingNav(root, spec.slug, scenario));
   main.appendChild(backLink(root, scenario, fresh));
 
   let report: RenderReport | null = null;

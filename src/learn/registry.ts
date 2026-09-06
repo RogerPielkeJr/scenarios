@@ -59,8 +59,8 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     input: 'landUse',
     title: 'Land use CO2',
     linkText: 'Learn more about land use CO2',
-    summary: 'Deforestation minus regrowth, how wide the uncertainty runs, and '
-      + 'what turns the term negative.',
+    summary: 'Deforestation minus regrowth, why nobody knows the number precisely, '
+      + 'and what turns the term negative.',
     status: 'live',
   },
   {

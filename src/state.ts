@@ -111,6 +111,11 @@ export function learnHref(slug: string, scenario: Scenario): string {
   return `/learn/${slug}/?${encodeScenario(scenario)}`;
 }
 
+/** The link to the Learn More index, which carries the scenario the same way. */
+export function learnIndexHref(scenario: Scenario): string {
+  return `/learn/?${encodeScenario(scenario)}`;
+}
+
 /**
  * The link back to the THB Scenario Builder. `applied` names the one field a
  * builder replaced, which the top page uses to say where the value came

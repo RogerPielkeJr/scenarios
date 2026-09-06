@@ -14,6 +14,7 @@
   --dim: #5a6c82;
   --navy: #1f3a5f;
   --rule: #c9d4e0;
+  --field: #eef1f5;
   --you: #0b1a2e;
   --focus: #1f3a5f;
   /* The teaching layer's own colour, kept away from the seven scenario
@@ -49,6 +50,7 @@
     --dim: #93a3b8;
     --navy: #8fb4d9;
     --rule: #2a3746;
+    --field: #1c2635;
     --you: #e6ecf3;
     --focus: #8fb4d9;
     --teal: #2a9d8f;
@@ -66,6 +68,7 @@
   --dim: #93a3b8;
   --navy: #8fb4d9;
   --rule: #2a3746;
+  --field: #1c2635;
   --you: #e6ecf3;
   --focus: #8fb4d9;
   --teal: #2a9d8f;
@@ -88,7 +91,7 @@ body {
 }
 
 .wrap {
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 30px clamp(16px, 3vw, 26px) 64px;
 }
@@ -128,7 +131,7 @@ h1 {
   margin: 0;
   font-weight: 600;
   letter-spacing: -0.015em;
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 
 .standfirst {
@@ -154,6 +157,8 @@ h1 {
   padding-bottom: 14px;
   border-bottom: 2px solid var(--navy);
 }
+.lead-in p { margin: 0 0 8px; }
+.lead-in p:last-child { margin-bottom: 0; color: var(--dim); }
 
 .visually-hidden {
   position: absolute;
@@ -318,19 +323,29 @@ input[type='range'] {
   color: var(--dim);
   margin-bottom: 4px;
 }
+/* A bare underline read as a heading rather than as somewhere to type, so
+   this carries the full box, ground and caret of an ordinary text field. */
 .naming input {
   width: 100%;
   font-family: var(--serif);
   font-size: clamp(19px, 2.1vw, 23px);
   font-weight: 600;
   color: var(--ink);
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--rule);
-  padding: 2px 0 7px;
+  background: var(--field);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 7px 11px;
+  cursor: text;
 }
-.naming input::placeholder { color: var(--dim); font-weight: 400; opacity: 0.75; }
-.naming input:focus { outline: none; border-bottom-color: var(--navy); }
+.naming input::placeholder { color: var(--dim); font-weight: 400; opacity: 0.85; }
+.naming input:hover { border-color: var(--navy); }
+.naming input:focus { outline: none; border-color: var(--navy); background: var(--panel); }
+.naming-hint {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--dim);
+  margin: 5px 0 0;
+}
 .naming input:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 
 .chart-figure { margin: 0; }
@@ -421,8 +436,17 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .notes b.you { color: var(--you); }
 
 /* --- the bibliography page ---------------------------------------------- */
-.reading { max-width: 72ch; }
-.reading section { margin-bottom: 34px; }
+.reading section {
+  display: grid;
+  grid-template-columns: var(--band-left) 1fr;
+  gap: var(--band-gap);
+  align-items: start;
+  margin-bottom: 34px;
+}
+.reading section > * { min-width: 0; }
+@media (max-width: 860px) {
+  .reading section { grid-template-columns: 1fr; gap: 14px; }
+}
 .reading h2 {
   font-family: var(--sans);
   font-size: 16px;
@@ -469,6 +493,7 @@ footer a { color: inherit; }
 /* Every block repeats the header's grid: the heading in the left column, its
    content in the right, so headings and body align down the page and text
    wraps at the edge of its own track rather than at some invented width. */
+.learn-block, nav.siblings { --band-left: minmax(180px, 250px); }
 .learn-block { padding: 30px 0; border-top: 1px solid var(--rule); }
 .learn-block:first-of-type { border-top: none; }
 .learn-block .band-left h2 {
@@ -478,7 +503,7 @@ footer a { color: inherit; }
   color: var(--navy);
   margin: 0;
   letter-spacing: 0.01em;
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 .learn-block .band-left .block-note {
   font-size: 16px;

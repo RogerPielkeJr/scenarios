@@ -68,7 +68,7 @@ const SOURCE_PARTS: BuilderPart[] = SOURCES.map((entry) => ({
   default: Math.round(entry.last * CALIBRATION),
   decimals: 0,
   unitSuffix: ' Mt',
-  note: `${pc(entry.share)} of anthropogenic methane today. This source ran `
+  note: `${pc(entry.share)} of anthropogenic methane today. This source emitted `
     + `${mt(entry.first * CALIBRATION)} in ${C.firstYear} and `
     + `${mt(entry.last * CALIBRATION)} in ${C.lastYear}, a change of `
     + `${entry.growth >= 0 ? '+' : '−'}${Math.abs(entry.growth).toFixed(2)}% a year.`,
@@ -131,14 +131,14 @@ export const METHANE_PAGE: LearnPageSpec = {
       `Livestock supplies the largest share at ${pc(LIVESTOCK.share)}, fossil fuel production `
       + `and distribution ${pc(FOSSIL.share)}, waste ${pc(WASTE.share)} and rice `
       + `${pc(RICE.share)}. The first two carry most of the reductions the scenarios assume.`,
-      'Natural wetlands emit more than all of these together and sit outside both the chart '
+      'Natural wetlands emit more than all of these together, and fall outside both the chart '
       + 'and the slider. The Global Methane Budget puts wetlands and inland fresh water at '
       + '248 Tg a year against 369 Tg from direct anthropogenic sources, which lets a '
       + 'scenario cut human methane hard and still leave a large natural flux in place.',
     ],
     caption: `Anthropogenic methane by source, ${C.firstYear} to ${C.lastYear}, in million `
       + 'tonnes a year, then a straight line to the 2100 total you set above. The seven '
-      + 'CMIP7 markers sit as dots at 2100.',
+      + 'Dots at 2100 mark the seven CMIP7 scenarios.',
     dataSource: 'EDGAR 2024 release, anthropogenic CH4 by sector; ScenarioMIP CMIP7 markers',
     key: [
       ...SOURCES.map((entry) => ({
@@ -210,7 +210,7 @@ export const METHANE_PAGE: LearnPageSpec = {
     paragraphs: [
       'A short atmospheric life cuts both ways. Methane emitted in the 2030s has stopped '
       + 'warming the planet by 2100, so a scenario can emit a great deal along the way and '
-      + 'still land at a low 2100 level. A cut also delivers its cooling within two decades '
+      + 'still reach a low 2100 level. A cut also delivers its cooling within two decades '
       + 'rather than over centuries, which draws attention to methane out of proportion to '
       + 'its share of emissions.',
       'Fossil methane leaks from wells, pipelines, compressors and mines, and stopping it '
@@ -225,7 +225,7 @@ export const METHANE_PAGE: LearnPageSpec = {
       + `among the sources on this chart between ${C.firstYear} and ${C.lastYear}, at `
       + `${RICE.growth >= 0 ? '+' : '−'}${Math.abs(RICE.growth).toFixed(2)}% a year, while `
       + `waste methane from landfills and wastewater grew fastest of the five at `
-      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both run `
+      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both stay `
       + 'smaller than fossil fuels or livestock, and both yield more readily.',
       'The Global Methane Budget records that direct anthropogenic methane has tracked the '
       + 'scenarios assuming no or minimal mitigation policy since 2012. That describes the '
@@ -237,7 +237,7 @@ export const METHANE_PAGE: LearnPageSpec = {
     heading: 'What the CMIP7 markers assume',
     note: 'The widest spread of any of the six sliders.',
     paragraphs: [
-      `The markers run from ${mt(VERY_LOW_CH4)} in VERY LOW to ${mt(HIGH_CH4)} in HIGH, a `
+      `The markers range from ${mt(VERY_LOW_CH4)} in VERY LOW to ${mt(HIGH_CH4)} in HIGH, a `
       + `spread of ${(HIGH_CH4 / VERY_LOW_CH4).toFixed(1)} times. HIGH assumes `
       + `${((HIGH_CH4 / BASE.methaneMt - 1) * 100).toFixed(0)}% more than today; VERY LOW `
       + `assumes ${((1 - VERY_LOW_CH4 / BASE.methaneMt) * 100).toFixed(0)}% less.`,
@@ -257,9 +257,9 @@ export const METHANE_PAGE: LearnPageSpec = {
     note: 'One control per source, added up.',
     paragraphs: [
       'Set each source’s emissions in 2100 and the builder adds them up. Every control opens '
-      + `at today’s level and carries a mark at where that source stood in ${C.firstYear}.`,
+      + `at today’s level, with a mark showing where that source stood in ${C.firstYear}.`,
       `EDGAR's inventory totals ${mt(C.totals.last)} for ${C.lastYear}, while the tool's base `
-      + `year uses ${mt(BASE.methaneMt)}, which sits inside the Global Methane Budget's `
+      + `year uses ${mt(BASE.methaneMt)}, which falls inside the Global Methane Budget's `
       + 'top-down estimate of 369 Tg a year for direct anthropogenic sources, range 350 to '
       + `391. The page scales each source by ${CALIBRATION.toFixed(3)} so today's five add `
       + 'up to the number the slider starts from.',

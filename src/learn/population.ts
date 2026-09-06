@@ -181,15 +181,15 @@ export const POPULATION_PAGE: LearnPageSpec = {
       `World population grew from ${bn(FIRST_VALUE)} in ${FIRST_YEAR} to ${bn(C.today.worldBn)} in `
       + `${C.today.year}. The UN's medium projection peaks at ${bn(C.today.peakBn)} in `
       + `${C.today.peakYear} and declines from there, reaching ${bn(C.world2100.medium)} in 2100.`,
-      `The three SSP trajectories the climate scenarios run on spread wider than the UN's `
+      `The climate scenarios use three SSP trajectories, and those spread wider than the UN's `
       + `own interval: ${bn(ANCHORS_2100.SSP1)} in SSP1 against ${bn(ANCHORS_2100.SSP3)} in `
       + 'SSP3. Those three describe '
       + 'different development stories, so their spread measures disagreement about how the '
       + 'century unfolds rather than statistical uncertainty about one projection.',
-      `A third forecaster lands lower than either. IHME's reference scenario peaks at `
+      `A third forecaster expects fewer people than either. IHME's reference scenario peaks at `
       + `${bn(IHME.peakBn)} in ${IHME.peakYear} and falls to ${bn(IHME.end2100Bn)} by 2100, `
       + `with a 95% uncertainty interval of ${bn(IHME.end2100Lo)} to ${bn(IHME.end2100Hi)}. `
-      + `That sits ${bn(C.world2100.medium - IHME.end2100Bn)} below the UN medium and inside `
+      + `IHME therefore finishes ${bn(C.world2100.medium - IHME.end2100Bn)} below the UN medium, inside `
       + `SSP1. The gap turns on fertility: IHME forecasts a world total of `
       + `${IHME.fertility2100} births per woman in 2100 against the UN's `
       + `${FERTILITY.world['2100']}, on the argument that female education and access to `
@@ -201,7 +201,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
       + 'projection with its '
       + '95% prediction interval, the three SSP trajectories the CMIP7 markers use, the seven '
       + 'markers as dots at 2100, IHME\'s two published points, and your own value. Each '
-      + 'marker sits on an SSP trajectory, so four of the seven share one point.',
+      + 'marker follows an SSP trajectory, so four of the seven share one point.',
     dataSource: 'UN World Population Prospects 2024; IIASA SSP database v3.2; IHME reference forecast (Vollset et al. 2020); ScenarioMIP CMIP7 markers',
     key: [
       { label: `Estimates to ${HISTORY.years[HISTORY.years.length - 1] ?? 2023}`,
@@ -260,9 +260,9 @@ export const POPULATION_PAGE: LearnPageSpec = {
 
   drivers: {
     heading: 'What moves it',
-    note: 'Births, the age structure already alive, and where both sit.',
+    note: 'Births, the age structure already alive, and how much each one decides.',
     paragraphs: [
-      `Fertility carries the projection. The world averaged ${FERTILITY.world['1950']} births `
+      `Fertility decides the projection. The world averaged ${FERTILITY.world['1950']} births `
       + `per woman in 1950, ${FERTILITY.world['1990']} in 1990 and ${FERTILITY.world['2024']} `
       + `in 2024, and the UN's medium projection takes it to ${FERTILITY.world['2100']} by 2100. `
       + `Holding the 2024 rate instead produces ${bn(C.heldStill2100.constantFertility)} people `
@@ -306,15 +306,15 @@ export const POPULATION_PAGE: LearnPageSpec = {
     note: 'Seven regions that add up to the UN’s own world figures.',
     paragraphs: [
       'Set each region and the builder adds them up. Every control opens at the UN medium '
-      + 'variant and runs from the UN low variant to the UN high variant, which the UN builds '
-      + 'by subtracting and adding half a child per woman at every date.',
+      + 'variant, and you can move it anywhere between the UN low and UN high variants, which '
+      + 'the UN builds by subtracting and adding half a child per woman at every date.',
       `The seven regions reproduce the UN's world figures exactly at each of those variants: `
       + `${bn(C.world2100.low)} at low, ${bn(C.world2100.medium)} at medium, `
       + `${bn(C.world2100.high)} at high. Every region at its low variant still gives `
       + `${bn(C.world2100.low)}, so the builder stops above the slider's floor of 6 billion.`,
       `The 95% prediction interval works differently and does not add up this way. Summing the `
       + `regional lower bounds gives ${bn(C.world2100.regionalLo95Sum)} against the UN's world `
-      + `figure of ${bn(C.world2100.lo95)}, because the regions do not all land at the bottom of `
+      + `figure of ${bn(C.world2100.lo95)}, because the regions do not all reach the bottom of `
       + 'their own ranges in the same century.',
     ],
     action: 'Use this population in my scenario',

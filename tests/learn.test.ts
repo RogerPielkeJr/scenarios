@@ -278,3 +278,42 @@ describe('the population page', () => {
     }
   });
 });
+
+describe('a scenario survives every route between the pages', () => {
+  // The reported bug: "The other five" and the toolbar linked to bare paths,
+  // so hopping page to page reset all six numbers and the name to defaults,
+  // and the next Use button carried those defaults back over the reader's own.
+  it('links to the sibling pages carrying the scenario, not a bare path', () => {
+    loadPage(`?${encodeScenario(SCENARIO)}`);
+    mountLearnPage(POPULATION_PAGE);
+    const links = Array.from(document.querySelectorAll('.sibling-list a'));
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) {
+      const href = link.getAttribute('href') ?? '';
+      const [path, query] = href.split('?');
+      expect(path).toMatch(/^\/learn\/[a-z-]+\/$/);
+      expect(decodeScenario(query ?? '')).toEqual(SCENARIO);
+    }
+  });
+
+  it('links to the Learn More index carrying the scenario', () => {
+    loadPage(`?${encodeScenario(SCENARIO)}`);
+    mountLearnPage(POPULATION_PAGE);
+    const toolbar = document.getElementById('learn-toolbar');
+    const href = toolbar?.getAttribute('href') ?? '';
+    expect(href.startsWith('/learn/?')).toBe(true);
+    expect(decodeScenario(href.split('?')[1] ?? '')).toEqual(SCENARIO);
+  });
+
+  it('hands the other five values back untouched when one is replaced', () => {
+    loadPage(`?${encodeScenario(SCENARIO)}`);
+    const page = mountLearnPage(POPULATION_PAGE);
+    const back = decodeScenario(page.builder.href().split('#')[1] ?? '');
+    expect(back).not.toBeNull();
+    expect(back?.name).toBe(SCENARIO.name);
+    for (const id of INPUT_IDS) {
+      if (id === 'population') continue;
+      expect(back?.inputs[id]).toBe(SCENARIO.inputs[id]);
+    }
+  });
+});

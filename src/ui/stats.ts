@@ -61,7 +61,7 @@ export function renderStats(
   } else {
     tiles.analogue.textContent = country.name;
     tiles.analogueNote.textContent =
-      `${perDollar(intensity)} kg CO2 per dollar · ${country.name} runs `
+      `${perDollar(intensity)} kg CO2 per dollar · ${country.name} emits `
       + `${perDollar(country.kg_co2_per_usd)}`;
   }
 }

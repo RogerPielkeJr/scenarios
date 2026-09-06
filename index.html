@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Build your own emissions scenario</title>
+<title>Build your own THB emissions scenario</title>
 <meta name="description" content="Set six assumptions and see how far they sit from what the world has done and from the seven CMIP7 scenarios.">
 <meta name="author" content="Roger Pielke Jr.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
       <a class="masthead" href="https://thehonestbroker.org">
         <img src="/thb-logo.png" alt="The Honest Broker" width="216" height="216">
       </a>
-      <h1>Build your own emissions scenario</h1>
+      <h1>Build your own THB emissions scenario</h1>
     </div>
     <div class="band-right">
       <p class="standfirst">
@@ -29,7 +29,7 @@
       </p>
       <nav class="toolbar" aria-label="Site">
         <a class="ghost" href="https://thehonestbroker.org">The Honest Broker</a>
-        <a class="ghost" href="/learn/">Learn more</a>
+        <a class="ghost" id="learn-toolbar" href="/learn/">Learn more</a>
         <a class="ghost" href="https://decarbonization.thehonestbroker.org">Decarbonization</a>
         <a class="ghost" href="/bibliography.html">Bibliography</a>
         <button type="button" id="theme-toggle" class="ghost" aria-pressed="false">
@@ -51,7 +51,11 @@
         <div class="legend" id="legend"></div>
       </section>
 
-      <p class="lead-in">Then move the sliders to build your own.</p>
+      <div class="lead-in">
+        <p>Then move the sliders to build your own.</p>
+        <p>Or visit each of the Learn More pages from the buttons below to understand each
+        scenario element and produce a more informed input to your bespoke scenario.</p>
+      </div>
 
       <section aria-labelledby="controls-heading">
         <h2 id="controls-heading" class="visually-hidden">The six assumptions</h2>
@@ -64,7 +68,9 @@
         <div class="naming">
           <label for="scenario-name">Name your scenario</label>
           <input type="text" id="scenario-name" maxlength="60" autocomplete="off"
-                 spellcheck="false" placeholder="Build your own">
+                 spellcheck="false" placeholder="Type your own name here">
+          <p class="naming-hint">Whatever you type here names your line on the chart, in the
+          table and on everything you download.</p>
         </div>
 
         <figure class="chart-figure">

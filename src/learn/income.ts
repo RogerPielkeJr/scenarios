@@ -184,7 +184,7 @@ export const INCOME_PAGE: LearnPageSpec = {
     paragraphs: [
       `World output per person rose from ${dollars(C.levels.first)} in ${C.firstYear} to `
       + `${dollars(C.levels.last)} in ${C.lastYear}, at ${rate(C.rates.wholeRecord)} across `
-      + `the whole record. The past decade ran slightly faster, at ${rate(C.rates.recentDecade)}.`,
+      + `the whole record. The past decade grew slightly faster, at ${rate(C.rates.recentDecade)}.`,
       `The seven markers spread from ${rate(HIGH_RATE)} to `
       + `${rate(Math.max(...MARKERS.map((m) => markerValueFor(m, 'income') ?? 0)))}. `
       + `CMIP7 HIGH takes the low end, reaching ${dollars(HIGH_2100)} per person in 2100 `
@@ -248,7 +248,7 @@ export const INCOME_PAGE: LearnPageSpec = {
     extra: {
       kind: 'plot',
       caption: 'The same question inside the three World Bank income groups: what each '
-        + 'averages now, and where the growth you set for it lands by 2100.',
+        + 'averages now, and what the growth you set takes it to by 2100.',
       dataSource: 'World Bank purchasing-power GDP and population, by income group',
       key: GROUPS.map((entry, index) => ({
         label: entry.label,
@@ -319,8 +319,8 @@ export const INCOME_PAGE: LearnPageSpec = {
       + 'above shows it. Treat that as a demonstration of what steady extrapolation does '
       + 'across 75 years rather than as a forecast.',
       'That saturation ties income to energy intensity, so read the two together. A '
-      + 'scenario can pair fast income growth with fast intensity decline and land on modest '
-      + 'energy demand, or pair slow growth with slow decline and land in the same place. The '
+      + 'scenario can pair fast income growth with fast intensity decline and end at modest '
+      + 'energy demand, or pair slow growth with slow decline and end in the same place. The '
       + 'four factors multiply, so only their product settles anything.',
     ],
   },

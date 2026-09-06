@@ -160,7 +160,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
   standfirst: 'One slider sets how fast the world squeezes energy out of each dollar of '
     + 'output. This page shows what that term has done since 1965, why it has carried most '
     + 'of the decarbonisation on record, and where any candidate rate falls among the rates '
-    + 'the world has actually run.',
+    + 'the world has actually managed.',
 
   definition: {
     quantity: 'Primary energy per dollar of world output',
@@ -255,7 +255,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       caption: `Every ${WINDOWS.span}-year window in the record, one tick each, from `
         + `${rate(WINDOWS.fastest.value)} in ${WINDOWS.fastest.from}-${WINDOWS.fastest.to} to `
         + `${rate(WINDOWS.slowest.value)} in ${WINDOWS.slowest.from}-${WINDOWS.slowest.to}. `
-        + 'Faster improvement sits to the left.',
+        + 'Faster improvement lies to the left.',
       dataSource: 'Energy Institute Statistical Review 2026 over World Bank and Maddison output',
       spec(outcome: BuilderOutcome, scenario): StripSpec {
         const chosen = outcome.value;
@@ -295,8 +295,8 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       + 'of output.',
       'Structural change does as much and attracts less notice. When a country builds out '
       + 'its steel, cement and chemical capacity, its energy intensity rises for a decade or '
-      + 'two; when growth moves toward services, it falls. China ran the first of those '
-      + 'movements through the 2000s and the world average followed.',
+      + 'two; when growth moves toward services, it falls. China went through the first of those '
+      + 'movements in the 2000s, and the world average followed.',
       'Sectoral mix moves the term inside each of those sectors: aluminium substituting for '
       + 'steel, road freight shifting to rail, an economy making more pharmaceuticals and '
       + 'less fertiliser. Decomposition studies separate the three, and they attribute the '
@@ -322,7 +322,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       + 'deal reaches that total partly by assuming the world stops improving the term that '
       + 'has improved most reliably.',
       'The low markers push the other way. HIGH-to-LOW assumes 2.29% a year and VERY LOW '
-      + '2.11%, both faster than any window the world has run for 25 years. Those two '
+      + '2.11%, both faster than any 25-year window the world has ever managed. Those two '
       + 'scenarios ask for sustained improvement beyond the record in exactly the term the '
       + 'high scenario asks the world to abandon.',
     ],
@@ -332,7 +332,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
     heading: 'Build your value',
     note: 'Borrow a stretch of the record, or scale the observed rate.',
     paragraphs: [
-      'Two ways in. Pick a window from the record and take the rate the world actually ran '
+      'Two ways in. Pick a window from the record and take the rate the world actually achieved '
       + 'across it, or set a multiple of the rate observed since 1990. Either way the page '
       + 'reports where the answer falls among the '
       + `${WINDOW_RATES.length} ${WINDOWS.span}-year windows on record.`,
@@ -344,7 +344,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       {
         id: 'window',
         label: 'A window from the record',
-        note: 'The rate the world ran between two years you choose.',
+        note: 'The rate the world achieved between two years you choose.',
         parts: WINDOW_PARTS,
         combine(values) {
           const window = windowRate(values);

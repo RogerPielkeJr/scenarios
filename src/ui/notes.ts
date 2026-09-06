@@ -91,12 +91,12 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
   parts.push(comparisonSentence(flags));
 
   if (flags.populationOutsideUn === 'above') {
-    parts.push(`<p>Your population sits above the top of the UN's 95% range of `
+    parts.push(`<p>Your population rises above the top of the UN's 95% range of `
       + `${UN_2024.hi95} billion. Only SSP3, which carries CMIP7 HIGH, goes there.</p>`);
   }
   if (flags.populationOutsideUn === 'below') {
-    parts.push(`<p>Your population sits below the bottom of the UN's 95% range of `
-      + `${UN_2024.lo95} billion, where SSP1 and SSP5 also sit.</p>`);
+    parts.push(`<p>Your population falls below the bottom of the UN's 95% range of `
+      + `${UN_2024.lo95} billion, which SSP1 and SSP5 also assume.</p>`);
   }
   if (flags.efficiencySlowerThanRecord) {
     parts.push('<p>No sustained period on record shows the energy needed per dollar '
@@ -152,7 +152,7 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
     + `weakest ${BOUND_RATES.slowestEfficiency.window} window, and the fuel mix `
     + `${Math.abs(BOUND_RATES.slowestFuelMix.value).toFixed(2)}% a year, the weakest `
     + `${BOUND_RATES.slowestFuelMix.window} window. Income grows at the fastest observed rate and `
-    + 'population reaches the top of the UN range, so emissions run as high as slow technology '
+    + 'population reaches the top of the UN range, so emissions climb as high as slow technology '
     + `permits, about ${thousands(BOUNDS.slow)} GtCO2. <b>Ausubel methane economy</b> uses his `
     + 'own 1988 published trajectory, which squeezes carbon out of primary energy to 0.06 tonnes '
     + 'of carbon per kilowatt-year by 2100, implying the fuel mix improving 2.79% a year, with '

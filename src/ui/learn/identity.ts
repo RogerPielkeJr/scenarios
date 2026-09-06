@@ -79,8 +79,8 @@ export function buildIdentity(root: Document, options: IdentityOptions = {}): HT
 
   const aside = root.createElement('p');
   aside.className = 'identity-aside';
-  aside.appendChild(root.createTextNode('Methane runs alongside the CO2 terms and reaches the '
-    + 'warming figure through its own coefficient: '));
+  aside.appendChild(root.createTextNode('The identity above covers CO2 only. Methane warms '
+    + 'the world through a coefficient of its own: '));
   aside.appendChild(factorNode(root, 'methane', 'Methane', active, linked));
   aside.appendChild(root.createTextNode('.'));
   wrapper.appendChild(aside);

@@ -4,7 +4,9 @@ import { computePath } from './model/kaya.js';
 import { MARKERS, MARKER_BY_ID, MARKER_YEARS, publishedPath } from './model/markers.js';
 import { defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
-import { ScenarioState, decodeScenario, displayName, pathWithScenario } from './state.js';
+import {
+  ScenarioState, decodeScenario, displayName, learnIndexHref, pathWithScenario,
+} from './state.js';
 import { renderChart } from './ui/chart.js';
 import { downloadScenarioPdf, downloadScenarioPng } from './ui/export.js';
 import { renderNotes } from './ui/notes.js';
@@ -177,6 +179,12 @@ export function mountApp(root: Document = document): App {
     panel(results, 'model', null, () => { path = computePath(inputs); });
 
     panel(results, 'sliders', null, () => sliders?.update(scenario));
+    // The toolbar route into Learn More has to carry the scenario too; a bare
+    // /learn/ sends the reader to the six pages holding the defaults.
+    panel(results, 'learn-toolbar', null, () => {
+      const link = root.getElementById('learn-toolbar');
+      if (link instanceof HTMLAnchorElement) link.href = learnIndexHref(scenario);
+    });
     panel(results, 'presets', null, () => presets?.update(presetId));
     panel(results, 'legend', legend, () => buildLegend(legend, label));
     panel(results, 'chart', chart, () => {

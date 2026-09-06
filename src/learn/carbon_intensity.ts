@@ -199,7 +199,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + `${factorFor('oil').toFixed(1)} and natural gas ${factorFor('gas').toFixed(1)}. `
       + 'Nuclear, hydro, wind and solar release none at the point of use. Shifting energy '
       + "between those columns does the whole of this factor's work.",
-      `Two accountings run side by side here. Burning fuel released `
+      `This page counts carbon two ways. Burning fuel released `
       + `${kg(C.levels.energyBasis2024)} in ${C.lastYear}. The slider measures `
       + `${kg(C.levels.sliderBasis2024)}, because it also carries the cement, flaring and `
       + 'other industrial CO2 the CMIP7 scenarios count, '
@@ -215,7 +215,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + `and ${C.lastYear} at ${rate(C.rates.energyBasis1990)}. Neither figure corrects the `
       + 'other. That site tracks the emissions the world reports from burning fuel; this one '
       + 'tracks the emissions the CMIP7 scenarios count, because it argues with those '
-      + 'scenarios. The gap between the two, cement most of it, is the '
+      + 'scenarios. The gap between the two, mostly cement, comes to the '
       + `${kg(C.nonCombustion.kgPerGj)} this page adds on top of any fuel mix.`,
     ],
   },
@@ -329,12 +329,12 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + 'zero-carbon supply has to quadruple and then some, because it has to cover both the '
       + 'share it takes from fossil fuels and the growth in the total. Every scenario that '
       + 'decarbonises quickly rests, underneath, on how fast the world builds clean supply.',
-      `Fuel switching inside the fossil block helps and runs out. Replacing every remaining `
+      `Fuel switching inside the fossil block helps, then stops helping. Replacing every remaining `
       + `tonne of coal with gas would cut about `
       + `${((factorFor('coal') - factorFor('gas')) * (FACTORS.find((f) => f.id === 'coal')?.share2024 ?? 0) / 100).toFixed(1)} `
       + 'kgCO2 per GJ, worth roughly a decade of the observed rate, and then the term would '
-      + 'sit at the carbon content of gas and stop falling.',
-      `A floor sits underneath. Take every fossil fuel out of the mix and the slider still `
+      + 'settle at the carbon content of gas and stop falling.',
+      `This factor cannot fall to zero. Take every fossil fuel out of the mix and the slider still `
       + `reads ${kg(C.zeroCarbonFloor.kgPerGj)}, the cement, flaring and industrial process `
       + `CO2 that no change of fuel touches. Reaching that floor by 2100 implies `
       + `${rate(C.zeroCarbonFloor.impliedRate)}, and no faster rate exists on this page `
@@ -373,7 +373,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + 'normalises them; their proportions carry the answer. Published emission factors turn '
       + 'the mix into kilograms of CO2 per gigajoule, and the distance from today’s '
       + `${kg(C.levels.sliderBasis2024)} across 75 years gives the rate the slider takes.`,
-      `Two adjustments sit between the mix and the answer, both of them visible in the result. The `
+      `Two adjustments separate the mix from the answer, and the result shows you both. The `
       + `page scales the emission factors by ${C.calibration.factor.toFixed(3)}, because applied `
       + `raw to the ${C.lastYear} mix they give ${kg(C.calibration.modelled2024)} against the `
       + `${kg(C.calibration.observed2024)} the world actually emitted from energy, the `

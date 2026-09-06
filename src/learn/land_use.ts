@@ -42,7 +42,7 @@ const PARTS: BuilderPart[] = [
     default: 100,
     decimals: 0,
     unitSuffix: '% of today',
-    note: `Gross deforestation runs ${gt(D.deforestation)} today, with another `
+    note: `Gross deforestation releases ${gt(D.deforestation)} today, with another `
       + `${gt(D.otherAndPeat)} from other land-use transitions, peat drainage and peat fire. `
       + 'Zero means the world stops clearing forest altogether.',
     marks: [
@@ -129,8 +129,8 @@ export const LAND_USE_PAGE: LearnPageSpec = {
   input: 'landUse',
   title: 'Land use CO2',
   standfirst: 'One slider sets what forests and farming do to the atmosphere in 2100. This '
-    + 'term runs smallest of the six, carries the widest uncertainty, and alone among them '
-    + 'turns negative on its own.',
+    + 'term stays the smallest of the six, nobody knows it as precisely as the others, and '
+    + 'alone among them it turns negative on its own.',
 
   definition: {
     quantity: 'Net CO2 from land use, land-use change and forestry in 2100',
@@ -156,7 +156,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     heading: 'What the world has done',
     note: 'The band shows the published uncertainty rather than a spread of scenarios.',
     paragraphs: [
-      `Land-use CO2 ran ${gt(C.levels.first)} in ${C.firstYear}, peaked at `
+      `Land-use CO2 reached ${gt(C.levels.first)} in ${C.firstYear}, peaked at `
       + `${gt(C.levels.peak)} in ${C.levels.peakYear}, and reached ${gt(C.levels.last)} in `
       + `${C.lastYear}. The Global Carbon Budget records a statistically significant decline `
       + 'of about 0.7 GtCO2 per decade since the late 1990s.',
@@ -172,7 +172,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     ],
     caption: `World land-use CO2, ${C.firstYear} to ${C.lastYear}, with the Global Carbon `
       + `Budget's one-sigma uncertainty of ±${C.uncertaintyGtCo2} GtCO2, then a straight line `
-      + 'to the 2100 flux you set above. The seven CMIP7 markers sit as dots at 2100.',
+      + 'to the 2100 flux you set above. Dots at 2100 mark the seven CMIP7 scenarios.',
     dataSource: 'Global Carbon Budget 2024, land-use change CO2, via Our World in Data; ScenarioMIP CMIP7 markers',
     key: [
       { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
@@ -247,7 +247,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + 'converts most cheaply and where the crops pay: soy and cattle in the Amazon, oil palm '
       + 'in insular Asia, subsistence and charcoal in the Congo basin. Those three countries '
       + 'account for more than half of global land-use emissions.',
-      'Regrowth runs in the other direction and receives less attention. Farmland abandoned '
+      'Regrowth pushes the other way, and far fewer people talk about it. Farmland abandoned '
       + 'in one place regrows while forest falls in another, and only the net reaches the '
       + `atmosphere. Regrowth currently offsets two-thirds of the deforestation flux, so the `
       + 'balance can shift without either flow changing much.',
@@ -255,10 +255,10 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + 'stop almost entirely, regrowth has to continue or expand on the land already '
       + 'recovering, and new land has to come into forest at scale. The controls at the top '
       + 'of this page make the size of that requirement explicit.',
-      `Engineered removal sits alongside those. In this tool it belongs on this slider, `
+      `Engineered removal belongs with those three. In this tool it goes on this slider, `
       + 'because a product of four positive factors cannot go below zero however fast the '
       + 'fuel mix changes. Every CMIP7 marker that reaches net negative CO2 does it through '
-      + 'terms that land on this line.',
+      + 'terms this slider covers.',
     ],
   },
 
@@ -266,7 +266,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     heading: 'What the CMIP7 markers assume',
     note: 'From a large sink to a modest source.',
     paragraphs: [
-      `The markers run from ${signedGt(MEDIUM_LOW?.kaya.landUse ?? 0)} in MEDIUM-to-LOW, the `
+      `The markers range from ${signedGt(MEDIUM_LOW?.kaya.landUse ?? 0)} in MEDIUM-to-LOW, the `
       + `largest sink of the seven, to ${signedGt(HIGH?.kaya.landUse ?? 0)} in HIGH, which `
       + `stays a source. VERY LOW assumes ${signedGt(VERY_LOW?.kaya.landUse ?? 0)}.`,
       `A sink of ${signedGt(MEDIUM_LOW?.kaya.landUse ?? 0)} asks this term to move by `

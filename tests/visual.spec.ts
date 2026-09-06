@@ -121,7 +121,7 @@ test('the bibliography button reaches the bibliography and back', async ({ page 
   await expect(page.locator('.cited-by').first()).toContainText('Cited by:');
   await expect(page.getByText('The Climate Fix')).toBeVisible();
   await page.locator('.toolbar a', { hasText: 'Back to the THB Scenario Builder' }).click();
-  await expect(page.locator('h1')).toHaveText('Build your own emissions scenario');
+  await expect(page.locator('h1')).toHaveText('Build your own THB emissions scenario');
 });
 
 test('the PNG button produces a scenario sheet', async ({ page }) => {

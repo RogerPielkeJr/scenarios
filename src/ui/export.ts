@@ -119,7 +119,7 @@ async function drawSheet(
   ctx.fillText(title, SHEET.pad, 42, SHEET.width - SHEET.pad * 2 - 46);
   ctx.fillStyle = dim;
   ctx.font = `12.5px ${SANS}`;
-  ctx.fillText('Build your own emissions scenario \u00b7 six assumptions, and where they '
+  ctx.fillText('Build your own THB emissions scenario \u00b7 six assumptions, and where they '
     + 'put the century.', SHEET.pad, 62);
 
   try {
