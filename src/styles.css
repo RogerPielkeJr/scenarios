@@ -433,6 +433,85 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .stat-note { font-size: 16px; color: var(--dim); margin-top: 3px; }
 .stat-error { color: var(--scenario-high); font-family: var(--sans); font-size: 15px; }
 
+/* The 404 page's list of places to go. */
+.notfound-list { margin: 0; padding-left: 20px; }
+.notfound-list li { margin-bottom: 11px; line-height: 1.5; }
+.notfound-list li:last-child { margin-bottom: 0; }
+
+/*
+ * The scenario strip: the reader's two headline numbers, fixed to the foot of
+ * the window while the chart sits off screen. See src/ui/strip.ts for why
+ * it exists and what shows it.
+ *
+ * `.has-strip` comes from the script, so a page with scripting off keeps
+ * its old foot and reserves no room for a strip nothing will draw.
+ */
+.scenario-strip {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 30;
+  background: var(--panel);
+  border-top: 1px solid var(--rule);
+  box-shadow: 0 -3px 14px rgb(15 22 32 / 14%);
+  padding: 9px clamp(12px, 3vw, 26px);
+}
+
+.strip-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px clamp(10px, 2.2vw, 24px);
+}
+
+.strip-name {
+  font-family: var(--sans);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 34%;
+}
+
+.strip-pair { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.strip-value {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.strip-key { font-family: var(--sans); font-size: 14px; color: var(--dim); }
+
+/* Pushed to the far end, and never squeezed by a long scenario name. */
+#strip-jump { margin-left: auto; flex: none; }
+.strip-jump-short { display: none; }
+
+/* The strip covers the foot of the page while it shows, so the page keeps a
+   strip's height of clearance under its last line. */
+.has-strip .wrap { padding-bottom: 108px; }
+
+@media (max-width: 700px) {
+  .strip-name { display: none; }
+  .strip-value { font-size: 18px; }
+  .strip-key { font-size: 13px; }
+}
+
+/* Measured, not guessed. With the long button label and both keys the strip
+   needs 430px of content in 414px of room at 440px wide, and 361px in 336px
+   at 360px wide, which cuts the button off the end. The short label and the
+   shorter first key carry it down to 306px, inside every width the site
+   supports. tests/visual.spec.ts holds the button inside the strip. */
+@media (max-width: 480px) {
+  .strip-jump-long { display: none; }
+  .strip-jump-short { display: inline; }
+  .strip-key-more { display: none; }
+  .strip-inner { gap: 5px 10px; }
+}
+
 /* Wide content scrolls inside its own container so the page body never
    scrolls sideways. Below the min-width the five columns would otherwise
    crush the headings onto three lines each. */

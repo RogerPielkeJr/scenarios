@@ -22,6 +22,9 @@ for (const breakpoint of BREAKPOINTS) {
         const tile = document.getElementById('tile-cumulative');
         return tile !== null && tile.textContent !== '' && tile.textContent !== '—';
       });
+      // The strip is fixed to the window, so a full-page shot would stamp it
+      // across the middle of a tall page. It has baselines of its own below.
+      await page.addStyleTag({ content: '#scenario-strip { display: none !important; }' });
       await page.evaluate(() => document.fonts.ready);
       await expect(page).toHaveScreenshot(`${breakpoint.name}-${theme}.png`, { fullPage: true });
     });
@@ -383,4 +386,140 @@ test('the learn index opens every finished page', async ({ page }) => {
   await expect(page.locator('.forthcoming-tag')).toHaveCount(6 - LIVE_SLUGS.length);
   await page.locator('.learn-index a').first().click();
   await expect(page.locator('h1')).toHaveText('Population');
+});
+
+// The strip carries the reader's two headline numbers to wherever they are.
+// Its whole reason for existing is the distance between the sliders and the
+// chart, so these run in a real browser: jsdom has no IntersectionObserver.
+test.describe('the scenario strip', () => {
+  // On a wide screen the chart sits beside the sliders and shows on load, so
+  // the strip has nothing to add until the reader works down the column.
+  test('stays down while the chart shows, and comes up once it does not',
+    async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.goto('/');
+      const strip = page.locator('#scenario-strip');
+      await expect(strip).toBeHidden();
+
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await expect(strip).toBeVisible();
+      await expect(page.locator('#strip-cumulative')).not.toHaveText('—');
+      await expect(page.locator('#strip-cumulative'))
+        .toHaveText(await page.locator('#tile-cumulative').textContent() ?? '');
+
+      // And the chart comes back in one press.
+      await page.locator('#strip-jump').click();
+      await expect(page.locator('.chart-figure')).toBeInViewport();
+      await expect(strip).toBeHidden();
+    });
+
+  // On a phone the sliders sit above the chart entirely, so the strip earns
+  // its place from the first moment: the reader can reach every slider before
+  // the chart comes into view at all.
+  test('is already up on a phone, where the chart starts below the fold',
+    async ({ page }) => {
+      await page.setViewportSize({ width: 360, height: 720 });
+      await page.goto('/');
+      await expect(page.locator('#scenario-strip')).toBeVisible();
+      await expect(page.locator('.chart-figure')).not.toBeInViewport();
+
+      await page.locator('#strip-jump').click();
+      await expect(page.locator('.chart-figure')).toBeInViewport();
+      await expect(page.locator('#scenario-strip')).toBeHidden();
+    });
+
+  test('tracks the sliders while the chart is out of sight', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 720 });
+    await page.goto('/');
+    await expect(page.locator('#scenario-strip')).toBeVisible();
+    const warmingBefore = await page.locator('#strip-warming').textContent();
+    // The methane slider sits at the foot of the column, furthest from the
+    // chart, which is the case the strip exists for. Methane moves the
+    // warming and leaves the CO2 total alone, so only one of the two changes.
+    await page.locator('#input-methane').fill('600');
+    await expect(page.locator('#strip-warming')).not.toHaveText(warmingBefore ?? '');
+
+    // A slider that does move the total moves the strip with it.
+    const cumulativeBefore = await page.locator('#strip-cumulative').textContent();
+    await page.locator('#input-population').fill('11.5');
+    await expect(page.locator('#strip-cumulative')).not.toHaveText(cumulativeBefore ?? '');
+
+    // Whatever moved, the strip and the tiles still agree.
+    await expect(page.locator('#strip-cumulative'))
+      .toHaveText(await page.locator('#tile-cumulative').textContent() ?? '');
+    await expect(page.locator('#strip-warming'))
+      .toHaveText(await page.locator('#tile-warming').textContent() ?? '');
+  });
+
+  // The sliders owned `.readout` first, for the large value under each track.
+  // A strip rule reaching those would fix all six to the foot of the window.
+  test('leaves the sliders\' own readouts alone', async ({ page }) => {
+    await page.goto('/');
+    const readouts = page.locator('#controls .readout');
+    expect(await readouts.count()).toBe(6);
+    for (let index = 0; index < 6; index += 1) {
+      const position = await readouts.nth(index).evaluate(
+        (node) => getComputedStyle(node).position);
+      expect(position, `slider readout ${index}`).toBe('static');
+    }
+  });
+
+  // The strip holds a button at the far end of a fixed row. Widths where its
+  // contents stop fitting cut that button off the edge, and because the strip
+  // clips rather than pushing the page wide, the sideways-scroll test above
+  // never sees it. Both faults were real: at 360px the button sat 12.7px past
+  // the edge, and the long label came back at 440px before it fitted.
+  test('never clips its own button, at any width', async ({ page }) => {
+    for (const width of [320, 360, 380, 414, 430, 440, 460, 479, 480, 481, 560,
+      700, 860, 1024, 1280, 1600]) {
+      await page.setViewportSize({ width, height: 720 });
+      await page.goto('/');
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.locator('#scenario-strip').waitFor({ state: 'visible' });
+      const box = await page.evaluate(() => {
+        const strip = document.getElementById('scenario-strip');
+        const inner = strip?.querySelector('.strip-inner');
+        const jump = document.getElementById('strip-jump');
+        if (!(strip instanceof HTMLElement) || !(inner instanceof HTMLElement)
+          || !(jump instanceof HTMLElement)) throw new Error('no strip');
+        return {
+          overflow: inner.scrollWidth - inner.clientWidth,
+          gapRight: strip.getBoundingClientRect().right
+            - jump.getBoundingClientRect().right,
+          height: strip.getBoundingClientRect().height,
+        };
+      });
+      expect(box.overflow, `${width}px overflows its row`).toBeLessThanOrEqual(0);
+      expect(box.gapRight, `${width}px clips the button`).toBeGreaterThanOrEqual(8);
+      // The page reserves 108px under its last line for the strip.
+      expect(box.height, `${width}px is taller than the room reserved`)
+        .toBeLessThanOrEqual(108);
+    }
+  });
+
+  for (const width of [360, 1280]) {
+    test(`looks right at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 720 });
+      await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+      await page.goto('/');
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await expect(page.locator('#scenario-strip')).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      await expect(page.locator('#scenario-strip')).toHaveScreenshot(`strip-${width}.png`);
+    });
+  }
+});
+
+// A mistyped address has to land somewhere that leads back into the site.
+test('the 404 page carries the site and its routes', async ({ page }) => {
+  const response = await page.goto('/404.html');
+  expect(response?.status()).toBe(200);
+  await expect(page.locator('h1')).toHaveText('No page at that address');
+  await expect(page.locator('.masthead img')).toBeVisible();
+  for (const href of ['/', '/learn/', '/library.html', '/bibliography.html']) {
+    expect(await page.locator(`a[href="${href}"]`).count(),
+      href).toBeGreaterThan(0);
+  }
+  // It reserves no room for a strip it does not carry.
+  await expect(page.locator('#scenario-strip')).toHaveCount(0);
 });

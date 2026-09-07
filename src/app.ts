@@ -13,8 +13,9 @@ import { renderNotes } from './ui/notes.js';
 import { renderSliders, type SliderPanel } from './ui/sliders.js';
 import { attachFigureButtons } from './ui/figure.js';
 import { announceHandoff, appliedInput } from './ui/handoff.js';
+import { installStrip, type Strip } from './ui/strip.js';
 import { installShare, syncHash } from './ui/share.js';
-import { renderStats, type StatTiles } from './ui/stats.js';
+import { renderStats, scenarioSummary, type StatTiles } from './ui/stats.js';
 import { renderTable } from './ui/table.js';
 import { installThemeToggle } from './ui/theme.js';
 import { linkToolbar } from './ui/toolbar.js';
@@ -28,6 +29,7 @@ const OUTPUT_IDS = [
   'tile-added', 'tile-added-note',
   'tile-analogue', 'tile-analogue-note',
   'kaya-table', 'notes', 'chart', 'chart-caption',
+  'strip-cumulative', 'strip-warming',
 ];
 
 function required<T extends Element>(root: Document, id: string): T {
@@ -132,6 +134,8 @@ export interface App {
   apply(inputs: ScenarioInputs): void;
   state: ScenarioState;
   lastReport(): RenderReport | null;
+  /** Null on a page carrying no strip. */
+  strip(): Strip | null;
 }
 
 export function mountApp(root: Document = document): App {
@@ -160,6 +164,7 @@ export function mountApp(root: Document = document): App {
   let report: RenderReport | null = null;
   let sliders: SliderPanel | null = null;
   let presets: PresetPanel | null = null;
+  let strip: Strip | null = null;
 
   function render(): RenderReport {
     const inputs = state.get();
@@ -198,6 +203,8 @@ export function mountApp(root: Document = document): App {
     });
     panel(results, 'stats', tiles.cumulative,
       () => renderStats(tiles, inputs, path, published));
+    panel(results, 'strip', null,
+      () => strip?.update(label, scenarioSummary(inputs, path, published)));
     panel(results, 'table', table, () => renderTable(table, inputs, label));
     panel(results, 'notes', notes, () => {
       renderNotes(notes, computeFlags(inputs, path, presetId));
@@ -223,6 +230,8 @@ export function mountApp(root: Document = document): App {
     'emissions-scenario',
   );
   chart.parentElement?.insertAdjacentElement('afterend', figureButtons.element);
+
+  strip = installStrip(root, chart.closest('.chart-figure') ?? chart);
 
   sliders = renderSliders(controls, (id, value) => state.set(id, value));
   presets = buildPresets(presetsContainer, apply);
@@ -284,5 +293,5 @@ export function mountApp(root: Document = document): App {
     view?.history.replaceState(null, '', pathWithScenario(state.scenario()));
   }
 
-  return { render, apply, state, lastReport: () => report };
+  return { render, apply, state, lastReport: () => report, strip: () => strip };
 }

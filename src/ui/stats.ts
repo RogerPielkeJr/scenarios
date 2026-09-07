@@ -18,13 +18,45 @@ export interface StatTiles {
 }
 
 /**
+ * The three numbers the tiles lead with.
+ *
+ * With a published scenario on screen these report that scenario's published
+ * totals rather than the reconstruction's, because the chart above them draws
+ * its published path.
+ *
+ * The tiles and the readout strip both draw from here, so a reader looking at
+ * one and then the other can never be handed two different answers.
+ */
+export interface ScenarioSummary {
+  cumulativeGt: number;
+  warmingC: number;
+  addedC: number;
+}
+
+export function scenarioSummary(
+  inputs: ScenarioInputs,
+  path: ScenarioPath,
+  published: PublishedPath | null = null,
+): ScenarioSummary {
+  if (published !== null) {
+    return {
+      cumulativeGt: published.cumulativeGt,
+      warmingC: published.warmingC,
+      addedC: published.warmingC - ANCHORS.recentMeanC,
+    };
+  }
+  return {
+    cumulativeGt: path.cumulativeGt,
+    warmingC: warming(path.cumulativeGt, inputs.methane),
+    addedC: addedWarming(path.cumulativeGt, inputs.methane),
+  };
+}
+
+/**
  * The four tiles.
  *
- * With a published scenario on screen the first three report that scenario's
- * own published totals rather than the reconstruction's, because the chart
- * above them draws its published path. The country comparison keeps coming
- * from the Kaya factors, which supply the only 2100 carbon intensity either
- * way.
+ * The country comparison keeps coming from the Kaya factors, which supply the
+ * only 2100 carbon intensity either way.
  */
 export function renderStats(
   tiles: StatTiles,
@@ -32,24 +64,20 @@ export function renderStats(
   path: ScenarioPath,
   published: PublishedPath | null = null,
 ): void {
-  const cumulativeGt = published === null ? path.cumulativeGt : published.cumulativeGt;
-  tiles.cumulative.textContent = thousands(cumulativeGt);
+  const summary = scenarioSummary(inputs, path, published);
+  tiles.cumulative.textContent = thousands(summary.cumulativeGt);
   const highNote = HIGH === undefined ? 'GtCO2'
     : `GtCO2 · CMIP7 HIGH reaches ${thousands(HIGH.cumulativeGt)}`;
   tiles.cumulativeNote.textContent = published === null
     ? highNote
     : `GtCO2 · as published by ${published.label}`;
 
-  const t = published === null ? warming(path.cumulativeGt, inputs.methane) : published.warmingC;
-  tiles.warming.textContent = degrees(t);
+  tiles.warming.textContent = degrees(summary.warmingC);
   tiles.warmingNote.textContent = published === null
-    ? placeAmongMarkers(t)
+    ? placeAmongMarkers(summary.warmingC)
     : `as published by ${published.label}`;
 
-  const added = published === null
-    ? addedWarming(path.cumulativeGt, inputs.methane)
-    : published.warmingC - ANCHORS.recentMeanC;
-  tiles.added.textContent = signedDegrees(added);
+  tiles.added.textContent = signedDegrees(summary.addedC);
   tiles.addedNote.textContent =
     `above the ${ANCHORS.recentPeriod} average of ${ANCHORS.recentMeanC.toFixed(2)} °C`;
 

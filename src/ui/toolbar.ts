@@ -19,11 +19,12 @@ const LINKS: Array<[string, (scenario: Scenario) => string]> = [
 /**
  * Where feedback on the tool goes.
  *
- * Null until the post announcing the site exists. Every page prints the words
- * "Provide feedback" in its footer either way; set this to the address and
- * `linkFeedback` turns those words into a link on all of them at once.
+ * The Substack until the post announcing the site exists, so the words in the
+ * footer lead somewhere from the first day rather than sitting dead. Point
+ * this at the announcement post once it stands and `linkFeedback` moves every
+ * page at once.
  */
-export const FEEDBACK_URL: string | null = null;
+export const FEEDBACK_URL: string | null = 'https://rogerpielkejr.substack.com';
 
 /** Makes the footer's "Provide feedback" a link, once there is one to make. */
 export function linkFeedback(root: Document): void {

@@ -11,6 +11,8 @@ const PAGES: Record<string, string> = {
   main: 'index.html',
   bibliography: 'bibliography.html',
   library: 'library.html',
+  // GitHub Pages serves this for any address it cannot match.
+  'not-found': '404.html',
   // Directory indexes, so the built site serves /learn/ and
   // /learn/population/ as clean URLs with no rewrite rules.
   learn: 'learn/index.html',

@@ -12,6 +12,7 @@ const BIBLIOGRAPHY = read('bibliography.html');
 const LEARN_INDEX = read('learn/index.html');
 const LIBRARY = read('library.html');
 const LEARN_POPULATION = read('learn/population/index.html');
+const NOT_FOUND = read('404.html');
 const VITE_CONFIG = read('vite.config.ts');
 const PAGES = [
   ['index.html', INDEX],
@@ -193,6 +194,43 @@ describe('bibliography', () => {
   it('uses only https links', () => {
     const urls = [...BIBLIOGRAPHY.matchAll(/href="(https?:[^"]+)"/g)].map((m) => m[1] ?? '');
     expect(urls.filter((u) => u.startsWith('http:'))).toEqual([]);
+  });
+});
+
+// GitHub Pages serves /404.html for any address it cannot match. Without one
+// a mistyped link lands the reader on GitHub's own grey page, off the site
+// entirely, with no way back.
+describe('the 404 page', () => {
+  it('exists and is built as its own entry point', () => {
+    expect(existsSync(resolve(process.cwd(), '404.html'))).toBe(true);
+    expect(VITE_CONFIG).toContain("'not-found': '404.html'");
+  });
+
+  it('wears the furniture every other page wears', () => {
+    expect(NOT_FOUND).toContain('class="masthead"');
+    expect(NOT_FOUND).toContain('id="theme-toggle"');
+    expect(NOT_FOUND).toContain('This is work in progress');
+    expect(NOT_FOUND).toContain('data-feedback>Provide feedback</span>');
+  });
+
+  // Its whole job is to put the reader back on the site.
+  it('offers every part of the site', () => {
+    for (const href of ['/', '/learn/', '/library.html', '/bibliography.html',
+      METHODOLOGY_PDF]) {
+      expect(NOT_FOUND, href).toContain(`href="${href}"`);
+    }
+  });
+
+  // A missing page has no content to index and no preview worth rendering,
+  // and a canonical URL on it would tell a crawler the opposite.
+  it('asks not to be indexed, and claims no canonical URL or card', () => {
+    expect(NOT_FOUND).toContain('name="robots" content="noindex, follow"');
+    expect(NOT_FOUND).not.toContain('rel="canonical"');
+    expect(NOT_FOUND).not.toContain('property="og:');
+  });
+
+  it('stays out of the sitemap', () => {
+    expect(read('public/sitemap.xml')).not.toContain('404');
   });
 });
 

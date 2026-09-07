@@ -183,6 +183,26 @@
   </footer>
 
 </div>
+
+<!-- Shown only while the chart sits off screen; see src/ui/strip.ts. -->
+<div class="scenario-strip" id="scenario-strip" hidden>
+  <div class="strip-inner">
+    <span class="strip-name" id="strip-name"></span>
+    <span class="strip-pair">
+      <span class="strip-value" id="strip-cumulative">&mdash;</span>
+      <span class="strip-key">GtCO<sub>2</sub><span class="strip-key-more"> to 2100</span></span>
+    </span>
+    <span class="strip-pair">
+      <span class="strip-value" id="strip-warming">&mdash;</span>
+      <span class="strip-key">in 2100</span>
+    </span>
+    <button type="button" class="ghost" id="strip-jump">
+      <span class="strip-jump-long">Show the chart</span>
+      <span class="strip-jump-short" aria-hidden="true">Chart</span>
+    </button>
+  </div>
+</div>
+
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

@@ -126,10 +126,22 @@ it, so a missing PDF fails CI rather than 404ing on the live site.
 | `/learn/carbon-intensity/` | `learn/carbon-intensity/index.html` | CO2 per unit of energy |
 | `/learn/land-use/` | `learn/land-use/index.html` | Land use CO2 |
 | `/learn/methane/` | `learn/methane/index.html` | Methane |
+| `/404.html` | `404.html` | What GitHub Pages serves for any address it cannot match |
 
 Every page is a Vite entry point, carries the masthead and the toolbar, and is
 checked by `tests/pages.test.ts`. The `learn/…/index.html` layout gives clean
-URLs on GitHub Pages with no rewrite rules.
+URLs on GitHub Pages with no rewrite rules. The 404 page stands apart: it
+builds nothing in the browser, carries no scenario, tells crawlers to skip it,
+and stays out of the sitemap.
+
+The front page also carries the **scenario strip** (`src/ui/strip.ts`), fixed to
+the foot of the window and shown only while the chart sits off screen. The six
+sliders run down a column taller than the chart beside them, and below 860px
+they sit above it entirely, so a reader working the lower sliders would
+otherwise have no way to watch the answer change. The strip and the four tiles
+both draw from `scenarioSummary` in `src/ui/stats.ts`, so the two can never
+disagree. It carries the name "strip" because the sliders took `.readout`
+first, for the large value under each track.
 
 Every toolbar link off a page goes through `linkToolbar` in `src/ui/toolbar.ts`,
 which writes the reader's scenario into the href. A link the function cannot
