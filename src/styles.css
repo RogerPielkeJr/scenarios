@@ -170,6 +170,17 @@ h1 {
 .lead-in-methodology { margin-top: 10px; }
 .methodology-link { color: var(--navy); font-weight: 600; text-underline-offset: 3px; }
 
+/* Shown only when scripting is off, where most of each page is empty. */
+.noscript {
+  font-family: var(--sans);
+  font-size: 17px;
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border: 1px solid var(--navy);
+  border-left-width: 3px;
+  background: color-mix(in srgb, var(--navy) 7%, transparent);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px; height: 1px;
@@ -654,6 +665,9 @@ a.feedback { text-decoration: underline; }
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
+  /* The readout cannot break mid-number, so on a narrow screen it drops
+     under the heading rather than running off the side of the page. */
+  flex-wrap: wrap;
 }
 .builder-part h3 { font-family: var(--sans); font-size: 18.5px; font-weight: 600; margin: 0; }
 .builder-readout {
@@ -663,6 +677,7 @@ a.feedback { text-decoration: underline; }
   color: var(--accent-ink, var(--navy));
   white-space: nowrap;
 }
+@media (max-width: 420px) { .builder-readout { font-size: 20px; } }
 .builder-part .why { font-size: 16.5px; color: var(--dim); margin: 4px 0 0; }
 
 .builder-result {

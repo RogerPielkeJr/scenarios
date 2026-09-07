@@ -29,6 +29,21 @@ const SCALE = 2;
 /** Room under the drawing for the logo and the two credit lines. */
 const CREDIT_BAND = 52;
 const LOGO_SIZE = 30;
+/** Room above the drawing for the figure's title. */
+const TITLE_BAND = 44;
+const SANS = "'IBM Plex Sans', system-ui, sans-serif";
+const MONO = "'IBM Plex Mono', ui-monospace, monospace";
+const SERIF = 'Spectral, Georgia, serif';
+/**
+ * How many rows of the table the image carries.
+ *
+ * A figure drawn from an annual series has 76 rows behind it, and a picture
+ * of 76 rows is a picture nobody reads. The image takes an evenly spaced
+ * sample that always keeps the first year and the last, says which years it
+ * kept, and points at the spreadsheet for the rest.
+ */
+const MAX_TABLE_ROWS = 16;
+const TABLE_ROW_HEIGHT = 15;
 
 function resolveVariables(markup: string, styles: CSSStyleDeclaration): string {
   return markup.replace(/var\(\s*(--[\w-]+)\s*\)/g, (whole, name: string) => {
@@ -67,28 +82,74 @@ function save(blob: Blob, filename: string): void {
   URL.revokeObjectURL(href);
 }
 
+/** A cell as it prints: numbers to a sensible precision, blanks for gaps. */
+function printed(value: number | string | null): string {
+  if (value === null) return '';
+  if (typeof value === 'string') return value;
+  if (!Number.isFinite(value)) return '';
+  if (Number.isInteger(value)) return String(value);
+  return Math.abs(value) >= 100 ? value.toFixed(0)
+    : (Math.abs(value) >= 1 ? value.toFixed(2) : value.toFixed(3));
+}
+
+/** The row indices the image prints, evenly spaced, ends always kept. */
+export function sampledRows(total: number, limit = MAX_TABLE_ROWS): number[] {
+  if (total <= limit) return Array.from({ length: total }, (_unused, i) => i);
+  const step = (total - 1) / (limit - 1);
+  const kept = new Set<number>();
+  for (let i = 0; i < limit; i += 1) kept.add(Math.round(i * step));
+  kept.add(total - 1);
+  return [...kept].sort((a, b) => a - b);
+}
+
 /**
- * The figure as a PNG, on the page's own background, over a band carrying the
- * mark, the source of the numbers and the analysis credit. A figure that
- * leaves the site has to say where it came from without the page around it.
+ * The figure as a PNG: its title, the drawing, the numbers behind it, and a
+ * band carrying the mark, the source and the analysis credit.
+ *
+ * A figure that leaves the site has to say what it is, what it is made of and
+ * where it came from without the page around it. The table is a sample of the
+ * rows when there are more than the image can hold; the spreadsheet button
+ * beside this one hands over every one of them.
  */
 export async function figureToPng(
-  svg: SVGSVGElement, filename: string, source: string,
+  svg: SVGSVGElement, filename: string, data: FigureData,
 ): Promise<void> {
   const styles = window.getComputedStyle(document.documentElement);
   const paper = styles.getPropertyValue('--panel').trim() || '#ffffff';
+  const ink = styles.getPropertyValue('--ink').trim() || '#16243a';
   const dim = styles.getPropertyValue('--dim').trim() || '#5a6c82';
   const rule = styles.getPropertyValue('--rule').trim() || '#c9d4e0';
+  const navy = styles.getPropertyValue('--navy').trim() || '#1f3a5f';
   const view = viewBoxOf(svg);
+
+  const totalRows = Math.max(...data.columns.map((column) => column.values.length), 0);
+  const rows = sampledRows(totalRows);
+  const extras = data.extraRows ?? [];
+  const thinned = rows.length < totalRows;
+  const tableBand = data.columns.length === 0 ? 0
+    : 26 + (rows.length + 1 + extras.length) * TABLE_ROW_HEIGHT + (thinned ? 18 : 8);
+  const height = TITLE_BAND + view.height + tableBand + CREDIT_BAND;
 
   const canvas = document.createElement('canvas');
   canvas.width = view.width * SCALE;
-  canvas.height = (view.height + CREDIT_BAND) * SCALE;
+  canvas.height = height * SCALE;
   const ctx = canvas.getContext('2d');
   if (ctx === null) throw new Error('no 2d canvas context');
   ctx.scale(SCALE, SCALE);
   ctx.fillStyle = paper;
-  ctx.fillRect(0, 0, view.width, view.height + CREDIT_BAND);
+  ctx.fillRect(0, 0, view.width, height);
+  ctx.textBaseline = 'alphabetic';
+
+  // The title, which on the front page's chart is the reader's own scenario.
+  ctx.fillStyle = ink;
+  ctx.font = `600 19px ${SERIF}`;
+  ctx.fillText(data.title, 8, 26, view.width - 16);
+  ctx.strokeStyle = navy;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(8, TITLE_BAND - 10);
+  ctx.lineTo(view.width - 8, TITLE_BAND - 10);
+  ctx.stroke();
 
   const markup = resolveVariables(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${view.width}" height="${view.height}" `
@@ -97,12 +158,19 @@ export async function figureToPng(
   );
   const url = URL.createObjectURL(new Blob([markup], { type: 'image/svg+xml;charset=utf-8' }));
   try {
-    ctx.drawImage(await loadImage(url), 0, 0, view.width, view.height);
+    ctx.drawImage(await loadImage(url), 0, TITLE_BAND, view.width, view.height);
   } finally {
     URL.revokeObjectURL(url);
   }
 
-  const bandTop = view.height + 6;
+  if (data.columns.length > 0) {
+    drawTable(ctx, {
+      top: TITLE_BAND + view.height + 20, width: view.width,
+      data, rows, extras, thinned, totalRows,
+    }, { ink, dim, rule, navy });
+  }
+
+  const bandTop = TITLE_BAND + view.height + tableBand + 6;
   ctx.strokeStyle = rule;
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -120,8 +188,8 @@ export async function figureToPng(
   }
 
   ctx.fillStyle = dim;
-  ctx.font = "12px 'IBM Plex Sans', system-ui, sans-serif";
-  ctx.fillText(`Data: ${source}`, textLeft, bandTop + 20, view.width - textLeft - 8);
+  ctx.font = `12px ${SANS}`;
+  ctx.fillText(`Data: ${data.source}`, textLeft, bandTop + 20, view.width - textLeft - 8);
   ctx.fillText(CREDIT, textLeft, bandTop + 36, view.width - textLeft - 8);
 
   const blob = await new Promise<Blob>((resolve, reject) => {
@@ -129,6 +197,100 @@ export async function figureToPng(
       ? reject(new Error('could not encode the PNG')) : resolve(made)), 'image/png');
   });
   save(blob, filename);
+}
+
+interface TableLayout {
+  top: number;
+  width: number;
+  data: FigureData;
+  rows: readonly number[];
+  extras: ReadonlyArray<Array<number | string | null>>;
+  thinned: boolean;
+  totalRows: number;
+}
+
+interface Palette { ink: string; dim: string; rule: string; navy: string }
+
+/**
+ * The numbers under the drawing.
+ *
+ * The type shrinks until the widest cell in every column fits its share of
+ * the width, because a figure of seven fuel shares and one of two series
+ * cannot use the same size and both stay readable.
+ */
+function drawTable(
+  ctx: CanvasRenderingContext2D, layout: TableLayout, palette: Palette,
+): void {
+  const { top, width, data, rows, extras, thinned, totalRows } = layout;
+  const margin = 8;
+  const available = width - margin * 2;
+  const columnWidth = available / data.columns.length;
+
+  let size = 11;
+  while (size > 6) {
+    ctx.font = `${size}px ${MONO}`;
+    const widest = Math.max(...data.columns.map((column) => Math.max(
+      ctx.measureText(column.header).width,
+      ...rows.map((row) => ctx.measureText(printed(column.values[row] ?? null)).width),
+    )));
+    if (widest <= columnWidth - 8) break;
+    size -= 0.5;
+  }
+
+  ctx.fillStyle = palette.dim;
+  ctx.font = `600 10.5px ${SANS}`;
+  ctx.fillText('THE NUMBERS BEHIND THIS FIGURE', margin, top - 8);
+
+  let y = top + TABLE_ROW_HEIGHT;
+  ctx.font = `600 ${size}px ${SANS}`;
+  data.columns.forEach((column, index) => {
+    ctx.fillText(column.header, margin + index * columnWidth,
+      y, columnWidth - 8);
+  });
+  ctx.strokeStyle = palette.navy;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin, y + 4);
+  ctx.lineTo(width - margin, y + 4);
+  ctx.stroke();
+
+  ctx.font = `${size}px ${MONO}`;
+  for (const row of rows) {
+    y += TABLE_ROW_HEIGHT;
+    ctx.fillStyle = palette.ink;
+    data.columns.forEach((column, index) => {
+      ctx.fillText(printed(column.values[row] ?? null),
+        margin + index * columnWidth, y, columnWidth - 8);
+    });
+    ctx.strokeStyle = palette.rule;
+    ctx.beginPath();
+    ctx.moveTo(margin, y + 4);
+    ctx.lineTo(width - margin, y + 4);
+    ctx.stroke();
+  }
+
+  // Extra rows carry values that sit outside the table's shape -- a marker at
+  // one year, a named rate on a distribution -- and can be wider than the
+  // table is. They get a grid of their own rather than the columns above,
+  // which on a one-column figure pushed every value off the right edge.
+  const extraColumns = Math.max(1, ...extras.map((extra) => extra.length));
+  const extraWidth = available / extraColumns;
+  for (const extra of extras) {
+    y += TABLE_ROW_HEIGHT;
+    ctx.fillStyle = palette.ink;
+    extra.forEach((value, index) => {
+      ctx.fillText(printed(value), margin + index * extraWidth, y, extraWidth - 8);
+    });
+  }
+
+  if (thinned) {
+    y += TABLE_ROW_HEIGHT;
+    ctx.fillStyle = palette.dim;
+    ctx.font = `10px ${SANS}`;
+    ctx.fillText(`${rows.length} of ${totalRows} rows, evenly spaced. `
+      + 'The spreadsheet beside the image carries every one of them.',
+    margin, y, available);
+  }
 }
 
 function escapeXml(text: string): string {
@@ -222,7 +384,7 @@ export function attachFigureButtons(
   png.setAttribute('aria-label', 'Download this figure as a PNG image');
   png.addEventListener('click', () => {
     message.textContent = 'Building…';
-    figureToPng(svg, `${fileStem(data.title, fallbackStem)}.png`, data.source).then(
+    figureToPng(svg, `${fileStem(data.title, fallbackStem)}.png`, data).then(
       () => { message.textContent = 'Downloaded'; hide(); },
       (error: unknown) => {
         message.textContent = 'Could not build the image';

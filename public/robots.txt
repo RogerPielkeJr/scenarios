@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://scenarios.thehonestbroker.org/sitemap.xml

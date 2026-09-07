@@ -79,6 +79,22 @@ marker paths, the SSP population curves and the emulator fit. See DATA.md.
 Both the scripts and their outputs are committed. Run the scripts when a source
 is updated, then commit the changed JSON.
 
+## The social card
+
+`public/social-card.png` is what a link to the site renders as on Substack,
+Bluesky or X. Every page points `og:image` at it.
+
+```sh
+python3 scripts/build_social_card.py
+```
+
+It needs `Pillow`, takes its fonts from `matplotlib`, and shells out to
+`scripts/emit_card_path.mjs` for the heavy line so the card draws a path the
+site's own model produced rather than a second copy of the Kaya identity
+written in Python. It refuses to write the card if that path drifts from the
+preset's frozen total. Commit the PNG: as with the PDF, the deploy workflow
+runs no Python.
+
 ## The methodology PDF
 
 `public/thb-scenario-builder-methodology.pdf` binds `METHODOLOGY.md`,

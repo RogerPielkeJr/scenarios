@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fileStem, toSpreadsheet, type FigureData } from '../src/ui/figure.js';
+import { fileStem, sampledRows, toSpreadsheet, type FigureData } from '../src/ui/figure.js';
 import { plotTable, stripTable } from '../src/ui/plot.js';
 
 const DATA: FigureData = {
@@ -106,5 +106,38 @@ describe('filenames', () => {
     expect(fileStem('Population — What the world has done', 'x'))
       .toBe('population-what-the-world-has-done');
     expect(fileStem('———', 'emissions-scenario')).toBe('emissions-scenario');
+  });
+});
+
+// The downloaded image carries the numbers under the drawing, and an annual
+// series has far more rows than an image can hold.
+describe('the rows the image prints', () => {
+  it('keeps every row when there are few enough', () => {
+    expect(sampledRows(5)).toEqual([0, 1, 2, 3, 4]);
+    expect(sampledRows(16)).toEqual([...Array(16).keys()]);
+  });
+
+  // Losing the last year would cut 2100 off a chart whose whole point is 2100.
+  it('always keeps the first row and the last', () => {
+    for (const total of [17, 35, 68, 76, 136, 1000]) {
+      const rows = sampledRows(total);
+      expect(rows[0], `${total}`).toBe(0);
+      expect(rows[rows.length - 1], `${total}`).toBe(total - 1);
+      expect(rows.length, `${total}`).toBeLessThanOrEqual(17);
+      expect(new Set(rows).size, `${total}`).toBe(rows.length);
+      expect([...rows].sort((a, b) => a - b), `${total}`).toEqual(rows);
+    }
+  });
+
+  // Evenly spaced, so a 76-year annual series lands on the five-yearly marker
+  // years the CMIP7 columns actually carry rather than between them.
+  it('spaces the rows evenly', () => {
+    const rows = sampledRows(76);
+    const gaps = new Set(rows.slice(1).map((row, i) => row - (rows[i] ?? 0)));
+    expect([...gaps].every((gap) => Math.abs(gap - 5) <= 1)).toBe(true);
+  });
+
+  it('handles an empty figure', () => {
+    expect(sampledRows(0)).toEqual([]);
   });
 });

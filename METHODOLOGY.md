@@ -123,7 +123,10 @@ the bibliography comes back to the scenario they left. **Copy link to this
 scenario** hands over that same address.
 
 The builder downloads a PNG and a PDF of the whole scenario sheet. Every figure
-on every page downloads as a PNG, and the numbers behind it as a spreadsheet.
+on every page downloads two ways: as a PNG carrying the figure's title, the
+drawing and the numbers under it, and as a spreadsheet of those numbers. Where
+a figure rests on more rows than an image can hold, the PNG prints an evenly
+spaced sample and says so; the spreadsheet always carries every row.
 
 ## What every figure carries
 

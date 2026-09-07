@@ -165,7 +165,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + 'explains why the scenarios disagree about this term more than about any other.',
       `Two figures from the same project show what that means. The series drawn here averages `
       + `${gt(C.vintageGap.seriesDecadeMean)} over 2014 to 2023, while the Global Carbon `
-      + `Budget's own 2024 paper reports ${gt(C.vintageGap.paperDecadeMean)} for that decade. `
+      + `Budget's 2024 paper reports ${gt(C.vintageGap.paperDecadeMean)} for that decade. `
       + `The ${(C.vintageGap.seriesDecadeMean - C.vintageGap.paperDecadeMean).toFixed(2)} `
       + 'GtCO2 between them falls short of the uncertainty on either, and exceeds most of '
       + 'what the sliders on this page argue about.',
@@ -288,8 +288,8 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       `The restoration arithmetic multiplies area by rate: a million hectares taking up `
       + `${C.growthRates.matureTropical} tonnes of CO2 a hectare each year removes `
       + `${(C.growthRates.matureTropical / 1000).toFixed(3)} GtCO2 a year. Reaching a gigatonne `
-      + `at that rate needs ${Math.round(1000 / C.growthRates.matureTropical)} Mha, and at the `
-      + `young-forest rate of ${C.growthRates.youngTropicalSouthAmerica}, `
+      + `at that rate needs ${Math.round(1000 / C.growthRates.matureTropical)} Mha. At the `
+      + `young-forest rate of ${C.growthRates.youngTropicalSouthAmerica} it needs `
       + `${Math.round(1000 / C.growthRates.youngTropicalSouthAmerica)} Mha.`,
       'Every figure here carries the uncertainty on the line above it. Treat the result as an '
       + 'accounting of what a scenario requires rather than as a measurement.',

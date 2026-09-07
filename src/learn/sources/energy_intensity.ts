@@ -19,7 +19,7 @@ export const ENERGY_INTENSITY_SOURCES: readonly Source[] = [
   },
   {
     title: 'Maddison-style estimates of the evolution of the world economy: A new 2023 update',
-    publisher: 'Bolt and van Zanden, Journal of Economic Surveys 38(5)',
+    publisher: 'Bolt and van Zanden, Journal of Economic Surveys 39(2)',
     vintage: '2024, database release 2023',
     url: 'https://doi.org/10.1111/joes.12618',
     used: 'World output before 1990, used only for its growth rates, which carry the World '

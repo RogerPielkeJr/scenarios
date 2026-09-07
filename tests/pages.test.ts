@@ -77,6 +77,64 @@ describe('both pages', () => {
   });
 });
 
+// A link posted to Substack or X renders from these. Without them the site
+// arrives as a grey box on the day it is announced, and nothing in the build
+// would have said so.
+describe('the tags a shared link renders from', () => {
+  const SITE = 'https://scenarios.thehonestbroker.org';
+
+  it.each(PAGES)('%s carries a favicon and a theme colour', (_name, html) => {
+    expect(html).toContain('rel="icon" href="/thb-logo.png"');
+    expect(html).toContain('name="theme-color"');
+  });
+
+  it.each(PAGES)('%s carries a canonical URL on this domain', (_name, html) => {
+    expect(html).toMatch(new RegExp(`<link rel="canonical" href="${SITE}[^"]*">`));
+  });
+
+  it.each(PAGES)('%s carries a card with an image, a title and a description',
+    (_name, html) => {
+      for (const tag of ['og:type', 'og:site_name', 'og:url', 'og:title', 'og:description',
+        'og:image', 'og:image:width', 'og:image:height', 'og:image:alt']) {
+        expect(html, tag).toContain(`property="${tag}"`);
+      }
+      expect(html).toContain('name="twitter:card" content="summary_large_image"');
+      expect(html).toContain(`content="${SITE}/social-card.png"`);
+    });
+
+  // The card's title and description have to say what the page is, and every
+  // page has to differ from the others, or ten links all preview the same.
+  it('gives every page its own card title', () => {
+    const titles = PAGES.map(([, html]) =>
+      /<meta property="og:title" content="([^"]*)"/.exec(html)?.[1] ?? '');
+    expect(titles.every((title) => title.length > 10)).toBe(true);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it('has the image the cards point at', () => {
+    expect(existsSync(resolve(process.cwd(), 'public/social-card.png'))).toBe(true);
+    expect(existsSync(resolve(process.cwd(), 'scripts/build_social_card.py'))).toBe(true);
+  });
+
+  it('lists every page in the sitemap', () => {
+    const sitemap = read('public/sitemap.xml');
+    for (const path of ['/', '/learn/', '/library.html', '/bibliography.html',
+      '/learn/population/', '/learn/methane/']) {
+      expect(sitemap, path).toContain(`<loc>${SITE}${path}</loc>`);
+    }
+    expect(read('public/robots.txt')).toContain(`${SITE}/sitemap.xml`);
+  });
+});
+
+// Most of every page is built in the browser, so a reader with scripting off
+// sees headings and empty boxes unless the page says why.
+describe('scripting off', () => {
+  it.each(PAGES)('%s explains itself without JavaScript', (_name, html) => {
+    expect(html).toContain('<noscript>');
+    expect(html).toContain('needs JavaScript switched on');
+  });
+});
+
 describe('the methodology PDF', () => {
   // A button pointing at a file nobody built is a 404 on the live site, and
   // neither the type checker nor the bundler would notice.

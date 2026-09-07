@@ -196,7 +196,8 @@ export const LIBRARY_SECTIONS: LibrarySection[] = [
           + '6694e94c-1a17-4633-8952-219506e9a023_576x720.png',
         gloss: 'The final CMIP7 scenarios cut cumulative fossil CO2 again. The highest '
           + 'path falls from SSP5-8.5’s 7,380 Gt to 3,438 Gt, and the current-policy '
-          + 'path to 2,528 Gt — the marks this tool draws under its sliders.',
+          + 'path to 2,528 Gt. The set that survived that cut is the seven this tool '
+          + 'measures every scenario against.',
       },
     ],
   },
