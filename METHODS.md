@@ -16,6 +16,21 @@ CO2 = population × (GDP ÷ population) × (energy ÷ GDP) × (CO2 ÷ energy)
 The reader sets six numbers: the 2100 population, three annual rates that
 compound from the base year, and 2100 values for land use CO2 and methane.
 
+Counting the stops each slider offers and multiplying them, the six reach
+**519,753,168,866,151** distinct scenarios. `SCENARIO_COUNT` in
+`src/model/config.ts` derives that from the slider definitions rather than
+carrying it as a literal, the front page prints what it derives, and
+`tests/config.test.ts` checks the figure in this paragraph still matches. The
+count is what the sliders themselves reach: a hand-edited `?s=` link can carry
+a value between two stops, which the model clamps to range but does not snap,
+so links address a denser set again.
+
+Far fewer answers than scenarios come out the other end. Across the whole space
+the century total spans 130 to 38,088 GtCO2 and warming 1.45 to 5.93 °C, which
+at the precision the tiles print leaves at most 37,959 distinct totals and 448
+distinct warming figures. Four factors multiplied together, and only the
+product shows.
+
 The base year is 2025, holding the observed 2024 state, since 2025 is not
 complete in every source. The path runs one year at a time to 2100 and the
 cumulative total sums every year.

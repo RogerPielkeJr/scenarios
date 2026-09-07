@@ -2,7 +2,7 @@ import { PRESETS } from './model/bounds.js';
 import { computeFlags, markerIdForPreset } from './model/flags.js';
 import { computePath } from './model/kaya.js';
 import { MARKERS, MARKER_BY_ID, MARKER_YEARS, publishedPath } from './model/markers.js';
-import { defaultInputs } from './model/config.js';
+import { SCENARIO_COUNT, defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import {
   ScenarioState, decodeScenario, displayName, pathWithScenario,
@@ -230,6 +230,11 @@ export function mountApp(root: Document = document): App {
     'emissions-scenario',
   );
   chart.parentElement?.insertAdjacentElement('afterend', figureButtons.element);
+
+  // How many scenarios the sliders reach. Written once: it depends on the
+  // slider definitions, not on where the reader has put them.
+  const count = root.getElementById('scenario-count');
+  if (count !== null) count.textContent = SCENARIO_COUNT.toLocaleString('en-US');
 
   strip = installStrip(root, chart.closest('.chart-figure') ?? chart);
 

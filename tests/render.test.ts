@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { mountApp, type RenderReport } from '../src/app.js';
 import { PRESETS } from '../src/model/bounds.js';
-import { INPUT_SPECS } from '../src/model/config.js';
+import { INPUT_SPECS, SCENARIO_COUNT } from '../src/model/config.js';
 import { MARKERS } from '../src/model/markers.js';
 import { LEARN_ENTRIES } from '../src/learn/registry.js';
 
@@ -220,6 +220,23 @@ describe('the toolbar routes off the front page', () => {
       expect(href.startsWith(`${path}?s=11.3_`), id).toBe(true);
       expect(href, id).toContain('n=Crowded%20century');
     }
+  });
+});
+
+describe('the scenario count on the front page', () => {
+  beforeEach(() => { loadPage(); });
+
+  // Printed from SCENARIO_COUNT, never typed into the markup, so a slider
+  // whose range or step moves carries the sentence with it.
+  it('prints the number the sliders actually reach', () => {
+    mountApp();
+    const printed = document.getElementById('scenario-count')?.textContent ?? '';
+    expect(printed).toBe(SCENARIO_COUNT.toLocaleString('en-US'));
+    expect(printed).not.toBe('—');
+    // And the markup itself carries no figure, only the placeholder.
+    const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
+    expect(html).toContain('id="scenario-count">&mdash;<');
+    expect(html).not.toContain(SCENARIO_COUNT.toLocaleString('en-US'));
   });
 });
 

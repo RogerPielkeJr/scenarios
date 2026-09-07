@@ -41,6 +41,33 @@ export const SPEC_BY_ID: Readonly<Record<InputId, InputSpec>> = Object.freeze(
   Object.fromEntries(INPUT_SPECS.map((spec) => [spec.id, spec])) as Record<InputId, InputSpec>,
 );
 
+/**
+ * How many stops a slider offers: min, min + step, ... max, inclusive.
+ *
+ * The rounding matters. (14 - 6) / 0.1 is 79.99999999999999 in binary
+ * floating point, and a bare floor would lose a position off every slider.
+ */
+export function sliderPositions(spec: InputSpec): number {
+  return Math.round((spec.max - spec.min) / spec.step) + 1;
+}
+
+/**
+ * How many distinct scenarios the six sliders reach, as their product.
+ *
+ * Derived, never typed. The front page prints this number, and a literal
+ * there would go stale the moment a slider's range or step moved. The
+ * product sits inside Number.MAX_SAFE_INTEGER at 5.2e14 against 9.0e15;
+ * tests/config.test.ts holds that, since past it the arithmetic would start
+ * losing whole scenarios in silence.
+ *
+ * It counts what the sliders themselves reach. A hand-edited ?s= link can
+ * carry a value between two stops, which the model clamps to range but does
+ * not snap, so links address a denser set than this.
+ */
+export const SCENARIO_COUNT = INPUT_SPECS.reduce(
+  (total, spec) => total * sliderPositions(spec), 1,
+);
+
 /** Every input at its default. */
 export function defaultInputs(): ScenarioInputs {
   return Object.fromEntries(
