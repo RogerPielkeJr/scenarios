@@ -81,15 +81,48 @@ export function renderStats(
   tiles.addedNote.textContent =
     `above the ${ANCHORS.recentPeriod} average of ${ANCHORS.recentMeanC.toFixed(2)} °C`;
 
-  const intensity = path.final.kgCo2PerUsd;
-  const country = analogueFor(intensity);
-  if (country === null) {
-    tiles.analogue.textContent = 'no economy today';
-    tiles.analogueNote.textContent = 'cleaner than anywhere on earth';
-  } else {
-    tiles.analogue.textContent = country.name;
-    tiles.analogueNote.textContent =
-      `${perDollar(intensity)} kg CO2 per dollar · ${country.name} emits `
-      + `${perDollar(country.kg_co2_per_usd)}`;
+  const analogue = analogueTile(path.final.kgCo2PerUsd);
+  tiles.analogue.textContent = analogue.value;
+  tiles.analogueNote.textContent = analogue.note;
+}
+
+/**
+ * The country tile's two lines, for the page and for the downloaded sheet
+ * alike, so a reader comparing the two is never given different answers.
+ *
+ * Only a match names an economy. The other three verdicts say plainly that
+ * the table holds none, and name the economy at the edge so the reader keeps
+ * a bearing: a 2100 world at 0.011 kg CO2 per dollar resembles nothing on
+ * earth today, and saying "Switzerland", which emits four times that, was
+ * worse than saying nothing.
+ */
+export function analogueTile(intensity: number): { value: string; note: string } {
+  const per = `${perDollar(intensity)} kg CO2 per dollar`;
+  const verdict = analogueFor(intensity);
+  if (verdict === null) return { value: 'no comparison', note: per };
+  if (verdict.kind === 'match') {
+    return {
+      value: verdict.country.name,
+      note: `${per} · ${verdict.country.name} emits ${perDollar(verdict.country.kg_co2_per_usd)}`,
+    };
   }
+  if (verdict.kind === 'cleaner') {
+    return {
+      value: 'no economy this clean',
+      note: `${per} · the cleanest today is ${verdict.nearest.name} at `
+        + `${perDollar(verdict.nearest.kg_co2_per_usd)}`,
+    };
+  }
+  if (verdict.kind === 'dirtier') {
+    return {
+      value: 'no economy this carbon-intensive',
+      note: `${per} · the highest today is ${verdict.nearest.name} at `
+        + `${perDollar(verdict.nearest.kg_co2_per_usd)}`,
+    };
+  }
+  return {
+    value: 'no close match',
+    note: `${per} · the nearest is ${verdict.nearest.name} at `
+      + `${perDollar(verdict.nearest.kg_co2_per_usd)}`,
+  };
 }

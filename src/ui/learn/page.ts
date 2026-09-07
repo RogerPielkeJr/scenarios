@@ -250,7 +250,7 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
 
   // The identity, with this factor inked.
   const identity = band(root, 'Where it sits');
-  identity.body.appendChild(buildIdentity(root, { active: spec.input }));
+  identity.body.appendChild(buildIdentity(root, { active: spec.input, scenario }));
   main.appendChild(identity.section);
 
   // The record.

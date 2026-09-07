@@ -3,7 +3,7 @@ import { BOUNDS, HIGH_EFFICIENCY_RATIO,
 import { ANALOGUE_META } from '../model/analogue.js';
 import { BOUND_RATES } from '../model/observed.js';
 import { UN_2024 } from '../model/population.js';
-import { EMULATOR_FORM } from '../model/emulator.js';
+import { EMULATOR_FORM, METHANE } from '../model/emulator.js';
 import { thousands } from '../format.js';
 
 const you = (text: string) => `<b class="you">${text}</b>`;
@@ -148,7 +148,8 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
     + 'the seven CMIP7 markers, so treat it as indicative rather than as a model result. It reads the total '
     + 'CO2 you emit and your methane, and nothing else, which means two paths reaching the same '
     + 'total give the same answer however differently they got there. Methane adds about '
-    + `0.12 °C per 100 Mt a year. It takes the form ${EMULATOR_FORM}.</p>`);
+    + `${(METHANE.k * 100).toFixed(2)} °C per 100 Mt a year. It takes the form `
+    + `${EMULATOR_FORM}.</p>`);
 
   parts.push(`<p><b>The two technology bounds.</b> Jesse Ausubel argued in 1995 that `
     + 'technological trajectories move at rates steady enough to bound the future, and that a '

@@ -9,13 +9,14 @@
  * canvas clean of any cross-origin taint.
  */
 import { INPUT_SPECS } from '../model/config.js';
-import { addedWarming, warming } from '../model/emulator.js';
-import { analogueFor } from '../model/analogue.js';
+import { ANCHORS } from '../model/emulator.js';
+
 import { MARKER_BY_ID, placeAmongMarkers, type PublishedPath } from '../model/markers.js';
 import type { ScenarioInputs, ScenarioPath } from '../model/types.js';
 import { displayName, type Scenario } from '../state.js';
 import { degrees, formatInput, signedDegrees, thousands } from '../format.js';
 import { jpegToPdf } from './pdf.js';
+import { analogueTile, scenarioSummary } from './stats.js';
 
 const SCALE = 2;
 const SHEET = { width: 720, pad: 26 };
@@ -53,28 +54,33 @@ function viewBoxOf(svg: SVGSVGElement): { width: number; height: number } {
   return { width: width as number, height: height as number };
 }
 
-function summaryOf(
+/**
+ * The four rows the downloaded sheet carries, exported so a test can hold
+ * them against the four tiles on the page. Kept private, they drifted.
+ */
+export function summaryOf(
   inputs: ScenarioInputs, path: ScenarioPath, published: PublishedPath | null,
 ): Array<[string, string, string]> {
+  // The same three numbers the tiles show, from the same function, and the
+  // same two lines for the country. A sheet that disagreed with the page it
+  // came from would be worse than no sheet. The anchor year and its mean come
+  // from the emulator data rather than being retyped here: this file carried
+  // 1.24 and "2015-2024" as literals, so a refit would have moved the page and
+  // left the download behind.
   const high = MARKER_BY_ID['H'];
-  const cumulativeGt = published === null ? path.cumulativeGt : published.cumulativeGt;
-  const t = published === null ? warming(path.cumulativeGt, inputs.methane) : published.warmingC;
-  const added = published === null
-    ? addedWarming(path.cumulativeGt, inputs.methane)
-    : published.warmingC - 1.24;
-  const country = analogueFor(path.final.kgCo2PerUsd);
+  const summary = scenarioSummary(inputs, path, published);
+  const country = analogueTile(path.final.kgCo2PerUsd);
   return [
-    ['Cumulative CO2, 2025 to 2100', thousands(cumulativeGt),
+    ['Cumulative CO2, 2025 to 2100', thousands(summary.cumulativeGt),
       published !== null ? `GtCO2 · as published by ${published.label}`
         : (high === undefined ? 'GtCO2'
           : `GtCO2 · CMIP7 HIGH reaches ${thousands(high.cumulativeGt)}`)],
-    ['Warming in 2100 above 1850-1900', degrees(t),
-      published === null ? placeAmongMarkers(t) : `as published by ${published.label}`],
-    ['Added warming from now', signedDegrees(added),
-      'above the 2015-2024 average of 1.24 °C'],
-    ['Your 2100 world looks like', country === null ? 'no economy today' : country.name,
-      country === null ? 'cleaner than anywhere on earth'
-        : `${path.final.kgCo2PerUsd.toFixed(3)} kg CO2 per dollar`],
+    [`Warming in 2100 above ${ANCHORS.baseline}`, degrees(summary.warmingC),
+      published === null ? placeAmongMarkers(summary.warmingC)
+        : `as published by ${published.label}`],
+    ['Added warming from now', signedDegrees(summary.addedC),
+      `above the ${ANCHORS.recentPeriod} average of ${ANCHORS.recentMeanC.toFixed(2)} °C`],
+    ['Your 2100 world looks like', country.value, country.note],
   ];
 }
 

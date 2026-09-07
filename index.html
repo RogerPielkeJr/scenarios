@@ -196,8 +196,11 @@
       <span class="strip-value" id="strip-warming">&mdash;</span>
       <span class="strip-key">in 2100</span>
     </span>
-    <button type="button" class="ghost" id="strip-jump">
-      <span class="strip-jump-long">Show the chart</span>
+    <!-- The name lives on the button, not in the spans: below 480px the long
+         label is display:none and the short one is aria-hidden, which would
+         otherwise leave the button with no accessible name at all. -->
+    <button type="button" class="ghost" id="strip-jump" aria-label="Show the chart">
+      <span class="strip-jump-long" aria-hidden="true">Show the chart</span>
       <span class="strip-jump-short" aria-hidden="true">Chart</span>
     </button>
   </div>

@@ -420,7 +420,8 @@ Above-ground biomass only; below-ground carbon and soil add more.
 Restricted to economies above 25 Mt CO2 and $40 billion. The build asserts the
 count and prints anything dropped at the join. GDP carries the comparison as
 well as the ratio: the tile names the largest economy within 5% of the reader's
-2100 world, not the nearest of any size. See METHODS.md.
+2100 world, not the nearest of any size, and says plainly that there is none
+when nothing sits that close. See METHODS.md.
 
 ### `markers.json`, `population.json`, `emulator.json`, `config.json`, `presets.json`, `notes.json`
 

@@ -54,7 +54,7 @@ function mount(): void {
   main.appendChild(back);
 
   const identity = band('The identity');
-  identity.body.appendChild(buildIdentity(document, { active: null, linked: true }));
+  identity.body.appendChild(buildIdentity(document, { active: null, linked: true, scenario }));
   main.appendChild(identity.section);
 
   const pages = band('The six pages');

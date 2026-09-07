@@ -4,6 +4,7 @@
  * a drawing, so it wraps rather than shrinks on a narrow screen.
  */
 import { LEARN_ENTRIES } from '../../learn/registry.js';
+import { learnHref, type Scenario } from '../../state.js';
 import type { InputId } from '../../model/types.js';
 
 /** The four factors that multiply, in the order the identity writes them. */
@@ -16,26 +17,38 @@ const CHAIN: Array<{ input: InputId; short: string }> = [
 
 function factorNode(
   root: Document, input: InputId, text: string, active: InputId | null, linked: boolean,
+  scenario: Scenario,
 ): HTMLElement {
   const entry = LEARN_ENTRIES.find((candidate) => candidate.input === input);
   const live = entry !== undefined && entry.status === 'live' && linked && input !== active;
   const node = root.createElement(live ? 'a' : 'span');
   node.className = input === active ? 'factor is-active' : 'factor';
   node.textContent = text;
-  if (live && node instanceof HTMLAnchorElement) node.href = `/learn/${entry.slug}/`;
+  // Through learnHref, never a bare path: a bare one drops the reader's six
+  // numbers and their name on the way, and the Use button on the page they
+  // land on then carries the defaults home over all of them.
+  if (live && node instanceof HTMLAnchorElement) node.href = learnHref(entry.slug, scenario);
   return node;
 }
 
 export interface IdentityOptions {
+  /**
+   * The reader's scenario, which every factor link carries.
+   *
+   * Required, not optional: this is the third place a bare link to a Learn
+   * More page has reset the reader's scenario, so the type now refuses one.
+   */
+  scenario: Scenario;
   /** The factor to ink, or null on the index where none leads. */
   active?: InputId | null;
   /** Links every other live factor to its page. */
   linked?: boolean;
 }
 
-export function buildIdentity(root: Document, options: IdentityOptions = {}): HTMLElement {
+export function buildIdentity(root: Document, options: IdentityOptions): HTMLElement {
   const active = options.active ?? null;
   const linked = options.linked ?? true;
+  const { scenario } = options;
   const wrapper = root.createElement('div');
   wrapper.className = 'identity';
 
@@ -48,7 +61,8 @@ export function buildIdentity(root: Document, options: IdentityOptions = {}): HT
       operator.textContent = '×';
       line.appendChild(operator);
     }
-    line.appendChild(factorNode(root, factor.input, factor.short, active, linked));
+    line.appendChild(factorNode(root, factor.input, factor.short, active, linked,
+      scenario));
   });
   const equals = root.createElement('span');
   equals.className = 'op op-equals';
@@ -66,7 +80,7 @@ export function buildIdentity(root: Document, options: IdentityOptions = {}): HT
   plus.className = 'op';
   plus.textContent = '+';
   tail.appendChild(plus);
-  tail.appendChild(factorNode(root, 'landUse', 'Land use CO2', active, linked));
+  tail.appendChild(factorNode(root, 'landUse', 'Land use CO2', active, linked, scenario));
   const total = root.createElement('span');
   total.className = 'op op-equals';
   total.textContent = '=';
@@ -81,7 +95,7 @@ export function buildIdentity(root: Document, options: IdentityOptions = {}): HT
   aside.className = 'identity-aside';
   aside.appendChild(root.createTextNode('The identity above covers CO2 only. Methane warms '
     + 'the world through a coefficient of its own: '));
-  aside.appendChild(factorNode(root, 'methane', 'Methane', active, linked));
+  aside.appendChild(factorNode(root, 'methane', 'Methane', active, linked, scenario));
   aside.appendChild(root.createTextNode('.'));
   wrapper.appendChild(aside);
 

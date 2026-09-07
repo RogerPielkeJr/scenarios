@@ -75,6 +75,19 @@ describe('the scenario strip', () => {
     expect(text('strip-name')).toContain('as published');
   });
 
+  // The button swaps a long label for a short one below 480px by hiding one
+  // span and showing the other. With the name left to the spans, a phone got
+  // a button with no accessible name at all: the long label goes out of the
+  // tree with display:none and the short one carries aria-hidden.
+  it('keeps an accessible name whichever label shows', () => {
+    mountApp();
+    const jump = document.getElementById('strip-jump');
+    expect(jump?.getAttribute('aria-label')).toBe('Show the chart');
+    for (const span of document.querySelectorAll('#strip-jump span')) {
+      expect(span.getAttribute('aria-hidden'), span.className).toBe('true');
+    }
+  });
+
   it('renders as a panel of its own, so a failure there cannot take the page down', () => {
     const app = mountApp();
     const names = app.lastReport()?.panels.map((entry) => entry.name) ?? [];

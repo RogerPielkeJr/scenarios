@@ -465,11 +465,22 @@ world at 0.126 kg/$ came out as New Zealand, a $256 billion economy, while the
 Netherlands sat at 0.124 with five times the output. CMIP7 HIGH was one of the
 scenarios it hit. The 5% band is what keeps the likeness true; a wider one buys
 larger names at the cost of the claim, since at 10% a world at 0.16 kg/$ would
-"look like" Japan at 0.170. Where no economy of any size sits within 5% — the
-clean end of the table, below about 0.04 kg/$ — the tile falls back to the
-nearest and still names Switzerland. The note under the tile prints both
-numbers, so the reader can see the gap. `tests/analogue.test.ts` walks the
-whole range and holds both rules.
+"look like" Japan at 0.170.
+
+**Where no economy sits within 5%, the tile says so rather than naming one.**
+It reads "no economy this clean", "no close match" or "no economy this
+carbon-intensive", and the note names the economy at the edge of the table so
+the reader keeps a bearing. Falling back to the nearest of any size, as it did
+until 2026-09-07, put Switzerland against a 2100 world at 0.011 kg/$ when
+Switzerland emits 0.043 — four times as much. Three of the eight presets land
+in that stretch, CMIP7 MEDIUM-to-LOW, CMIP7 VERY LOW and the Ausubel methane
+economy, so the tile was asserting a likeness that did not exist on every one
+of them.
+
+Four stretches inside the tool's reachable range hold no economy within 5%:
+below 0.041 kg/$, and the gaps at 0.046–0.049, 0.071–0.076 and 0.381–0.404.
+The note prints the reader's own ratio in every case, so the gap stays visible.
+`tests/analogue.test.ts` walks the whole range and holds every rule.
 
 ## The chart axis
 

@@ -64,8 +64,10 @@ chart, the column in the table, and every file the page hands back.
   of GDP sits within 5% of the reader's 2100 world, drawn from 66 economies
   large enough to measure well. Largest, rather than nearest, so the comparison
   lands on an economy the reader recognises instead of whichever small one
-  happens to sit on the number. It compares that one ratio and says nothing else
-  about the country.
+  happens to sit on the number. Where nothing sits within 5% the tile says so
+  instead of naming an economy, and names the one at the edge of the table
+  instead: a world at 0.011 kg CO2 per dollar resembles nothing on earth today.
+  It compares that one ratio and says nothing else about the country.
 
 Load one of the four CMIP7 presets and the first three figures report what
 that scenario published, rather than the reconstruction, until a slider moves.

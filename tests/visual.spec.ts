@@ -97,6 +97,37 @@ test('a shared link restores the scenario', async ({ page }) => {
   await expect(page.locator('#readout-methane')).toHaveText('500 Mt/yr');
 });
 
+// A bare internal link drops the reader's six numbers and their name, and the
+// Use button on the page they land on then carries the defaults home over all
+// of them. This has been three separate bugs now: the sibling nav and the
+// toolbar (e2525e3), the bibliography's back link (8ffdadb), and the factor
+// links inside the Kaya identity. So the rule is checked wholesale rather than
+// link by link: on every page, every internal link carries the scenario.
+test('no internal link anywhere drops the scenario', async ({ page }) => {
+  const query = 's=11.5_2.2_-1.1_-0.9_-3_450&n=Audit%20run';
+  const bare: string[] = [];
+  const pages = ['/', '/learn/', '/learn/population/', '/learn/income/',
+    '/learn/energy-intensity/', '/learn/carbon-intensity/', '/learn/land-use/',
+    '/learn/methane/', '/library.html', '/bibliography.html'];
+  for (const path of pages) {
+    await page.goto(path === '/' ? `/#${query}` : `${path}?${query}`);
+    await page.waitForFunction(() => document.querySelectorAll('a[href]').length > 3);
+    const links = await page.evaluate(() => Array.from(document.querySelectorAll('a[href]'))
+      .map((a) => ({
+        href: a.getAttribute('href') ?? '',
+        text: (a.textContent ?? '').trim().slice(0, 40),
+      })));
+    for (const link of links) {
+      // Only routes between the tool's own pages carry a scenario. The PDF,
+      // the images and every outside link do not.
+      if (!link.href.startsWith('/')) continue;
+      if (/\.(pdf|png|xml|txt)$/.test(link.href)) continue;
+      if (!/[#?].*s=/.test(link.href)) bare.push(`${path} → "${link.text}" → ${link.href}`);
+    }
+  }
+  expect(bare).toEqual([]);
+});
+
 test('never scrolls the page body sideways', async ({ page }) => {
   // 380 is the narrowest width the pages have to work at; 360 gives a margin.
   for (const path of ['/', '/learn/', '/learn/population/', '/bibliography.html']) {
