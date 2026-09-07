@@ -240,6 +240,41 @@ describe('a published scenario on screen', () => {
     expect(report?.outputs['notes']).toContain('This shows CMIP7 MEDIUM as published');
   });
 
+  it('reports MEDIUM-to-LOW as published, and names the gap the right way round', () => {
+    const app = mountApp();
+    const ml = PRESETS.find((preset) => preset.id === 'cmip7-medium-to-low');
+    if (ml === undefined) throw new Error('no CMIP7 MEDIUM-to-LOW preset');
+    app.apply(ml.inputs);
+    const report = app.lastReport();
+    expect(report?.outputs['tile-cumulative']).toBe('1,710');
+    expect(report?.outputs['tile-warming']).toBe('2.20 °C');
+    const notes = report?.outputs['notes'] ?? '';
+    expect(notes).toContain('This shows CMIP7 MEDIUM-to-LOW as published');
+    // The only preset whose reconstruction lands under its marker.
+    expect(notes).toContain('1,230 GtCO2 against 1,710');
+    expect(notes).toContain('below it');
+  });
+
+  // The two technology bounds measure the reconstruction's total. With a
+  // published scenario on screen the tiles report the marker instead, so a
+  // bound sentence would judge a number the reader cannot see. MEDIUM-to-LOW
+  // is where that showed: 1,710 on the tile, 1,230 behind it, and the fast
+  // bound at 1,585 in between.
+  it('leaves the technology bounds alone while a published scenario stands', () => {
+    const app = mountApp();
+    const ml = PRESETS.find((preset) => preset.id === 'cmip7-medium-to-low');
+    if (ml === undefined) throw new Error('no CMIP7 MEDIUM-to-LOW preset');
+    app.apply(ml.inputs);
+    expect(app.lastReport()?.outputs['notes']).not.toContain('you have passed the lowest total');
+
+    // One slider move hands the reader their own reconstruction, and the
+    // sentence comes back.
+    app.state.set('landUse', -8.7);
+    const notes = app.lastReport()?.outputs['notes'] ?? '';
+    expect(notes).not.toContain('as published');
+    expect(notes).toContain('you have passed the lowest total');
+  });
+
   it('draws the published path through the marker\'s own points', () => {
     const app = mountApp();
     const veryLow = PRESETS.find((preset) => preset.id === 'cmip7-very-low');

@@ -107,14 +107,21 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
     parts.push('<p>The fuel mix has never changed this fast. CMIP7 MEDIUM assumes about '
       + 'four times the observed rate and the low scenarios assume more.</p>');
   }
-  if (flags.aboveSlowBound) {
-    parts.push(`<p>Above ${thousands(BOUNDS.slow)} GtCO2 you have passed the highest total `
-      + 'reachable with every technological trajectory held at the slowest rate the world '
-      + 'has recorded.</p>');
-  }
-  if (flags.belowFastBound) {
-    parts.push(`<p>Below ${thousands(BOUNDS.fast)} GtCO2 you have passed the lowest total `
-      + 'reachable with every technological trajectory at its fastest recorded rate.</p>');
+  // Both bounds judge the reconstruction's own total. While a published
+  // scenario stands untouched the tiles report that scenario instead, so
+  // these would measure a number the reader cannot see. CMIP7 MEDIUM-to-LOW
+  // is where that shows: its published total reads 1,710 GtCO2 while the
+  // reconstruction behind it totals 1,230, below the fast bound.
+  if (!flags.showingPublished) {
+    if (flags.aboveSlowBound) {
+      parts.push(`<p>Above ${thousands(BOUNDS.slow)} GtCO2 you have passed the highest total `
+        + 'reachable with every technological trajectory held at the slowest rate the world '
+        + 'has recorded.</p>');
+    }
+    if (flags.belowFastBound) {
+      parts.push(`<p>Below ${thousands(BOUNDS.fast)} GtCO2 you have passed the lowest total `
+        + 'reachable with every technological trajectory at its fastest recorded rate.</p>');
+    }
   }
   if (flags.markerFidelity !== null) {
     parts.push(fidelitySentence(flags.markerFidelity, flags.showingPublished));

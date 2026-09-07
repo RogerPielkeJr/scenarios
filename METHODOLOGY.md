@@ -60,18 +60,21 @@ chart, the column in the table, and every file the page hands back.
   Indicative, not a model result, and never shown to more than two decimals.
 - **Added warming from now.** The same figure measured against the 2015–2024
   average of 1.24 °C rather than against 1850–1900.
-- **Your 2100 world looks like.** The economy whose 2024 CO2 per dollar of GDP
-  sits closest to the reader's 2100 world, drawn from 66 economies large enough
-  to measure well. It compares that one ratio and says nothing else about the
-  country.
+- **Your 2100 world looks like.** The largest economy whose 2024 CO2 per dollar
+  of GDP sits within 5% of the reader's 2100 world, drawn from 66 economies
+  large enough to measure well. Largest, rather than nearest, so the comparison
+  lands on an economy the reader recognises instead of whichever small one
+  happens to sit on the number. It compares that one ratio and says nothing else
+  about the country.
 
-Load one of the three CMIP7 presets and the first three figures report what
+Load one of the four CMIP7 presets and the first three figures report what
 that scenario published, rather than the reconstruction, until a slider moves.
 
-## The seven preset buttons
+## The eight preset buttons
 
-Four presets come from the record and from the two technology bounds; three
-load the Kaya factors a CMIP7 marker reports.
+Four presets come from the record and from the two technology bounds; four load
+the Kaya factors a CMIP7 marker reports. Those four are the markers of the seven
+that publish a carbon-intensity rate.
 
 | Preset | Cumulative CO2 | Warming in 2100 |
 |---|---|---|
@@ -84,11 +87,12 @@ Every rate behind those four comes out of `scripts/build_data.py`, recomputed
 from the primary series rather than typed in, and the window that produced each
 one travels with it.
 
-The three CMIP7 presets reproduce where a marker ends up far better than how it
-gets there, and two of them cannot reach the scenario they name at all. The
+The four CMIP7 presets reproduce where a marker ends up far better than how it
+gets there, and three of them cannot reach the scenario they name at all. The
 interface reports the gap in place, computed on the spot, whenever one of them
-loads. **Methods** gives the two reasons — the shape of the path, and the sign
-of the emissions — and the size of each miss.
+loads. **Methods** gives the three reasons — the shape of the path, the sign of
+the emissions, and the timing of the land-use sink — and the size of each miss.
+MEDIUM-to-LOW is the one that lands below its marker rather than above.
 
 ## The Learn More pages
 

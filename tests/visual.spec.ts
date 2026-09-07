@@ -292,7 +292,9 @@ test('the back link returns the scenario unchanged', async ({ page }) => {
 
 test('a published scenario draws its own path until a slider moves', async ({ page }) => {
   await page.goto('/');
-  await page.locator('.presets button', { hasText: 'CMIP7 MEDIUM' }).click();
+  // By data-preset, not by text: "CMIP7 MEDIUM" is a prefix of
+  // "CMIP7 MEDIUM-to-LOW" and matches both buttons.
+  await page.locator('.presets button[data-preset="cmip7-medium"]').click();
   await expect(page.locator('#tile-cumulative')).toHaveText('2,770');
   await expect(page.locator('#tile-warming')).toHaveText('2.84 °C');
   await expect(page.locator('#chart text', { hasText: 'CMIP7 MEDIUM as published' }))

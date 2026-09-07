@@ -1,4 +1,4 @@
-import { nearestAnalogue } from '../model/analogue.js';
+import { analogueFor } from '../model/analogue.js';
 import { ANCHORS, addedWarming, warming } from '../model/emulator.js';
 import { MARKER_BY_ID, placeAmongMarkers, type PublishedPath } from '../model/markers.js';
 import type { ScenarioInputs, ScenarioPath } from '../model/types.js';
@@ -82,7 +82,7 @@ export function renderStats(
     `above the ${ANCHORS.recentPeriod} average of ${ANCHORS.recentMeanC.toFixed(2)} °C`;
 
   const intensity = path.final.kgCo2PerUsd;
-  const country = nearestAnalogue(intensity);
+  const country = analogueFor(intensity);
   if (country === null) {
     tiles.analogue.textContent = 'no economy today';
     tiles.analogueNote.textContent = 'cleaner than anywhere on earth';

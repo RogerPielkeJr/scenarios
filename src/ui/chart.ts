@@ -188,8 +188,22 @@ function markerLabels(yFor: (v: number) => number, highlight: string | null): st
   }).join('');
 }
 
+/**
+ * How many characters of a name the chart draws before it cuts.
+ *
+ * Wide enough for every label the tool writes itself. With a published
+ * scenario on screen the label reads "CMIP7 <marker> as published", and the
+ * longest of those, CMIP7 LOW-to-NEGATIVE, runs 34 characters. At 30 the
+ * chart ellipsised its own words: CMIP7 MEDIUM-to-LOW came out as "CMIP7
+ * MEDIUM-to-LOW as publis...". A reader's own name still cuts here, and the
+ * caption carries the whole of it either way.
+ *
+ * tests/chart.test.ts holds the placement guarantee at this length.
+ */
+export const NAME_LIMIT = 34;
+
 /** Long names get an ellipsis on the chart; the caption carries the whole thing. */
-function shorten(name: string, limit = 30): string {
+function shorten(name: string, limit = NAME_LIMIT): string {
   return name.length <= limit ? name : `${name.slice(0, limit - 1).trimEnd()}\u2026`;
 }
 

@@ -128,6 +128,7 @@ function isAbove(value: number | null, limit: number): boolean {
 const MARKER_PRESETS: Record<string, string> = {
   'cmip7-high': 'H',
   'cmip7-medium': 'M',
+  'cmip7-medium-to-low': 'ML',
   'cmip7-very-low': 'VL',
 };
 

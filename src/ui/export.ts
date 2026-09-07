@@ -10,7 +10,7 @@
  */
 import { INPUT_SPECS } from '../model/config.js';
 import { addedWarming, warming } from '../model/emulator.js';
-import { nearestAnalogue } from '../model/analogue.js';
+import { analogueFor } from '../model/analogue.js';
 import { MARKER_BY_ID, placeAmongMarkers, type PublishedPath } from '../model/markers.js';
 import type { ScenarioInputs, ScenarioPath } from '../model/types.js';
 import { displayName, type Scenario } from '../state.js';
@@ -62,7 +62,7 @@ function summaryOf(
   const added = published === null
     ? addedWarming(path.cumulativeGt, inputs.methane)
     : published.warmingC - 1.24;
-  const country = nearestAnalogue(path.final.kgCo2PerUsd);
+  const country = analogueFor(path.final.kgCo2PerUsd);
   return [
     ['Cumulative CO2, 2025 to 2100', thousands(cumulativeGt),
       published !== null ? `GtCO2 · as published by ${published.label}`

@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
-import { CHART_GEOMETRY, niceScale, renderChart } from '../src/ui/chart.js';
-import { INPUT_SPECS } from '../src/model/config.js';
+import { CHART_GEOMETRY, NAME_LIMIT, niceScale, renderChart } from '../src/ui/chart.js';
+import { INPUT_SPECS, defaultInputs } from '../src/model/config.js';
+import { MARKERS } from '../src/model/markers.js';
 import { computePath } from '../src/model/kaya.js';
 import type { ScenarioInputs } from '../src/model/types.js';
 
@@ -150,7 +151,7 @@ describe('the reader’s own label on the chart', () => {
   // to keep clear, so the same guarantee has to hold at the longest name the
   // chart will draw.
   it('holds for the longest name the chart draws', () => {
-    const names = ['A', 'Trend continues', 'A'.repeat(30), 'A'.repeat(60)];
+    const names = ['A', 'Trend continues', 'A'.repeat(NAME_LIMIT), 'A'.repeat(60)];
     const failures: string[] = [];
     for (const name of names) {
       for (const inputs of CORNERS) {
@@ -159,6 +160,20 @@ describe('the reader’s own label on the chart', () => {
       }
     }
     expect(failures.slice(0, 5)).toEqual([]);
+  });
+
+  // The chart may cut a reader's own name. Cutting its own words is a defect:
+  // at a 30-character limit CMIP7 MEDIUM-to-LOW drew as "CMIP7 MEDIUM-to-LOW
+  // as publis...". Every marker, not only the four with preset buttons.
+  it('never ellipsises a label the tool writes itself', () => {
+    for (const marker of MARKERS) {
+      const label = `CMIP7 ${marker.label} as published`;
+      expect(label.length, label).toBeLessThanOrEqual(NAME_LIMIT);
+      const svg = render(defaultInputs(), label);
+      const drawn = svg.querySelector('[data-user-label]')?.textContent ?? '';
+      expect(drawn, label).not.toContain('\u2026');
+      expect(drawn, label).toBe(label);
+    }
   });
 
   it('stays inside the plot', () => {

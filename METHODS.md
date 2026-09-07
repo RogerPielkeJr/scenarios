@@ -150,18 +150,22 @@ Every rate above is recomputed by `scripts/build_data.py` from the primary
 sources rather than typed in, and the window that produced each one is recorded
 alongside it.
 
-### The three CMIP7 presets
+### The four CMIP7 presets
 
-Three further buttons load the Kaya factors that a marker itself reports. Two
-land close to the scenario they name. VERY LOW cannot:
+Four further buttons load the Kaya factors that a marker itself reports. These
+are the four markers of the seven that publish a carbon-intensity rate; the
+other three do not, because their 2100 fossil CO2 runs negative. HIGH lands
+close to the scenario it names. The other three cannot:
 
 | Preset | Marker total | Preset reproduces | Gap |
 |---|---|---|---|
 | CMIP7 HIGH | 3,777 Gt | 3,838 Gt | +61 |
 | CMIP7 MEDIUM | 2,770 Gt | 3,094 Gt | +324 |
+| CMIP7 MEDIUM-to-LOW | 1,710 Gt | 1,230 Gt | −480 |
 | CMIP7 VERY LOW | 268 Gt | 1,298 Gt | +1,030 |
 
-The reason is in the next section. The interface says so in place when one of
+MEDIUM-to-LOW is the one that lands below the marker it names rather than
+above. The reason is in the next section. The interface says so in place when one of
 these is loaded rather than leaving the reader to notice.
 
 ## The Learn More pages
@@ -323,9 +327,10 @@ both, computed rather than asserted (`markerFidelity` in
 |---|---|---|---|---|---|---|
 | CMIP7 HIGH | 55.9 | 55.0 | 3,838 | 3,777 | 48.8 | 47.1 |
 | CMIP7 MEDIUM | 34.0 | 34.4 | 3,094 | 2,770 | 43.3 | 36.1 |
+| CMIP7 MEDIUM-to-LOW | −2.9 | −9.2 | 1,230 | 1,710 | 22.4 | 35.1 |
 | CMIP7 VERY LOW | −0.1 | −5.8 | 1,298 | 268 | 22.5 | −1.2 |
 
-Two separate causes, and the interface names whichever applies:
+Three separate causes, and the interface names whichever applies:
 
 **Shape.** A constant rate spreads one improvement evenly across 75 years,
 while the markers bend. MEDIUM lands within 1% of its own 2100 emissions and
@@ -339,6 +344,14 @@ factors multiplied together stay positive, so the fossil term cannot turn
 negative at all, and only the land use slider can pull a path below zero. The
 tool reproduces the descent as far as the point where VERY LOW's own emissions
 cross zero and no further.
+
+**Land use timing.** MEDIUM-to-LOW ends the century with a land-use sink of
+−8.8 GtCO2 a year, by far the largest of the seven. The land use slider draws a
+straight line from today's source to that sink, so the tool banks the sink from
+2025 while the marker builds it late, and the same shape error that lifts
+MEDIUM above its marker pushes MEDIUM-to-LOW 480 Gt below its own. It is the
+one preset that undershoots. `tests/presets.test.ts` pins the sign as well as
+the size, so a change that flipped it could not pass quietly.
 
 The chart brings the named marker's own published path forward whenever one of
 those presets is loaded, so the divergence sits in front of the reader rather
@@ -438,12 +451,25 @@ efficiency and fuel mix could be built, financed or fuelled.
 
 ## The country comparison
 
-The tile names the economy whose 2024 CO2 per dollar of GDP is closest to the
-reader's 2100 world. It uses Energy Institute CO2 over World Bank purchasing
-power GDP, restricted to 66 economies above 25 Mt CO2 and $40 billion, so a
-small or poorly measured economy cannot become the answer. It compares one ratio
-and nothing else: it does not say the world would resemble that country in any
-other respect.
+The tile names the **largest** economy whose 2024 CO2 per dollar of GDP sits
+within 5% of the reader's 2100 world, where largest means GDP, the denominator
+of the ratio being compared. It uses Energy Institute CO2 over World Bank
+purchasing power GDP, restricted to 66 economies above 25 Mt CO2 and $40
+billion, so a small or poorly measured economy cannot become the answer. It
+compares one ratio and nothing else: it does not say the world would resemble
+that country in any other respect.
+
+Taking the nearest economy of any size, which the tile did until 2026-09-07,
+kept returning whichever small economy happened to sit on the number: a 2100
+world at 0.126 kg/$ came out as New Zealand, a $256 billion economy, while the
+Netherlands sat at 0.124 with five times the output. CMIP7 HIGH was one of the
+scenarios it hit. The 5% band is what keeps the likeness true; a wider one buys
+larger names at the cost of the claim, since at 10% a world at 0.16 kg/$ would
+"look like" Japan at 0.170. Where no economy of any size sits within 5% — the
+clean end of the table, below about 0.04 kg/$ — the tile falls back to the
+nearest and still names Switzerland. The note under the tile prints both
+numbers, so the reader can see the gap. `tests/analogue.test.ts` walks the
+whole range and holds both rules.
 
 ## The chart axis
 

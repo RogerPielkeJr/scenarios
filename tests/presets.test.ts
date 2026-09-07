@@ -72,14 +72,19 @@ describe('presets', () => {
     }
   });
 
-  // The three CMIP7 presets load a marker's Kaya factors into the sliders.
-  // Two land close to the marker they name; VERY LOW cannot, because the
-  // Kaya identity has no term for engineered carbon removal and that marker
-  // goes net negative after 2050. Pinned so the size of each gap is visible.
+  // The four CMIP7 presets load a marker's Kaya factors into the sliders.
+  // HIGH lands close. The other three cannot: a constant rate carries one
+  // improvement evenly across 75 years while the markers bend, and the Kaya
+  // identity has no term for engineered carbon removal, so a marker that goes
+  // net negative is out of reach. MEDIUM-to-LOW is the one that lands BELOW
+  // its marker rather than above, because its land-use sink reaches -8.8 Gt
+  // and a straight line to it accumulates that sink from 2025. Pinned so the
+  // size and the sign of each gap stay visible.
   // See METHODS.md, "What the tool does not represent".
   it.each([
     { label: 'CMIP7 HIGH', markerId: 'H', toleranceGt: 70 },
     { label: 'CMIP7 MEDIUM', markerId: 'M', toleranceGt: 330 },
+    { label: 'CMIP7 MEDIUM-to-LOW', markerId: 'ML', toleranceGt: 500 },
     { label: 'CMIP7 VERY LOW', markerId: 'VL', toleranceGt: 1050 },
   ])('reproduces $label to within $toleranceGt Gt of its marker',
     ({ label, markerId, toleranceGt }) => {
@@ -92,6 +97,24 @@ describe('presets', () => {
       expect(Math.abs(path.cumulativeGt - (marker?.cumulativeGt ?? 0)))
         .toBeLessThanOrEqual(toleranceGt);
     });
+
+  // The tolerance test above passes on magnitude alone, so the sign goes in
+  // separately: three presets overshoot their marker and MEDIUM-to-LOW
+  // undershoots it. A flip either way means the model moved.
+  it.each([
+    { label: 'CMIP7 HIGH', markerId: 'H', direction: 'above' },
+    { label: 'CMIP7 MEDIUM', markerId: 'M', direction: 'above' },
+    { label: 'CMIP7 MEDIUM-to-LOW', markerId: 'ML', direction: 'below' },
+    { label: 'CMIP7 VERY LOW', markerId: 'VL', direction: 'above' },
+  ])('lands $direction the marker $label names', ({ label, markerId, direction }) => {
+    const preset = PRESETS.find((p) => p.label === label);
+    if (preset === undefined) throw new Error(`no preset ${label}`);
+    const marker = MARKER_BY_ID[markerId];
+    if (marker === undefined) throw new Error(`no marker ${markerId}`);
+    const gap = computePath(preset.inputs).cumulativeGt - marker.cumulativeGt;
+    if (direction === 'above') expect(gap).toBeGreaterThan(0);
+    else expect(gap).toBeLessThan(0);
+  });
 
   // The brief states 4,600 Gt and 3.4 degC for the slow bound and 1,400 and
   // 2.2 for the fast one. Recalibrating the base year moved the totals but

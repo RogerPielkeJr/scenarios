@@ -228,8 +228,38 @@ def main() -> None:
     }
 
     # --- presets.json -------------------------------------------------------
+    # The prototype's PRE list carries three of the seven markers as presets.
+    # MEDIUM-to-LOW is the fourth marker that publishes a carbon-intensity
+    # rate, so it derives from the marker data the same way the other three
+    # did: the marker's own Kaya rates and 2100 population, with land use and
+    # methane rounded to the decimals their sliders carry.
+    #
+    # The rule is checked rather than assumed. HIGH and MEDIUM reproduce
+    # exactly. VERY LOW reproduces in every field but the carbon-intensity
+    # rate, which that marker does not publish and the prototype's author
+    # chose by hand, so it stays out of the check.
+    def cmip7_preset(key: str) -> dict:
+        rate = MKRATE[key]
+        return {'pop': MKPOP[key], 'gdppc': rate['gdppc'], 'ei': rate['ei'],
+                'ci': rate['ci'], 'ch4': round(D['ch4'][key]),
+                'lu': round(D['afolu'][key], 1)}
+
+    pre = list(C['PRE'])
+    carried = {label: values for label, values in pre}
+    for key, label in (('H', 'CMIP7 HIGH'), ('M', 'CMIP7 MEDIUM')):
+        derived = cmip7_preset(key)
+        drift = {field: (value, carried[label][field]) for field, value in derived.items()
+                 if abs(value - carried[label][field]) > 1e-9}
+        if drift:
+            raise SystemExit(f'{label} no longer derives from marker {key}: {drift}')
+
+    ml_label = 'CMIP7 MEDIUM-to-LOW'
+    if ml_label not in carried:
+        after = next(i for i, (label, _) in enumerate(pre) if label == 'CMIP7 MEDIUM')
+        pre.insert(after + 1, (ml_label, cmip7_preset('ML')))
+
     presets = []
-    for label, values in C['PRE']:
+    for label, values in pre:
         inputs = {INPUT_META[k][0]: v for k, v in values.items()}
         # This preset takes the observed rates, so it follows the corrected
         # carbon-intensity rate rather than the prototype's.
