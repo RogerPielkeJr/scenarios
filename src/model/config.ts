@@ -68,6 +68,20 @@ export const SCENARIO_COUNT = INPUT_SPECS.reduce(
   (total, spec) => total * sliderPositions(spec), 1,
 );
 
+/**
+ * The count as the front page says it: "almost 520 trillion".
+ *
+ * The qualifier comes from the comparison, not from a guess. If a slider
+ * range ever pushed the product past the round figure, this would say "just
+ * over" rather than going quietly wrong.
+ */
+export function approximateScenarioCount(): string {
+  const trillions = SCENARIO_COUNT / 1e12;
+  const rounded = Math.round(trillions);
+  const qualifier = SCENARIO_COUNT < rounded * 1e12 ? 'almost' : 'just over';
+  return `${qualifier} ${rounded} trillion`;
+}
+
 /** Every input at its default. */
 export function defaultInputs(): ScenarioInputs {
   return Object.fromEntries(

@@ -139,7 +139,9 @@ h1 {
 }
 
 .standfirst {
-  font-size: 21px;
+  /* A shade under the 21px the sitewide pass set, to carry the extra
+     sentence without pushing the header past the masthead beside it. */
+  font-size: 19.5px;
   color: var(--dim);
   margin: 0 0 12px;
 }

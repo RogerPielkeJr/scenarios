@@ -16,12 +16,13 @@ CO2 = population × (GDP ÷ population) × (energy ÷ GDP) × (CO2 ÷ energy)
 The reader sets six numbers: the 2100 population, three annual rates that
 compound from the base year, and 2100 values for land use CO2 and methane.
 
-Counting the stops each slider offers and multiplying them, the six reach
-**519,753,168,866,151** distinct scenarios. `SCENARIO_COUNT` in
+Counting the stops each slider offers and multiplying them, the six span
+**519,753,168,866,151** distinct scenarios, which the front page rounds to
+almost 520 trillion. `SCENARIO_COUNT` in
 `src/model/config.ts` derives that from the slider definitions rather than
 carrying it as a literal, the front page prints what it derives, and
 `tests/config.test.ts` checks the figure in this paragraph still matches. The
-count is what the sliders themselves reach: a hand-edited `?s=` link can carry
+count covers what the sliders themselves address: a hand-edited `?s=` link can carry
 a value between two stops, which the model clamps to range but does not snap,
 so links address a denser set again.
 
