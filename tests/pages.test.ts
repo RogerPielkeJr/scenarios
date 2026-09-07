@@ -21,6 +21,9 @@ const PAGES = [
   ['learn/population/index.html', LEARN_POPULATION],
 ] as const;
 
+/** The file scripts/build_methodology_pdf.py writes, served from the site root. */
+const METHODOLOGY_PDF = '/thb-scenario-builder-methodology.pdf';
+
 describe('both pages', () => {
   it.each(PAGES)('%s carries the masthead logo', (_name, html) => {
     expect(html).toContain('class="masthead"');
@@ -63,6 +66,38 @@ describe('both pages', () => {
 
   it.each(PAGES)('%s gives the logo explicit dimensions so it cannot reflow', (_name, html) => {
     expect(html).toMatch(/<img src="\/thb-logo\.png"[^>]*width="216"[^>]*height="216"/);
+  });
+
+  // The notice stands on every page, not only the front one, because a reader
+  // can land on any of them from a link.
+  it.each(PAGES)('%s carries the work-in-progress notice', (_name, html) => {
+    expect(html).toContain('This is work in progress');
+    expect(html).toContain('caveat lector');
+    expect(html).toContain('data-feedback>Provide feedback</span>');
+  });
+});
+
+describe('the methodology PDF', () => {
+  // A button pointing at a file nobody built is a 404 on the live site, and
+  // neither the type checker nor the bundler would notice.
+  it('exists where both links point', () => {
+    expect(existsSync(resolve(process.cwd(), `public${METHODOLOGY_PDF}`))).toBe(true);
+  });
+
+  it('is reachable from the library page and from the front page', () => {
+    expect(LIBRARY).toContain(`href="${METHODOLOGY_PDF}"`);
+    expect(LIBRARY).toContain('Methodology (PDF)');
+    expect(INDEX).toContain(`href="${METHODOLOGY_PDF}"`);
+  });
+
+  // The PDF is three files bound together. A part that stops existing would
+  // build a document quietly missing a third of itself.
+  it('is built from the three documents it names', () => {
+    const script = read('scripts/build_methodology_pdf.py');
+    for (const part of ['METHODOLOGY.md', 'METHODS.md', 'DATA.md']) {
+      expect(script, part).toContain(part);
+      expect(existsSync(resolve(process.cwd(), part)), part).toBe(true);
+    }
   });
 });
 

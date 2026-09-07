@@ -118,8 +118,28 @@ export interface PlotSpec {
 }
 
 const VIEW = { width: 680, height: 392 };
-const PLOT = { left: 52, top: 40, bottom: 348 };
-const LABEL_GAP = 15;
+// `left` holds the widest axis number these pages print -- six figures of
+// dollars per person on the income page's log axis -- clear of the viewBox
+// edge at the type size below. It was 52 when the numbers were 12px.
+const PLOT = { left: 68, top: 40, bottom: 348 };
+const LABEL_GAP = 18;
+
+/*
+ * Type on every Learn More figure, in viewBox units, matching the front
+ * page's chart. Larger and heavier than the page's own small print, because
+ * a figure leaves the page as a PNG or a printed sheet with none of the
+ * surrounding text to lean on. LABEL_GAP rises with `endLabel`: the spreader
+ * separates end labels in viewBox units, so bigger text needs more room.
+ */
+const TYPE = {
+  axisNumber: 15,
+  axisLabel: 15.5,
+  yearLabel: 15.5,
+  dividerLabel: 14,
+  endLabel: 15,
+} as const;
+/** Roughly the width of one character of `endLabel` sans, for the strip spread. */
+const END_LABEL_CHAR = 8.6;
 const SANS = "'IBM Plex Sans',system-ui,sans-serif";
 const MONO = "'IBM Plex Mono',ui-monospace,monospace";
 
@@ -139,7 +159,17 @@ function decimalsFor(step: number): number {
 }
 
 export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
-  const right = VIEW.width - (spec.rightGutter ?? 74);
+  // End labels sit outside the plot, so the gutter has to hold the longest of
+  // them. A page can ask for more room than that, never for less: at the type
+  // size above, "Your rate" on the income page overran a fixed 74 and printed
+  // past the edge of the figure.
+  const labelled = [
+    ...spec.series.filter((series) => series.labelAtEnd === true).map((s) => s.label),
+    ...(spec.points ?? []).map((point) => point.label),
+  ].filter((label) => label !== '');
+  const needed = Math.max(0, ...labelled.map((label) => label.length))
+    * END_LABEL_CHAR + 16;
+  const right = VIEW.width - Math.max(spec.rightGutter ?? 74, needed);
   const values: number[] = [];
   for (const series of spec.series) values.push(...series.points.map((p) => p.value));
   for (const band of spec.bands ?? []) values.push(...band.lo, ...band.hi);
@@ -210,18 +240,20 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
     const weight = value === 0 && scale.min < 0 ? 1.6 : 0.7;
     markup += `<line x1="${PLOT.left}" x2="${right}" y1="${y}" y2="${y}" `
       + `stroke="var(--rule)" stroke-width="${weight}"/>`
-      + `<text x="${PLOT.left - 9}" y="${y + 4}" text-anchor="end" font-family="${MONO}" `
-      + `font-size="12" fill="var(--dim)">${format(value, decimals)}</text>`;
+      + `<text x="${PLOT.left - 10}" y="${y + 5}" text-anchor="end" font-family="${MONO}" `
+      + `font-size="${TYPE.axisNumber}" font-weight="500" fill="var(--dim)">`
+      + `${format(value, decimals)}</text>`;
   }
   markup += `<text x="0" y="${PLOT.top - 18}" text-anchor="start" font-family="${SANS}" `
-    + `font-size="12.5" fill="var(--dim)">${escapeText(spec.yLabel)}</text>`;
+    + `font-size="${TYPE.axisLabel}" font-weight="600" fill="var(--dim)">`
+    + `${escapeText(spec.yLabel)}</text>`;
 
   spec.xTicks.forEach((year, index) => {
     const anchor = index === 0 ? 'start'
       : (index === spec.xTicks.length - 1 ? 'end' : 'middle');
-    markup += `<text x="${xFor(year).toFixed(1)}" y="${PLOT.bottom + 22}" `
-      + `text-anchor="${anchor}" font-family="${SANS}" font-size="13" `
-      + `fill="var(--dim)">${year}</text>`;
+    markup += `<text x="${xFor(year).toFixed(1)}" y="${PLOT.bottom + 25}" `
+      + `text-anchor="${anchor}" font-family="${SANS}" font-size="${TYPE.yearLabel}" `
+      + `font-weight="600" fill="var(--dim)">${year}</text>`;
   });
 
   // Stacked areas sit behind everything, each band drawn on the running total
@@ -260,7 +292,8 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
     markup += `<line x1="${x}" x2="${x}" y1="${PLOT.top}" y2="${PLOT.bottom}" `
       + `stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 4"/>`
       + `<text x="${x}" y="${PLOT.top - 6}" text-anchor="middle" font-family="${SANS}" `
-      + `font-size="11.5" fill="var(--dim)">${escapeText(spec.divider.label)}</text>`;
+      + `font-size="${TYPE.dividerLabel}" font-weight="600" fill="var(--dim)">`
+      + `${escapeText(spec.divider.label)}</text>`;
   }
 
   for (const series of spec.series) {
@@ -281,7 +314,7 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
     const last = series.points[series.points.length - 1];
     if (series.labelAtEnd !== true || last === undefined) continue;
     ends.push({
-      value: { text: series.label, color: series.color, x: xFor(last.year), weight: 600 },
+      value: { text: series.label, color: series.color, x: xFor(last.year), weight: 700 },
       at: yFor(last.value),
     });
   }
@@ -290,7 +323,7 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
       + `r="3.2" fill="${point.color}" data-point="${point.id}"/>`;
     if (point.label === '') continue;
     ends.push({
-      value: { text: point.label, color: point.color, x: xFor(point.year), weight: 500 },
+      value: { text: point.label, color: point.color, x: xFor(point.year), weight: 600 },
       at: yFor(point.value),
     });
   }
@@ -301,8 +334,8 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
         + `y1="${anchor.toFixed(1)}" y2="${at.toFixed(1)}" stroke="${value.color}" `
         + 'stroke-width="1" opacity="0.5"/>'
       : '';
-    markup += `${leader}<text x="${(value.x + 10).toFixed(1)}" y="${(at + 4).toFixed(1)}" `
-      + `font-family="${SANS}" font-size="12" font-weight="${value.weight}" `
+    markup += `${leader}<text x="${(value.x + 10).toFixed(1)}" y="${(at + 5).toFixed(1)}" `
+      + `font-family="${SANS}" font-size="${TYPE.endLabel}" font-weight="${value.weight}" `
       + `fill="${value.color}">${escapeText(value.text)}</text>`;
   }
 
@@ -350,13 +383,14 @@ export function renderStrip(svg: SVGSVGElement, spec: StripSpec): void {
 
   for (const tick of spec.ticks) {
     const x = xFor(tick).toFixed(1);
-    markup += `<text x="${x}" y="${STRIP.axis + 30}" text-anchor="middle" `
-      + `font-family="${SANS}" font-size="12" fill="var(--dim)">`
-      + `${tick.toFixed(decimals)}</text>`;
+    markup += `<text x="${x}" y="${STRIP.axis + 32}" text-anchor="middle" `
+      + `font-family="${SANS}" font-size="${TYPE.axisNumber}" font-weight="500" `
+      + `fill="var(--dim)">${tick.toFixed(decimals)}</text>`;
   }
   // Below the tick numbers, never beside them.
-  markup += `<text x="${STRIP.left}" y="${STRIP.axis + 58}" font-family="${SANS}" `
-    + `font-size="12.5" fill="var(--dim)">${escapeText(spec.axisLabel)}</text>`;
+  markup += `<text x="${STRIP.left}" y="${STRIP.axis + 60}" font-family="${SANS}" `
+    + `font-size="${TYPE.axisLabel}" font-weight="600" fill="var(--dim)">`
+    + `${escapeText(spec.axisLabel)}</text>`;
 
   // Highlights are spread the same way the chart spreads its end labels, so
   // two rates a whisker apart still read as two names. The gap comes from the
@@ -365,7 +399,7 @@ export function renderStrip(svg: SVGSVGElement, spec: StripSpec): void {
   const widest = Math.max(...spec.highlights.map((item) => item.label.length), 6);
   const placed = spreadLabels(
     spec.highlights.map((item) => ({ value: item, at: xFor(item.value) })),
-    widest * 6.9 + 14,
+    widest * END_LABEL_CHAR + 14,
   );
   for (const { value: item, anchor, at } of placed) {
     markup += `<line x1="${anchor.toFixed(1)}" x2="${anchor.toFixed(1)}" `
@@ -374,8 +408,8 @@ export function renderStrip(svg: SVGSVGElement, spec: StripSpec): void {
       + `<line x1="${anchor.toFixed(1)}" x2="${at.toFixed(1)}" y1="${STRIP.axis - 20}" `
       + `y2="${STRIP.axis - 30}" stroke="${item.color}" stroke-width="1" opacity="0.5"/>`
       + `<text x="${at.toFixed(1)}" y="${STRIP.axis - 36}" text-anchor="middle" `
-      + `font-family="${SANS}" font-size="12" font-weight="600" fill="${item.color}">`
-      + `${escapeText(item.label)}</text>`;
+      + `font-family="${SANS}" font-size="${TYPE.endLabel}" font-weight="700" `
+      + `fill="${item.color}">${escapeText(item.label)}</text>`;
   }
 
   svg.setAttribute('viewBox', `0 0 ${STRIP.width} ${STRIP.height}`);

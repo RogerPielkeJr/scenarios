@@ -79,6 +79,23 @@ marker paths, the SSP population curves and the emulator fit. See DATA.md.
 Both the scripts and their outputs are committed. Run the scripts when a source
 is updated, then commit the changed JSON.
 
+## The methodology PDF
+
+`public/thb-scenario-builder-methodology.pdf` binds `METHODOLOGY.md`,
+`METHODS.md` and `DATA.md` into one branded document, reachable from the button
+at the top of the library page and from the link under the front page lead-in.
+
+```sh
+npm run build:pdf     # python3 scripts/build_methodology_pdf.py
+```
+
+It needs `reportlab` and takes its fonts from whichever `matplotlib` the
+interpreter finds. **Run it and commit the PDF after editing any of the three
+markdown files** -- the deploy workflow has no Python step, so Vite copies
+whatever sits in `public/` and nothing rebuilds the document on the way out.
+`tests/pages.test.ts` checks that the file exists and that both links point at
+it, so a missing PDF fails CI rather than 404ing on the live site.
+
 ## Pages
 
 | URL | File | What it is |
@@ -101,6 +118,11 @@ URLs on GitHub Pages with no rewrite rules.
 Every toolbar link off a page goes through `linkToolbar` in `src/ui/toolbar.ts`,
 which writes the reader's scenario into the href. A link the function cannot
 find by id keeps its bare path and hands the next page the defaults.
+
+Every page also carries a work-in-progress notice in its footer, with the words
+"Provide feedback" in a `[data-feedback]` span. Set `FEEDBACK_URL` in
+`src/ui/toolbar.ts` and `linkFeedback` -- which `linkToolbar` already calls on
+every page -- turns those words into a link everywhere at once.
 
 ## Adding a Learn More page
 

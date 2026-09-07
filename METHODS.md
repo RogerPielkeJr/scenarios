@@ -116,14 +116,17 @@ working.**
 
 | Preset | Population | Income | Energy/$ | CO2/energy | Land use | Methane | Cumulative | Warming |
 |---|---|---|---|---|---|---|---|---|
-| Kaya at observed rates | 10.2 | +1.91 | −1.43 | −0.21 | 2.0 | 380 | 4,084 | 3.19 |
+| Kaya at observed rates | 10.2 | +1.91 | −1.43 | −0.15 | 2.0 | 380 | 4,178 | 3.21 |
 | Trend continues | 10.2 | +1.91 | −1.62 | −0.48 | 1.0 | 300 | 3,409 | 2.94 |
 | Slowest technical progress | 11.4 | +2.23 | −1.36 | −0.17 | 2.0 | 450 | 5,047 | 3.47 |
 | Ausubel methane economy | 9.0 | +1.91 | −1.57 | −2.79 | −1.0 | 150 | 1,585 | 2.22 |
 
 **Kaya at observed rates.** The 1990 to 2024 record projected forward unchanged.
-Income +1.91, energy per dollar −1.43 and CO2 per unit of energy −0.21 all come
-straight out of the Energy Institute and World Bank series.
+Income +1.91, energy per dollar −1.43 and CO2 per unit of energy −0.15 all come
+straight out of the Energy Institute, World Bank and Global Carbon Budget
+series. The carbon-intensity figure was −0.21 until 2026-09-05, on a narrower
+basis; "The corrected carbon-intensity rate" below gives the change and what
+moved with it.
 
 **Trend continues.** The 2015 to 2024 rates, faster than the long record on both
 technology terms: −1.62 and −0.48. Income stays at the long-record 1.91 rather

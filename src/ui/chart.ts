@@ -10,7 +10,43 @@ const VIEW = { width: 660, height: 392 };
 // `top` leaves room above the highest gridline for the axis label, which
 // otherwise prints on top of the topmost number.
 const PLOT = { left: 56, right: 588, top: 40, bottom: 350 };
-const LABEL_GAP = 14;
+const LABEL_GAP = 19;
+
+/*
+ * Type on the chart, in viewBox units.
+ *
+ * Larger and heavier than the page's own small print: the chart is the thing
+ * a reader screenshots, exports as a PNG and reprints somewhere else, where
+ * none of the surrounding page comes with it and 12px axis numbers turn to
+ * grey mush. LABEL_GAP above rises with `markerLabel` -- the spreader keeps
+ * the scenario names apart in viewBox units, so bigger text needs more room
+ * between the lines or two of them touch.
+ */
+const TYPE = {
+  axisNumber: 15,
+  axisLabel: 15.5,
+  yearLabel: 15.5,
+  markerLabel: 15,
+  userLabel: 17,
+} as const;
+/**
+ * Half the visual height of a line of text, as a fraction of its size.
+ *
+ * Cap height runs about 0.72 of the size in this face, so text centred on a
+ * position reaches roughly 0.36 of its size either way. Both the placement
+ * above and the baseline it returns work from this one number.
+ */
+const CAP_RATIO = 0.36;
+/**
+ * What full clearance of the gridlines is worth, in units of drift.
+ *
+ * Ranking gridline clearance above proximity outright sent the label to the
+ * far side of the plot whenever the only gridline-free slots lay there, and a
+ * name three-quarters of the chart away from the line it names is worse than
+ * a name printed over a hairline. At 3 the label will move about 24 units to
+ * clear a gridline and no further.
+ */
+const GRID_WEIGHT = 1;
 
 /** Roughly how many horizontal gridlines to aim for. */
 const TARGET_GRIDLINES = 8;
@@ -94,8 +130,9 @@ function gridlines(scale: Scale, yFor: (v: number) => number): string {
     const weight = value === 0 ? 1.6 : 0.7;
     svg += `<line x1="${PLOT.left}" x2="${PLOT.right}" y1="${y}" y2="${y}" `
       + `stroke="var(--rule)" stroke-width="${weight}"/>`;
-    svg += `<text x="${PLOT.left - 9}" y="${y + 4}" text-anchor="end" `
-      + `font-family="${MONO}" font-size="12" fill="var(--dim)">${format(value)}</text>`;
+    svg += `<text x="${PLOT.left - 10}" y="${y + 5}" text-anchor="end" `
+      + `font-family="${MONO}" font-size="${TYPE.axisNumber}" font-weight="500" `
+      + `fill="var(--dim)">${format(value)}</text>`;
   }
   return svg;
 }
@@ -109,8 +146,9 @@ function yearLabels(): string {
   const years = [2025, 2050, 2075, 2100];
   return years.map((year, index) => {
     const anchor = index === 0 ? 'start' : (index === years.length - 1 ? 'end' : 'middle');
-    return `<text x="${xFor(year)}" y="${PLOT.bottom + 22}" text-anchor="${anchor}" `
-      + `font-family="${SANS}" font-size="13" fill="var(--dim)">${year}</text>`;
+    return `<text x="${xFor(year)}" y="${PLOT.bottom + 25}" text-anchor="${anchor}" `
+      + `font-family="${SANS}" font-size="${TYPE.yearLabel}" font-weight="600" `
+      + `fill="var(--dim)">${year}</text>`;
   }).join('');
 }
 
@@ -143,9 +181,10 @@ function markerLabels(yFor: (v: number) => number, highlight: string | null): st
       ? `<line x1="${PLOT.right}" x2="${PLOT.right + 7}" y1="${anchor.toFixed(1)}" `
         + `y2="${y.toFixed(1)}" stroke="${marker.color}" stroke-width="1" opacity="0.5"/>`
       : '';
-    return `${leader}<text x="${PLOT.right + 10}" y="${(y + 4).toFixed(1)}" `
-      + `font-family="${SANS}" font-size="12" font-weight="600" fill="${marker.color}" `
-      + `opacity="${marker.id === highlight ? 1 : 0.85}">${escapeText(marker.id)}</text>`;
+    return `${leader}<text x="${PLOT.right + 10}" y="${(y + 5).toFixed(1)}" `
+      + `font-family="${SANS}" font-size="${TYPE.markerLabel}" font-weight="700" `
+      + `fill="${marker.color}" `
+      + `opacity="${marker.id === highlight ? 1 : 0.9}">${escapeText(marker.id)}</text>`;
   }).join('');
 }
 
@@ -154,14 +193,135 @@ function shorten(name: string, limit = 30): string {
   return name.length <= limit ? name : `${name.slice(0, limit - 1).trimEnd()}\u2026`;
 }
 
-function userPath(path: DrawablePath, yFor: (v: number) => number, name: string): string {
+/**
+ * Roughly how wide a label runs, in viewBox units.
+ *
+ * IBM Plex Sans Bold averages a little over half its size per character. The
+ * estimate runs deliberately wide, because a label thought narrower than it
+ * really is would be placed into a gap it does not fit.
+ */
+function labelWidth(text: string): number {
+  return text.length * TYPE.userLabel * 0.6;
+}
+
+/** The y of a polyline at a given x, or null where the line does not reach. */
+function yAlong(
+  points: ReadonlyArray<{ x: number; y: number }>, x: number,
+): number | null {
+  for (let i = 1; i < points.length; i += 1) {
+    const a = points[i - 1];
+    const b = points[i];
+    if (a === undefined || b === undefined) continue;
+    if (x < a.x || x > b.x) continue;
+    const span = b.x - a.x;
+    return span === 0 ? a.y : a.y + ((x - a.x) / span) * (b.y - a.y);
+  }
+  return null;
+}
+
+/**
+ * Every height a polyline reaches between two x, as one interval.
+ *
+ * Exact rather than sampled: the lines are piecewise linear, so their highest
+ * and lowest points across a span are either at a vertex inside it or at one
+ * of its two ends. Sampling at fixed intervals missed a kink between samples
+ * and let a marker through the label.
+ */
+function bandBetween(
+  points: ReadonlyArray<{ x: number; y: number }>, left: number, right: number,
+): { top: number; bottom: number } | null {
+  const heights: number[] = [];
+  for (const edge of [left, right]) {
+    const y = yAlong(points, edge);
+    if (y !== null) heights.push(y);
+  }
+  for (const point of points) {
+    if (point.x >= left && point.x <= right) heights.push(point.y);
+  }
+  if (heights.length === 0) return null;
+  return { top: Math.min(...heights), bottom: Math.max(...heights) };
+}
+
+/** How far a height sits from a band, counting nothing when it is inside. */
+function distanceTo(y: number, band: { top: number; bottom: number }): number {
+  if (y < band.top) return band.top - y;
+  if (y > band.bottom) return y - band.bottom;
+  return 0;
+}
+
+/**
+ * Where the reader's own label goes.
+ *
+ * The label used to sit a fixed 11 units above the end of the reader's line,
+ * which put it straight through whatever else happened to run there. Any of
+ * the six sliders can move that line anywhere on the axis, so no fixed offset
+ * is clear for every combination.
+ *
+ * Instead: the label occupies a strip of the plot, from its left edge to the
+ * right of the chart. Take the band every line sweeps across that strip, then
+ * walk the plot height and score every position. Clearing the seven marker
+ * lines and the reader's own path comes first and absolutely, because a
+ * coloured line through the text ruins both. Everything after that is a
+ * trade between two goods: sitting off the gridlines, where bold text reads
+ * a little cleaner, and sitting near the end of the reader's line, which is
+ * what makes the label that line's name rather than a caption floating in
+ * the plot. `GRID_WEIGHT` prices the first in units of the second.
+ */
+function placeUserLabel(
+  path: DrawablePath, yFor: (v: number) => number, scale: Scale, text: string,
+): { x: number; y: number } {
+  const rightEdge = xFor(END_YEAR) - 6;
+  const left = Math.max(PLOT.left, rightEdge - labelWidth(text));
+  const half = TYPE.userLabel * CAP_RATIO;
+  const need = half + 2;
+
+  const userPoints = path.points.map((point) => ({
+    x: xFor(point.year), y: yFor(point.co2Gt),
+  }));
+  const markerPoints = MARKERS.map((marker) => MARKER_YEARS.map((year, index) => ({
+    x: xFor(year), y: yFor(at(marker.co2Gt, index)),
+  })));
+
+  const bands: Array<{ top: number; bottom: number }> = [];
+  for (const line of [userPoints, ...markerPoints]) {
+    const band = bandBetween(line, left, rightEdge);
+    if (band !== null) bands.push(band);
+  }
+  const grid: Array<{ top: number; bottom: number }> = [];
+  const gridlines = Math.round((scale.max - scale.min) / scale.step);
+  for (let i = 0; i <= gridlines; i += 1) {
+    const y = yFor(scale.min + i * scale.step);
+    grid.push({ top: y, bottom: y });
+  }
+
+  /** Room around a position, past what the text needs counting for nothing. */
+  const roomAt = (y: number, obstacles: ReadonlyArray<{ top: number; bottom: number }>) =>
+    Math.min(need, ...obstacles.map((band) => distanceTo(y, band)));
+
+  const anchor = yFor(at(path.points, path.points.length - 1, 'final point').co2Gt);
+  let best = { y: anchor, fromLines: -1, cost: Infinity };
+  for (let y = PLOT.top + half; y <= PLOT.bottom - half; y += 0.5) {
+    const fromLines = roomAt(y, bands);
+    const cost = Math.abs(y - anchor) - GRID_WEIGHT * roomAt(y, grid);
+    if (fromLines > best.fromLines
+        || (fromLines === best.fromLines && cost < best.cost)) {
+      best = { y, fromLines, cost };
+    }
+  }
+  return { x: rightEdge, y: best.y + half };
+}
+
+function userPath(
+  path: DrawablePath, yFor: (v: number) => number, scale: Scale, name: string,
+): string {
   const d = path.points.map((point, index) => `${index === 0 ? 'M' : 'L'}`
     + `${xFor(point.year).toFixed(1)},${yFor(point.co2Gt).toFixed(1)}`).join('');
-  const final = at(path.points, path.points.length - 1, 'final point');
-  const label = `<text x="${(xFor(END_YEAR) - 6).toFixed(1)}" `
-    + `y="${(yFor(final.co2Gt) - 11).toFixed(1)}" text-anchor="end" `
-    + `font-family="${SANS}" font-size="14" font-weight="600" fill="var(--you)">`
-    + `${escapeText(shorten(name))}</text>`;
+  const text = shorten(name);
+  const place = placeUserLabel(path, yFor, scale, text);
+  const label = `<text x="${place.x.toFixed(1)}" y="${place.y.toFixed(1)}" `
+    + `text-anchor="end" font-family="${SANS}" font-size="${TYPE.userLabel}" `
+    + `font-weight="700" fill="var(--you)" data-user-label="1">`
+    + `${escapeText(text)}</text>`;
   return `<path d="${d}" fill="none" stroke="var(--you)" stroke-width="3.4" `
     + `stroke-linejoin="round" data-user-path="1"/>${label}`;
 }
@@ -187,11 +347,12 @@ export function renderChart(
     // pushes it past x=0, which the live SVG shows because it allows overflow
     // and the export clips, so the label lost its first character in the PNG.
     + `<text x="0" y="${PLOT.top - 18}" text-anchor="start" `
-    + `font-family="${SANS}" font-size="12.5" fill="var(--dim)">GtCO2/yr</text>`
+    + `font-family="${SANS}" font-size="${TYPE.axisLabel}" font-weight="600" `
+    + `fill="var(--dim)">GtCO2/yr</text>`
     + yearLabels()
     + markerPaths(yFor, highlight)
     + markerLabels(yFor, highlight)
-    + userPath(path, yFor, name);
+    + userPath(path, yFor, scale, name);
 }
 
-export const CHART_GEOMETRY = { VIEW, PLOT };
+export const CHART_GEOMETRY = { VIEW, PLOT, TYPE, CAP_RATIO, labelWidth, shorten };

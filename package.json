@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:data": "python3 scripts/build_data.py",
+    "build:pdf": "python3 scripts/build_methodology_pdf.py",
     "typecheck": "tsc --noEmit",
     "test:visual": "playwright test",
     "test:visual:update": "rm -rf tests/screenshots && playwright test --update-snapshots",
