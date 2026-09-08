@@ -2,7 +2,7 @@
  * Every source the Learn More pages cite, keyed by page.
  *
  * Kept apart from the pages themselves so the bibliography can read the
- * lists without pulling in six data files, and apart from the bibliography
+ * lists without pulling in eight data files, and apart from the bibliography
  * page so a test can read them without a DOM.
  */
 import type { Source } from '../types.js';
@@ -13,6 +13,8 @@ import { ENERGY_INTENSITY_SOURCES } from './energy_intensity.js';
 import { CARBON_INTENSITY_SOURCES } from './carbon_intensity.js';
 import { LAND_USE_SOURCES } from './land_use.js';
 import { METHANE_SOURCES } from './methane.js';
+import { TIMING_SOURCES } from './timing.js';
+import { REMOVAL_SOURCES } from './removal.js';
 
 export const SOURCES_BY_SLUG: Readonly<Record<string, readonly Source[]>> = {
   population: POPULATION_SOURCES,
@@ -21,6 +23,8 @@ export const SOURCES_BY_SLUG: Readonly<Record<string, readonly Source[]>> = {
   'carbon-intensity': CARBON_INTENSITY_SOURCES,
   'land-use': LAND_USE_SOURCES,
   methane: METHANE_SOURCES,
+  timing: TIMING_SOURCES,
+  removal: REMOVAL_SOURCES,
 };
 
 export interface Cited {

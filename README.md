@@ -154,8 +154,7 @@ every page -- turns those words into a link everywhere at once.
 
 ## Adding a Learn More page
 
-Six pages exist, one per Kaya slider, listed in `src/learn/registry.ts`.
-Timing and removal have none yet. To add
+Eight pages exist, one per slider, listed in `src/learn/registry.ts`. To add
 another, or to rebuild one from scratch:
 
 1. **Data.** Write a build script under `scripts/` that fetches from a primary

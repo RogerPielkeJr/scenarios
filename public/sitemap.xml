@@ -2,42 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://scenarios.thehonestbroker.org/</loc>
-    <lastmod>2026-09-07</lastmod>
-  </url>
-  <url>
-    <loc>https://scenarios.thehonestbroker.org/learn/</loc>
-    <lastmod>2026-09-07</lastmod>
-  </url>
-  <url>
-    <loc>https://scenarios.thehonestbroker.org/learn/population/</loc>
-    <lastmod>2026-09-07</lastmod>
-  </url>
-  <url>
-    <loc>https://scenarios.thehonestbroker.org/learn/income/</loc>
-    <lastmod>2026-09-07</lastmod>
-  </url>
-  <url>
-    <loc>https://scenarios.thehonestbroker.org/learn/energy-intensity/</loc>
-    <lastmod>2026-09-07</lastmod>
-  </url>
-  <url>
-    <loc>https://scenarios.thehonestbroker.org/learn/carbon-intensity/</loc>
-    <lastmod>2026-09-07</lastmod>
-  </url>
-  <url>
-    <loc>https://scenarios.thehonestbroker.org/learn/land-use/</loc>
-    <lastmod>2026-09-07</lastmod>
-  </url>
-  <url>
-    <loc>https://scenarios.thehonestbroker.org/learn/methane/</loc>
-    <lastmod>2026-09-07</lastmod>
-  </url>
-  <url>
-    <loc>https://scenarios.thehonestbroker.org/library.html</loc>
-    <lastmod>2026-09-07</lastmod>
+    <lastmod>2026-09-08</lastmod>
   </url>
   <url>
     <loc>https://scenarios.thehonestbroker.org/bibliography.html</loc>
-    <lastmod>2026-09-07</lastmod>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/library.html</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/population/</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/energy-intensity/</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/carbon-intensity/</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/income/</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/methane/</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/land-use/</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/timing/</loc>
+    <lastmod>2026-09-08</lastmod>
+  </url>
+  <url>
+    <loc>https://scenarios.thehonestbroker.org/learn/removal/</loc>
+    <lastmod>2026-09-08</lastmod>
   </url>
 </urlset>

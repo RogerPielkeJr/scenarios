@@ -22,6 +22,8 @@ const PAGES: Record<string, string> = {
   'learn-income': 'learn/income/index.html',
   'learn-methane': 'learn/methane/index.html',
   'learn-land-use': 'learn/land-use/index.html',
+  'learn-timing': 'learn/timing/index.html',
+  'learn-removal': 'learn/removal/index.html',
 };
 
 export default defineConfig({

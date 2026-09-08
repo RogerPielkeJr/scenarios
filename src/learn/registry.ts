@@ -1,7 +1,7 @@
 import type { InputId } from '../model/types.js';
 
 /**
- * The six Learn More pages. One list, read by the /learn/ index, by the
+ * The eight Learn More pages. One list, read by the /learn/ index, by the
  * sibling navigation at the foot of every page, by the top page's links and
  * by the tests, so nothing can name a page the others have not heard of.
  */
@@ -70,6 +70,24 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     linkText: 'Learn more about methane',
     summary: 'A short-lived gas, five sources, and the difference between a '
       + 'level target and a rate target.',
+    status: 'live',
+  },
+  {
+    slug: 'timing',
+    input: 'improvementTiming',
+    title: 'When the improvement arrives',
+    linkText: 'Learn more about when the improvement arrives',
+    summary: 'Why the route matters as much as the destination, and how the world '
+      + 'has actually timed its two technology factors.',
+    status: 'live',
+  },
+  {
+    slug: 'removal',
+    input: 'removals',
+    title: 'Engineered CO₂ removal',
+    linkText: 'Learn more about engineered removal',
+    summary: 'The one term that can take a path below zero, what runs today, and how '
+      + 'far the deep scenarios scale it.',
     status: 'live',
   },
 ];

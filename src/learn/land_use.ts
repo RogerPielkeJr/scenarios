@@ -101,22 +101,6 @@ const PARTS: BuilderPart[] = [
       { value: C.growthRates.youngTropicalSouthAmerica, label: 'young', kind: 'high' },
     ],
   },
-  {
-    id: 'engineered',
-    label: 'Engineered removals in 2100',
-    min: 0,
-    max: 10,
-    step: 0.5,
-    default: 0,
-    decimals: 1,
-    unitSuffix: ' GtCO₂',
-    note: 'Bioenergy with carbon capture, direct air capture and the rest, counted here '
-      + 'because the four Kaya factors cannot produce a negative number and this slider can.',
-    marks: [
-      { value: 0, label: 'none', kind: 'observed' },
-      { value: 5, label: '5 Gt', kind: 'high' },
-    ],
-  },
 ];
 
 const VERY_LOW = MARKER_BY_ID['VL'];
@@ -255,10 +239,10 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + 'stop almost entirely, regrowth has to continue or expand on the land already '
       + 'recovering, and new land has to come into forest at scale. The controls at the top '
       + 'of this page make the size of that requirement explicit.',
-      `Engineered removal belongs with those three. In this tool it goes on this slider, `
-      + 'because a product of four positive factors cannot go below zero however fast the '
-      + 'fuel mix changes. Every CMIP7 marker that reaches net negative CO₂ does it through '
-      + 'terms this slider covers.',
+      `Engineered removal used to sit on this slider too, for want of anywhere else: a `
+      + 'product of four positive factors cannot go below zero however fast the fuel mix '
+      + 'changes. It now has a control of its own, so this one covers the land alone and the '
+      + 'two no longer overlap. See the removal page.',
     ],
   },
 
@@ -304,8 +288,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
         const regrowth = D.regrowth * ((values['regrowth'] ?? 100) / 100);
         const restored = ((values['area'] ?? 0) * (values['rate'] ?? C.growthRates.matureTropical))
           / 1000;
-        const engineered = values['engineered'] ?? 0;
-        const net = sources - regrowth - restored - engineered;
+        const net = sources - regrowth - restored;
         return {
           value: net,
           headline: `${signedGt(net)} in 2100`,
@@ -315,9 +298,6 @@ export const LAND_USE_PAGE: LearnPageSpec = {
               ? 'No newly restored land'
               : `${Math.round(values['area'] ?? 0)} Mha restored at `
                 + `${(values['rate'] ?? 0).toFixed(1)} tCO₂ a hectare removes ${gt(restored)}`,
-            engineered === 0
-              ? 'No engineered removal'
-              : `Engineered removal takes ${gt(engineered)}`,
             net < 0
               ? `A net sink, ${gt(Math.abs(net - BASE.landUseGt))} below today's `
                 + `${gt(BASE.landUseGt)}`

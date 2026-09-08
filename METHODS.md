@@ -268,7 +268,7 @@ these is loaded rather than leaving the reader to notice.
 
 ## The Learn More pages
 
-Six of the eight assumptions get a page that teaches the quantity, shows the
+Each of the eight assumptions gets a page that teaches the quantity, shows the
 record, and hands the reader a value built from assumptions they control. The
 pages share one scaffold (`src/ui/learn/page.ts`), one builder
 (`src/ui/learn/builder.ts`) and one plot component (`src/ui/plot.ts`), and each
@@ -412,6 +412,31 @@ times tonnes of CO₂ a hectare a year, divided by a thousand to reach GtCO₂.
 Engineered removal sits on this control because a product of four positive
 factors cannot go below zero. Every marker that reaches net negative CO₂ does
 it through terms that land on this line.
+
+### The timing builder
+
+One control: what share of the century's technology improvement lands by 2062.
+The page measures the same quantity against the record, and the two factors
+disagree. Energy per dollar improved 0.54% a year over 1965 to 1994 and 1.53%
+over 1994 to 2024, banking 26% of its improvement by the midpoint: it
+accelerated. The fuel mix went the other way, improving 0.38% then 0.11% and
+banking 79% by the midpoint before stalling. `scripts/build_timing.py` derives
+both from series this site already carries, so the page adds no new download.
+
+### The removal builder
+
+Two controls, added: what forests and soils take back in 2100, and what capture
+and storage takes back beside them. `scripts/build_removal.py` parses the State
+of Carbon Dioxide Removal executive summary rather than restating it, and fails
+loudly if the wording it matches on changes. Removal runs at 2.2 GtCO2 a year
+today, 5% of gross emissions, of which capture and storage is 0.002 GtCO2 a
+year, growing 40% a year against assessed pathways that scale it past 3.5 GtCO2
+a year by 2050.
+
+Engineered removal used to sit on the land use slider, for want of anywhere
+else. It has its own control now, so the land use builder covers land alone and
+the two no longer overlap; before that change a reader could set removal in both
+places and count it twice.
 
 ## What a CMIP7 preset does and does not reproduce
 

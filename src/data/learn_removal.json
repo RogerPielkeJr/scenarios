@@ -1,0 +1,54 @@
+{
+ "meta": {
+  "generated_by": "scripts/build_removal.py",
+  "source": "https://www.stateofcdr.org/asset/The-State-of-CDR-Executive-summary_June-2026.pdf",
+  "edition": "The State of Carbon Dioxide Removal, executive summary, June 2026"
+ },
+ "today": {
+  "totalGt": 2.2,
+  "novelGt": 0.002,
+  "conventionalGt": 2.198,
+  "novelSharePercent": 0.09,
+  "shareOfGrossPercent": 5.0,
+  "novelGrowthPercent": 40.0
+ },
+ "ahead": {
+  "pipeline2030Gt": 0.008,
+  "pledges2030Gt": 2.5,
+  "novel2050Gt": 3.5
+ },
+ "markers": [
+  {
+   "id": "H",
+   "label": "HIGH",
+   "color": "#d1332e",
+   "removals": 1.5,
+   "timing": 53,
+   "co2In2100": 55.04
+  },
+  {
+   "id": "M",
+   "label": "MEDIUM",
+   "color": "#e08214",
+   "removals": 0.0,
+   "timing": 61,
+   "co2In2100": 34.44
+  },
+  {
+   "id": "ML",
+   "label": "MEDIUM-to-LOW",
+   "color": "#7b3fa0",
+   "removals": 5.5,
+   "timing": 31,
+   "co2In2100": -9.23
+  },
+  {
+   "id": "VL",
+   "label": "VERY LOW",
+   "color": "#1a7f37",
+   "removals": 11.0,
+   "timing": 82,
+   "co2In2100": -5.77
+  }
+ ]
+}

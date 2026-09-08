@@ -108,7 +108,7 @@ MEDIUM-to-LOW is the one that lands below its marker rather than above.
 
 ## The Learn More pages
 
-Six pages, one per assumption. Each teaches the quantity, shows what the world
+Eight pages, one per assumption. Each teaches the quantity, shows what the world
 has done, and hands back a value the reader built rather than guessed:
 
 - **Population** adds up seven regional 2100 populations, each running between
