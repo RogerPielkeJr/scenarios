@@ -560,6 +560,16 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
   gap: 12px;
 }
 .ack-box p { margin: 0; font-size: 17.5px; line-height: 1.55; }
+/* A citation inside the callout: set in from the prose it follows, so the
+   reader can see which sentence it belongs to. */
+.ack-box .ack-ref {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--dim);
+  padding-left: 16px;
+  border-left: 2px solid var(--rule);
+}
+.ack-box .ack-ref cite { font-style: italic; }
 .reading section {
   display: grid;
   grid-template-columns: var(--band-left) 1fr;
@@ -609,7 +619,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
    to sit inside the opening sentence. */
 .fnref { text-decoration: none; color: inherit; }
 .fnref:hover sup, .fnref:focus-visible sup { text-decoration: underline; }
-#scenario-arithmetic { margin-top: 10px; font-size: 14.5px; line-height: 1.5; }
+#scenario-arithmetic { margin: 16px 0 0; font-size: 14.5px; line-height: 1.5; }
 #scenario-arithmetic sup { font-style: normal; margin-right: 2px; }
 
 footer {
