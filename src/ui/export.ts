@@ -21,8 +21,10 @@ import { analogueTile, scenarioSummary } from './stats.js';
 const SCALE = 2;
 const SHEET = { width: 720, pad: 26 };
 const CREDIT = 'Analysis by Roger Pielke Jr., The Honest Broker';
+// The same credit the figure carries on the page, so the sheet a reader
+// downloads never says something the page did not.
 const DATA_SOURCE = 'Data: ScenarioMIP CMIP7 marker scenarios; Energy Institute, World Bank '
-  + 'and Global Carbon Budget for the base year';
+  + 'and Global Carbon Budget';
 const LOGO_SRC = '/thb-logo.png';
 const SANS = "'IBM Plex Sans', system-ui, sans-serif";
 const MONO = "'IBM Plex Mono', ui-monospace, monospace";
