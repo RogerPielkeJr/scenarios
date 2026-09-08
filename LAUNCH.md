@@ -96,19 +96,53 @@ scenario builder from all four pages' nav. Those links already point at
 19. `curl -s https://scenarios.thehonestbroker.org/sitemap.xml` and confirm all
     ten URLs answer 200 on the live domain.
 
-## Decisions before any of this runs
+## Decisions, and where they landed
 
-- **The feedback link.** `FEEDBACK_URL` in `src/ui/toolbar.ts` still points at
-  `https://rogerpielkejr.substack.com`. It was always meant to move to the
-  launch post's own URL on the day, which needs that URL.
-- **What's New: what does it say?** Every other column carries a number that
-  changes. Options: a fixed entry naming the tool; or a computed one, which needs
-  a quantity worth recomputing nightly.
-- **Two sliders still have no Learn More page.** Timing and removal. Six of eight
-  have one. Launch as is and add them, or hold.
-- **The Stevenson and Pielke citation** in the bibliography gives 2018 and links
-  a Semantic Scholar mirror that now answers 202 with HTML rather than the PDF.
-  Published sources put it at 2015, written 2012. It is your paper: the year and
-  a stable link both need you.
+Answered on the evening of the 8th:
+
+- **The feedback link** arrives tomorrow. `FEEDBACK_URL` in
+  `src/ui/toolbar.ts` still reads `https://rogerpielkejr.substack.com`; it takes
+  the launch post's own URL before the push. **This is a launch-morning step,
+  not an optional one:** shipping without it points every reader who wants to
+  report an error at the Substack front page.
+- **What's New** carries a fixed button reading **NEW THB Climate Scenario
+  Tool**, not a computed column. It needs no nightly refresh, so it goes in
+  `build_home.py` beside the project list rather than in
+  `refresh_whats_new.py`.
+- **The two missing Learn More pages get built** — timing and removal. Not
+  started; see the note below.
+- **The Stevenson and Pielke citation** is fixed: 2015, not 2018, at the CU
+  Boulder Center for Science and Technology Policy Research, which serves the
+  PDF at `sciencepolicy.colorado.edu/admin/publication_files/2015.32.pdf`. The
+  file number itself carries the year.
+
+Still standing:
+
 - **Public repository.** Free Pages serves only from public repositories, so the
   source and its history go public with the site.
+
+## The two Learn More pages, before anyone writes them
+
+Research done, nothing built. One finding shapes the work and needs settling
+first, because it is a correctness problem rather than a gap:
+
+**The land use page still owns engineered removal, and says it has to.** Its
+builder carries an "Engineered removals in 2100" control, and its prose reads
+"In this tool it goes on this slider, because a product of four positive factors
+cannot go below zero." That stopped being true when the removals slider arrived.
+A reader can now set removal on the land use page *and* on the removals slider
+and count it twice.
+
+So the removal page does not just fill a gap: it takes that control over, the
+land use builder loses it, and that paragraph gets rewritten to point at the new
+page. Deployment figures for it come from the State of Carbon Dioxide Removal
+(Smith et al., stateofcdr.org), whose June 2026 executive summary downloads
+cleanly: about 2 GtCO₂ a year today, almost all of it conventional land-based,
+against roughly 0.002 GtCO₂ a year from the novel and durable methods.
+
+The timing page needs no new data. The site already carries the observed energy
+intensity series, 1965 to 2024, and the fuel mix series behind it, both from the
+Energy Institute and the World Bank, and the timing share is computable from
+them: how much of the century's improvement the world has actually delivered
+early against late. Each marker's own timing value already sits in
+`presets.json`, derived in `build_carried_data.py`.
