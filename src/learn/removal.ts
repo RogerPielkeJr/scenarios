@@ -30,7 +30,7 @@ function rampAt(year: number, target2100: number): number {
  *
  * Each marker's figure is its whole 2100 removal, because that is what the fit
  * in scripts/build_carried_data.py recovers from a published CO2 path: the
- * markers do not publish a split between forests and machinery. So the same
+ * markers do not publish a split between forests and CCS. So the same
  * tick belongs on both controls, and both notes say it is a total rather than
  * that family's share.
  */
@@ -77,7 +77,7 @@ const PARTS: BuilderPart[] = [
       + `weathering. These run at ${mt(TODAY.novelGt)} today, `
       + `${TODAY.novelSharePercent}% of all removal, growing `
       + `${TODAY.novelGrowthPercent}% a year. The scenario ticks give each marker’s whole `
-      + 'removal, not the part of it that comes from machinery.',
+      + 'removal, not the part of it that comes from CCS.',
     marks: [
       { value: 0, label: 'today 0.0', kind: 'observed' },
       ...MARKER_MARKS,
