@@ -582,6 +582,13 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
   color: var(--dim);
 }
 .footnote { margin: 18px 0 0; font-size: 15.5px; color: var(--dim); font-style: italic; }
+/* The marker in the standfirst, and the note it points at under the name box.
+   The note carries the arithmetic behind the scenario count, which is too long
+   to sit inside the opening sentence. */
+.fnref { text-decoration: none; color: inherit; }
+.fnref:hover sup, .fnref:focus-visible sup { text-decoration: underline; }
+#scenario-arithmetic { margin-top: 10px; font-size: 14.5px; line-height: 1.5; }
+#scenario-arithmetic sup { font-style: normal; margin-right: 2px; }
 
 footer {
   margin-top: 40px;

@@ -216,9 +216,12 @@ export function mountApp(root: Document = document): App {
   // The arithmetic behind it, written out so a reader can multiply it back.
   const arithmetic = root.getElementById('scenario-arithmetic');
   if (arithmetic !== null) {
-    arithmetic.textContent = SCENARIO_FACTORS
-      .map((factor) => `${factor.label} ${factor.count.toLocaleString('en-US')}`)
-      .join(' \u00d7 ');
+    // "population = 81 options" names the unit once, and the rest follow it.
+    const terms = SCENARIO_FACTORS.map((factor, index) => {
+      const count = factor.count.toLocaleString('en-US');
+      return index === 0 ? `${factor.label} = ${count} options` : `${factor.label} ${count}`;
+    });
+    arithmetic.innerHTML = `<sup>*</sup> ${terms.join(' \u00d7 ')}`;
   }
 
   strip = installStrip(root, chart.closest('.chart-figure') ?? chart);
