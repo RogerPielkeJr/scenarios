@@ -90,6 +90,47 @@ A line is a placeholder. The marker paths carry land use folded into their total
 CO2 and publish no separate land use series here, so there is no shape to borrow
 from them. If those series become available, the shape should follow them.
 
+### Timing and removal
+
+Two controls sit outside the Kaya identity and exist because the identity alone
+could not follow the scenarios.
+
+**Improvement delivered by 2062** redistributes the two technology rates across
+the century without moving where they end. The rate sliders fix the total change
+from the base year to 2100; this says how much of it lands by the midpoint. At
+50% the annual rate is constant, which is what the model did before this control
+existed. Above 50% the improvement front-loads and slows later; below 50% it
+builds.
+
+The weight on the annual rate decays geometrically rather than tilting linearly,
+so it never changes sign: a technology that improves cannot start worsening late
+in the century because the reader asked for an early push. Writing the effective
+years elapsed as
+
+```
+accumulated(t) = span * (1 - e^-Lt) / (1 - e^-L*span),  L = (2/span) * ln(s/(1-s))
+```
+
+for a midpoint share `s`, the endpoint is exact -- `accumulated(span) = span` for
+every `L` -- so the 2100 level the reader set on the rate slider stays put
+whatever the timing. `accumulatedYears` in `src/model/rates.ts`.
+
+**Engineered CO2 removal in 2100** is the additive term that carries a path below
+zero. The four Kaya factors multiply, so the fossil term approaches zero without
+ever crossing it, and no arrangement of the four reaches the net-negative
+emissions the deep-mitigation markers reach. Removal ramps as the square of
+elapsed time, close to nothing before the 2040s and accelerating after, which is
+how the scenarios deploy it.
+
+That shape also earns the control its place. A straight ramp from zero to a 2100
+level is arithmetically identical to moving the land use slider by the same
+amount -- checked, to zero difference across the path -- so a linear removal
+slider would have been a second way to say one thing and would have reached no
+scenario the six could not.
+
+Both sit at no effect by default, so every result the model produced before they
+existed is unchanged.
+
 ## Warming
 
 Warming in 2100 above 1850 to 1900:
@@ -198,7 +239,7 @@ these is loaded rather than leaving the reader to notice.
 
 ## The Learn More pages
 
-Each of the six assumptions gets a page that teaches the quantity, shows the
+Six of the eight assumptions get a page that teaches the quantity, shows the
 record, and hands the reader a value built from assumptions they control. The
 pages share one scaffold (`src/ui/learn/page.ts`), one builder
 (`src/ui/learn/builder.ts`) and one plot component (`src/ui/plot.ts`), and each
@@ -215,7 +256,7 @@ to answer for itself.
 ### The hand-off
 
 A link on the top page carries the reader's scenario to a page as
-`/learn/<slug>/?s=<six numbers>&n=<name>`, the same encoding share links use.
+`/learn/<slug>/?s=<numbers>&n=<name>`, the same encoding share links use.
 The page holds that string untouched. Two exits lead back:
 
 - **Back to my scenario** returns `/#s=<the identical string>`.
@@ -345,45 +386,50 @@ it through terms that land on this line.
 
 ## What a CMIP7 preset does and does not reproduce
 
-Loading a CMIP7 preset sets the six sliders to the Kaya factors that marker
-reports. Compounding those factors at a constant rate reproduces where the
-marker ends up far better than how it gets there, and the interface now reports
-both, computed rather than asserted (`markerFidelity` in
-`src/model/flags.ts`).
+Loading a CMIP7 preset sets the eight sliders to that marker's own properties:
+the six Kaya factors it reports, plus the timing and removal values derived from
+its published CO2 path in `scripts/build_carried_data.py`. The interface reports
+how closely the reconstruction follows, computed rather than asserted
+(`markerFidelity` in `src/model/flags.ts`).
 
 | Preset | 2100 CO2, this tool | Marker | Cumulative, this tool | Marker | 2050, this tool | Marker |
 |---|---|---|---|---|---|---|
-| CMIP7 HIGH | 55.9 | 55.0 | 3,838 | 3,777 | 48.8 | 47.1 |
-| CMIP7 MEDIUM | 34.0 | 34.4 | 3,094 | 2,770 | 43.3 | 36.1 |
-| CMIP7 MEDIUM-to-LOW | −2.9 | −9.2 | 1,230 | 1,710 | 22.4 | 35.1 |
-| CMIP7 VERY LOW | −0.1 | −5.8 | 1,298 | 268 | 22.5 | −1.2 |
+| CMIP7 HIGH | 54.5 | 55.0 | 3,765 | 3,777 | 48.1 | 47.1 |
+| CMIP7 MEDIUM | 34.1 | 34.4 | 2,767 | 2,770 | 37.0 | 36.1 |
+| CMIP7 MEDIUM-to-LOW | −8.4 | −9.2 | 1,710 | 1,710 | 35.3 | 35.1 |
+| CMIP7 VERY LOW | −11.1 | −5.8 | 323 | 268 | 6.3 | −1.2 |
 
-Three separate causes, and the interface names whichever applies:
+Before timing and removal existed the same four presets missed their markers'
+century totals by −12, +325, −480 and +1,031 GtCO2. Three causes drove that, and
+two of them are now controls rather than limitations:
 
-**Shape.** A constant rate spreads one improvement evenly across 75 years,
-while the markers bend. MEDIUM lands within 1% of its own 2100 emissions and
-still accumulates 12% more over the century, because MEDIUM cuts hardest in the
-2030s and 2040s. Reproducing that would need the markers' own factor
-trajectories decade by decade, which the marker files here do not carry; see
-DATA.md.
+**Shape, solved.** A constant rate spread one improvement evenly across 75 years
+while the markers bend. MEDIUM landed within 1% of its own 2100 emissions and
+still accumulated 12% more over the century, because MEDIUM cuts hardest in the
+2030s and 2040s: its own implied rate runs −0.77%/yr to 2050 and −0.03%/yr after
+2075. Its timing value of 61% carries that.
 
-**Sign.** VERY LOW removes more CO2 than it emits from around mid-century. Four
-factors multiplied together stay positive, so the fossil term cannot turn
-negative at all, and only the land use slider can pull a path below zero. The
-tool reproduces the descent as far as the point where VERY LOW's own emissions
-cross zero and no further.
+**Sign, solved.** MEDIUM-to-LOW and VERY LOW remove more CO2 than they emit
+before 2100, and four factors multiplied together stay positive. The removal
+term reaches those totals: 5.5 and 11.0 GtCO2 a year by 2100.
 
-**Land use timing.** MEDIUM-to-LOW ends the century with a land-use sink of
-−8.8 GtCO2 a year, by far the largest of the seven. The land use slider draws a
-straight line from today's source to that sink, so the tool banks the sink from
-2025 while the marker builds it late, and the same shape error that lifts
-MEDIUM above its marker pushes MEDIUM-to-LOW 480 Gt below its own. It is the
-one preset that undershoots. `tests/presets.test.ts` pins the sign as well as
-the size, so a change that flipped it could not pass quietly.
+**Land use timing, still a line.** Land use runs straight from today's source to
+the 2100 value, so a marker that builds its sink late is banked from 2025. With
+removal carrying the deep sinks this no longer dominates any preset, but the
+shape remains a placeholder for want of a published land use series.
 
-The chart brings the named marker's own published path forward whenever one of
-those presets is loaded, so the divergence sits in front of the reader rather
-than in a footnote.
+What is left is not the reconstruction. VERY LOW keeps the widest absolute gap,
+55 GtCO2 on a total of 268, which the logarithmic emulator turns into three
+hundredths of a degree. The remaining distance between a preset's warming and
+its marker's published warming is the emulator's own residual, measured in "How
+well it reproduces FaIR" below: up to 0.26 °C when the emulator is fed the
+markers' own published totals, with no reconstruction involved at all. No
+arrangement of sliders reaches past that, which is why the tiles print the
+published figure beside the reconstruction rather than in place of it.
+
+The chart draws the reconstruction in ink and picks the named marker out of the
+seven behind it whenever one of those presets is loaded, so the remaining
+divergence sits in front of the reader rather than in a footnote.
 
 ## The corrected carbon-intensity rate
 
@@ -471,7 +517,7 @@ reports its central behaviour.
 **The timing of warming.** Only 2100 is reported, not the path to it or anything
 after it.
 
-**Internal consistency.** Nothing checks that the six assumptions belong
+**Internal consistency.** Nothing checks that the eight assumptions belong
 together. The coherence flags name a few combinations no marker contains, worded
 as an observation rather than a block, because an unexamined combination is not
 an impossible one. Nothing checks that the energy system implied by a given

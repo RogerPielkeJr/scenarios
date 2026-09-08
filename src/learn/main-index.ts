@@ -57,7 +57,12 @@ function mount(): void {
   identity.body.appendChild(buildIdentity(document, { active: null, linked: true, scenario }));
   main.appendChild(identity.section);
 
-  const pages = band('The six pages');
+  // Derived, so adding a page carries the heading with it rather than leaving
+  // "six" over a list of seven.
+  const live = LEARN_ENTRIES.filter((entry) => entry.status === 'live').length;
+  const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven',
+    'eight', 'nine', 'ten'];
+  const pages = band(`The ${WORDS[live] ?? String(live)} pages`);
   const list = element('ol', 'learn-index');
   for (const entry of LEARN_ENTRIES) {
     const item = document.createElement('li');
