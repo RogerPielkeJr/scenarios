@@ -26,17 +26,35 @@ century total, and the two deep-mitigation markers end net-negative where
 nothing built from the four Kaya terms can follow. See "Timing and removal"
 below.
 
-Counting the stops each slider offers and multiplying them, the eight span
-**2,412,174,456,707,806,791** distinct scenarios, which the front page rounds
-to just over 2.4 quintillion. `SCENARIO_COUNT` in `src/model/config.ts` derives
-that from the slider definitions rather than carrying it as a literal, the
-front page prints what it derives, and `tests/config.test.ts` checks the figure
-in this paragraph still matches. It counts in BigInt, because the product
-outgrew exact double arithmetic when the two joined: as a `number` it came out
-as ...806700 for a true ...806791, losing whole scenarios in the last digits
-without saying so. The count covers what the sliders themselves address: a
-hand-edited `?s=` link can carry a value between two stops, which the model
-clamps to range but does not snap, so links address a denser set again.
+Counting the stops each slider offers and multiplying them, the eight reach
+**2,412,174,456,707,806,791** settings. That is not the same as the number of
+scenarios. Energy per dollar and CO2 per unit of energy enter the identity only
+through their product, so swapping one rate for the other leaves the path
+byte-identical, and about half of all settings repeat another. Methane changes
+no CO2 point at all, but it does change the warming, so it counts as part of an
+outcome.
+
+Which factors collapse depends on the timing slider. Income compounds over
+calendar years while the two technology rates compound over the redistributed
+clock, so at any timing but 50% income stands apart and only the technology pair
+collapses; at exactly 50% the two clocks coincide and all three collapse into a
+single product. Counting the distinct products exactly in each case and adding
+them gives **1,200,628,952,606,294,829** distinct scenarios, just over 1.2
+quintillion, which is what the front page states and what the parenthetical
+beside it explains.
+
+`SCENARIO_COUNT` and `DISTINCT_SCENARIO_COUNT` in `src/model/config.ts` derive
+both from the slider definitions rather than carrying either as a literal, the
+front page prints what it derives, and `tests/config.test.ts` checks the figures
+in this paragraph still match. The distinct-product counts behind them come from
+`scripts/build_carried_data.py`, because the three-rate case is 81.5 million
+products and belongs to the build rather than to page load. Both count in
+BigInt: the settings product outgrew exact double arithmetic when timing and
+removal joined, coming out as ...806700 for a true ...806791, losing whole
+scenarios in the last digits without saying so. Both cover what the sliders
+themselves address: a hand-edited `?s=` link can carry a value between two
+stops, which the model clamps to range but does not snap, so links address a
+denser set again.
 
 Far fewer answers than scenarios come out the other end. Across the whole space
 the century total spans -778 to 44,632 GtCO2 and warming 1.37 to 6.12 °C, which

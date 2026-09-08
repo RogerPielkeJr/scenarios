@@ -38,7 +38,7 @@ NAVY = (31, 58, 95)
 YOU = (11, 26, 46)
 
 TITLE = "The THB Scenario Builder"
-SUBTITLE = "Build your own emissions scenario and set it against the seven CMIP7 markers"
+SUBTITLE = "Build your own climate scenario and set it against the seven CMIP7 markers"
 FOOT = "scenarios.thehonestbroker.org  ·  Roger Pielke Jr., The Honest Broker"
 
 

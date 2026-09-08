@@ -234,7 +234,7 @@ describe('the scenario count on the front page', () => {
     mountApp();
     const printed = document.getElementById('scenario-count')?.textContent ?? '';
     expect(printed).toBe(approximateScenarioCount());
-    expect(printed).toBe('just over 2.4 quintillion');
+    expect(printed).toBe('just over 1.2 quintillion');
     expect(printed).not.toBe('—');
     // The markup carries no figure at all, only the placeholder.
     const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');

@@ -77,6 +77,36 @@ const SCALES: ReadonlyArray<readonly [bigint, string]> = [
   [1_000_000_000n, 'billion'],
 ];
 
+const RATE_PRODUCTS = configJson.rateProducts;
+
+/**
+ * How many distinct scenarios the sliders actually reach.
+ *
+ * SCENARIO_COUNT above counts settings. It is not the same thing: energy per
+ * dollar and CO2 per unit of energy enter the identity only through their
+ * product, so swapping one for the other leaves the path byte-identical and
+ * about half of all settings repeat another. Methane changes no CO2 point at
+ * all, but it does change the warming, so it counts as part of an outcome.
+ *
+ * Which factors collapse depends on the timing slider. Income compounds over
+ * calendar years while the two technology rates compound over the redistributed
+ * clock, so at any timing but 50% income stands apart and only the technology
+ * pair collapses. At exactly 50% the two clocks coincide and all three collapse
+ * into a single product. The two cases are counted separately and added.
+ *
+ * `rateProducts` comes from scripts/build_carried_data.py, which counts the
+ * distinct products exactly. The three-rate case is 81.5 million of them, which
+ * is a build-time job rather than a page-load one.
+ */
+export const DISTINCT_SCENARIO_COUNT: bigint = (() => {
+  const stops = (id: InputId) => BigInt(sliderPositions(SPEC_BY_ID[id]));
+  const timings = stops('improvementTiming');
+  const shaped = (timings - 1n) * stops('income') * BigInt(RATE_PRODUCTS.pairs);
+  const steady = BigInt(RATE_PRODUCTS.triples);
+  return stops('population') * stops('landUse') * stops('removals')
+    * stops('methane') * (shaped + steady);
+})();
+
 /**
  * The count as the front page says it: "just over 2.4 quintillion".
  *
@@ -85,15 +115,24 @@ const SCALES: ReadonlyArray<readonly [bigint, string]> = [
  * over" rather than going quietly wrong. Rounded to one decimal, so a scale
  * this large still says something the reader can hold.
  */
-export function approximateScenarioCount(): string {
-  const scale = SCALES.find(([size]) => SCENARIO_COUNT >= size) ?? SCALES[SCALES.length - 1];
+export function approximate(count: bigint): string {
+  const scale = SCALES.find(([size]) => count >= size) ?? SCALES[SCALES.length - 1];
   const [size, name] = scale as readonly [bigint, string];
   // Tenths, in integer arithmetic, so the rounding never drifts.
-  const tenths = (SCENARIO_COUNT * 10n) / size;
+  const tenths = (count * 10n) / size;
   const rounded = Number(tenths) / 10;
-  const qualifier = SCENARIO_COUNT * 10n < BigInt(Math.round(rounded * 10)) * size
+  const qualifier = count * 10n < BigInt(Math.round(rounded * 10)) * size
     ? 'almost' : 'just over';
   return `${qualifier} ${rounded.toFixed(1)} ${name}`;
+}
+
+export function approximateScenarioCount(): string {
+  return approximate(DISTINCT_SCENARIO_COUNT);
+}
+
+/** The settings figure, for the sentence that explains the difference. */
+export function approximateSettingsCount(): string {
+  return approximate(SCENARIO_COUNT);
 }
 
 /** Every input at its default. */

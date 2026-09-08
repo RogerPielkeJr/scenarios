@@ -2,7 +2,7 @@ import { PRESETS } from './model/bounds.js';
 import { computeFlags, markerIdForPreset } from './model/flags.js';
 import { computePath } from './model/kaya.js';
 import { MARKERS, MARKER_BY_ID, publishedPath } from './model/markers.js';
-import { approximateScenarioCount, defaultInputs } from './model/config.js';
+import { approximateScenarioCount, approximateSettingsCount, defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import {
   ScenarioState, decodeScenario, displayName, pathWithScenario,
@@ -209,6 +209,8 @@ export function mountApp(root: Document = document): App {
   // slider definitions, not on where the reader has put them.
   const count = root.getElementById('scenario-count');
   if (count !== null) count.textContent = approximateScenarioCount();
+  const settings = root.getElementById('settings-count');
+  if (settings !== null) settings.textContent = approximateSettingsCount();
 
   strip = installStrip(root, chart.closest('.chart-figure') ?? chart);
 

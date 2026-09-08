@@ -186,6 +186,35 @@ def main() -> None:
                 f'The fuel mix improved only {abs(ci_observed):.2f}% a year since 1990, and '
                 f'{abs(ci_decade):.2f}% over the past decade, counting the cement and '
                 'industrial CO2 the scenarios count.')
+    # --- how many scenarios the sliders actually reach -----------------------
+    # Multiplying the slider stops counts settings, not outcomes. Energy per
+    # dollar and CO2 per unit of energy enter the identity only through their
+    # product, so swapping one for the other leaves the path byte-identical and
+    # roughly half of all settings repeat another. Counting what the sliders
+    # reach means counting distinct products, not distinct pairs.
+    #
+    # The timing slider changes which factors collapse. Income compounds over
+    # calendar years while the two technology rates compound over the
+    # redistributed clock, so at any timing but 50% income stands apart and only
+    # the technology pair collapses. At exactly 50% the clocks coincide and all
+    # three collapse into one product. Both cases are counted.
+    #
+    # Done here rather than in the browser because the three-rate case is 81.5
+    # million products; src/model/config.ts composes these two with the slider
+    # stop counts.
+    def _hundredths(spec):
+        n = round((spec['max'] - spec['min']) / spec['step']) + 1
+        return [int(round((spec['min'] + k * spec['step']) * 100)) for k in range(n)]
+
+    by_id = {s['id']: s for s in inputs}
+    ei_v = _hundredths(by_id['energyPerDollar'])
+    ci_v = _hundredths(by_id['co2PerEnergy'])
+    inc_v = _hundredths(by_id['income'])
+    pairs = len({(10000 + a) * (10000 + b) for a in ei_v for b in ci_v})
+    triples = len({(10000 + a) * (10000 + b) * (10000 + c)
+                   for a in ei_v for b in ci_v for c in inc_v})
+    print(f'  distinct rate products: {pairs:,} pairs, {triples:,} triples')
+
     config = {
         'meta': {'generated_by': 'scripts/build_carried_data.py', 'provenance': provenance},
         'baseYear': BASE['year'], 'endYear': D['popyears'][-1],
@@ -208,6 +237,11 @@ def main() -> None:
                             'why': 'CO2 from energy over total energy supply, which leaves '
                                    'out the cement and industrial CO2 the slider carries'},
         'inputs': inputs,
+        # Distinct products the rate sliders reach, for counting outcomes
+        # rather than settings. See the comment where these are computed.
+        'rateProducts': {'pairs': pairs, 'triples': triples,
+                         'note': 'energy x CO2 rate products, and all three '
+                                 'including income, counted exactly'},
     }
 
     # --- emulator.json ------------------------------------------------------

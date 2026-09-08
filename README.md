@@ -1,4 +1,4 @@
-# Build your own THB emissions scenario
+# Build your own THB climate scenario
 
 The dashboard published at **scenarios.thehonestbroker.org**. A reader sets six
 assumptions and sees where the century lands, against what the world has

@@ -185,5 +185,10 @@
     "label": "None today"
    }
   }
- ]
+ ],
+ "rateProducts": {
+  "pairs": 101341,
+  "triples": 36961039,
+  "note": "energy x CO2 rate products, and all three including income, counted exactly"
+ }
 }

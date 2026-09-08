@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { INPUT_SPECS, SCENARIO_COUNT, sliderPositions } from '../src/model/config.js';
+import { DISTINCT_SCENARIO_COUNT, INPUT_SPECS, SCENARIO_COUNT, sliderPositions } from '../src/model/config.js';
 import { computePath } from '../src/model/kaya.js';
 import { warming } from '../src/model/emulator.js';
 import type { ScenarioInputs } from '../src/model/types.js';
@@ -43,9 +43,20 @@ describe('how many scenarios the sliders reach', () => {
   // METHODS.md quotes the figure. A slider range moving would change the
   // page and leave the document behind, which is how its preset table went
   // stale once already.
-  it('agrees with the figure METHODS.md states', () => {
+  it('agrees with the figures METHODS.md states', () => {
     const methods = readFileSync(resolve(process.cwd(), 'METHODS.md'), 'utf8');
     expect(methods).toContain(SCENARIO_COUNT.toLocaleString('en-US'));
+    expect(methods).toContain(DISTINCT_SCENARIO_COUNT.toLocaleString('en-US'));
+  });
+
+  // Settings are not scenarios: swapping the two technology rates leaves the
+  // path byte-identical, so roughly half of all settings repeat another. The
+  // front page says "distinct scenarios", so it has to print the smaller one.
+  it('separates settings from the scenarios they reach', () => {
+    expect(DISTINCT_SCENARIO_COUNT).toBeLessThan(SCENARIO_COUNT);
+    const ratio = Number(SCENARIO_COUNT) / Number(DISTINCT_SCENARIO_COUNT);
+    expect(ratio).toBeGreaterThan(1.9);
+    expect(ratio).toBeLessThan(2.1);
   });
 
   // The same paragraph quotes the span of the answers. Every one of those is

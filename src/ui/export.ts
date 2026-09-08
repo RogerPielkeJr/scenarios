@@ -126,7 +126,7 @@ async function drawSheet(
   ctx.fillText(title, SHEET.pad, 42, SHEET.width - SHEET.pad * 2 - 46);
   ctx.fillStyle = dim;
   ctx.font = `12.5px ${SANS}`;
-  ctx.fillText('Build your own THB emissions scenario', SHEET.pad, 62);
+  ctx.fillText('Build your own THB climate scenario', SHEET.pad, 62);
 
   try {
     const logo = await loadImage(LOGO_SRC);
