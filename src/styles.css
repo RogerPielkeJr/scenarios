@@ -548,6 +548,18 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .notes b.you { color: var(--you); }
 
 /* --- the bibliography page ---------------------------------------------- */
+/* The acknowledgement at the head of the bibliography. A tinted panel rather
+   than another reference block, because it credits the people whose work the
+   whole site sits on rather than citing a number taken from them. */
+.ack-box {
+  background: var(--field);
+  border-left: 3px solid var(--navy);
+  border-radius: 3px;
+  padding: 18px 22px;
+  display: grid;
+  gap: 12px;
+}
+.ack-box p { margin: 0; font-size: 17.5px; line-height: 1.55; }
 .reading section {
   display: grid;
   grid-template-columns: var(--band-left) 1fr;
@@ -556,8 +568,16 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
   margin-bottom: 34px;
 }
 .reading section > * { min-width: 0; }
+/* The heading takes the left band and everything after it belongs in the
+   content column. Auto-placement gave a section with three children its third
+   one back in the left band, which is how the Learn More list came out 420px
+   wide beside a 774px one on the same page. */
+.reading section > h2 { grid-column: 1; }
+.reading section > :not(h2) { grid-column: 2; }
 @media (max-width: 860px) {
   .reading section { grid-template-columns: 1fr; gap: 14px; }
+  .reading section > h2,
+  .reading section > :not(h2) { grid-column: 1; }
 }
 .reading h2 {
   font-family: var(--sans);
@@ -576,7 +596,9 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .ref a { color: var(--navy); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .gloss { margin: 0; font-size: 17px; color: var(--dim); }
 .cited-by {
-  margin: 2px 0 0;
+  /* The entry is a grid with its own gap; a margin here made the third line
+     sit 6px below the second where the first sat 4px above it. */
+  margin: 0;
   font-family: var(--sans);
   font-size: 14.5px;
   color: var(--dim);
