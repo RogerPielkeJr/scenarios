@@ -1,4 +1,4 @@
-# Build your own THB climate scenario
+# Build your own climate scenario
 
 The dashboard published at **scenarios.thehonestbroker.org**. A reader sets eight
 assumptions and sees where the century lands, against what the world has
@@ -116,7 +116,7 @@ it, so a missing PDF fails CI rather than 404ing on the live site.
 
 | URL | File | What it is |
 |---|---|---|
-| `/` | `index.html` | The THB Scenario Builder |
+| `/` | `index.html` | Build your own climate scenario |
 | `/bibliography.html` | `bibliography.html` | The book, the scenarios work, the sources |
 | `/library.html` | `library.html` | The Honest Broker posts on scenarios, in `src/library/entries.ts` |
 | `/learn/` | `learn/index.html` | Index of the Learn More pages |

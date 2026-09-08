@@ -38,7 +38,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "public" / "thb-scenario-builder-methodology.pdf"
 LOGO = ROOT / "public" / "thb-logo.png"
 
-TITLE = "The THB Scenario Builder"
+TITLE = "THB Build your own climate scenario"
 SUBTITLE = ("Methodology: what the tool calculates, where every number comes "
             "from, and what it does not represent")
 AUTHOR = "Roger Pielke Jr."

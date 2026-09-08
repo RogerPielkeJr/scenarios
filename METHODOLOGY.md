@@ -1,6 +1,6 @@
 # The site
 
-An overview of what the THB Scenario Builder does, page by page, and how to
+An overview of what Build your own climate scenario does, page by page, and how to
 read what it puts on the screen. The two parts that follow this one give the
 detail: **Methods** covers every calculation and every preset, **Data** covers
 where each number came from, when, and in what units.

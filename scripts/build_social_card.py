@@ -37,7 +37,7 @@ RULE = (201, 212, 224)
 NAVY = (31, 58, 95)
 YOU = (11, 26, 46)
 
-TITLE = "The THB Scenario Builder"
+TITLE = "THB Build your own climate scenario"
 SUBTITLE = "Build your own climate scenario and set it against the seven CMIP7 markers"
 FOOT = "scenarios.thehonestbroker.org  ·  Roger Pielke Jr., The Honest Broker"
 
@@ -75,7 +75,18 @@ def main():
     logo = Image.open(LOGO).convert("RGBA").resize((104, 104), Image.LANCZOS)
     card.paste(logo, (PAD, PAD - 8), logo)
 
-    draw.text((PAD + 130, PAD + 4), TITLE, font=face("DejaVuSerif-Bold.ttf", 52), fill=INK)
+    # Sized to the space rather than set at a fixed 52: the name has grown once
+    # already and ran off the right edge of the card, which a share preview
+    # shows and nothing else does.
+    title_width = W - PAD - (PAD + 130)
+    title_size = 52
+    while title_size > 24:
+        font = face("DejaVuSerif-Bold.ttf", title_size)
+        if draw.textlength(TITLE, font=font) <= title_width:
+            break
+        title_size -= 1
+    draw.text((PAD + 130, PAD + 4), TITLE, font=face("DejaVuSerif-Bold.ttf", title_size),
+              fill=INK)
     draw.text((PAD + 130, PAD + 66), SUBTITLE, font=face("DejaVuSans.ttf", 21), fill=DIM)
     draw.line([(PAD, PAD + 122), (W - PAD, PAD + 122)], fill=NAVY, width=3)
 
@@ -100,7 +111,7 @@ def main():
         draw.line([(left, y), (right, y)], fill=RULE, width=3 if line == 0 else 1)
         draw.text((left - 12, y - 9), str(line), font=face("DejaVuSansMono.ttf", 15),
                   fill=DIM, anchor="ra")
-    draw.text((PAD, top - 30), "GtCO2 a year, including land use",
+    draw.text((PAD, top - 30), "GtCO\u2082 a year, including land use",
               font=face("DejaVuSans-Bold.ttf", 17), fill=DIM)
 
     ends = []
