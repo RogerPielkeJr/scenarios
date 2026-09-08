@@ -253,7 +253,7 @@ export const LIBRARY_SECTIONS: LibrarySection[] = [
           + 'd233b250-6aef-461a-94b3-78dfd97c7e8c_691x460.png',
         gloss: 'Five figures from the IEA World Energy Outlook 2025, and the assumptions '
           + 'buried underneath them — the same assumptions, in the same places, that '
-          + 'the six sliders here ask you to set.',
+          + 'the sliders here ask you to set.',
       },
     ],
   },

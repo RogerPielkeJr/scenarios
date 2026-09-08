@@ -10,6 +10,7 @@ const SCENARIO = {
   inputs: {
     population: 10.2, income: 1.91, energyPerDollar: -1.62,
     co2PerEnergy: -0.48, landUse: 1, methane: 300,
+    improvementTiming: 50, removals: 0,
   },
   name: 'Fast electrification',
 };

@@ -112,24 +112,24 @@ describe('the reader’s own label on the chart', () => {
   }
 
   // Every slider at its floor, its default and its ceiling, in every
-  // combination: 3^6 = 729 charts, which is every corner and every middle of
-  // the space a reader can reach.
+  // combination: 3^8 = 6,561 charts, which is every corner and every middle of
+  // the space a reader can reach. Enumerated from INPUT_SPECS rather than
+  // nested by hand, so a new input widens the sweep instead of being left
+  // undefined in every case.
   const CORNERS: ScenarioInputs[] = (() => {
-    const axes = INPUT_SPECS.map((spec) => [spec.min, spec.default, spec.max]);
+    const specs = [...INPUT_SPECS];
+    const axes = specs.map((spec) => [spec.min, spec.default, spec.max]);
     const out: ScenarioInputs[] = [];
-    for (const population of axes[0] ?? []) {
-      for (const income of axes[1] ?? []) {
-        for (const energyPerDollar of axes[2] ?? []) {
-          for (const co2PerEnergy of axes[3] ?? []) {
-            for (const landUse of axes[4] ?? []) {
-              for (const methane of axes[5] ?? []) {
-                out.push({ population, income, energyPerDollar,
-                  co2PerEnergy, landUse, methane } as ScenarioInputs);
-              }
-            }
-          }
-        }
+    const total = 3 ** specs.length;
+    for (let n = 0; n < total; n += 1) {
+      let rest = n;
+      const inputs: Record<string, number> = {};
+      for (let i = 0; i < specs.length; i += 1) {
+        const values = axes[i] ?? [];
+        inputs[(specs[i] as { id: string }).id] = values[rest % 3] as number;
+        rest = Math.floor(rest / 3);
       }
+      out.push(inputs as unknown as ScenarioInputs);
     }
     return out;
   })();
@@ -212,13 +212,21 @@ describe('the reader’s own label on the chart', () => {
       const half = CHART_GEOMETRY.TYPE.userLabel * CHART_GEOMETRY.CAP_RATIO;
       const centre = Number(svg.querySelector('[data-user-label]')?.getAttribute('y')) - half;
       const gap = Math.max(0, Math.min(...heights) - centre, centre - Math.max(...heights));
+      // A label that has to sit far off draws a hairline back to its line, and
+      // then it still reads as that line's name. Those cases are counted
+      // separately rather than excused: the tie has to actually be there.
+      if (gap > 60) {
+        const tie = svg.querySelector('[data-user-tie]');
+        expect(tie, `no tie drawn at ${JSON.stringify(inputs)}`).not.toBeNull();
+        continue;
+      }
       worst.push([gap, JSON.stringify(inputs)]);
     }
-    // Across all 729 corners the label never sits more than about 78 units
-    // clear of its own line, on a plot 310 units tall, and it only gets that
-    // far where the markers close off everything nearer. The bound guards
-    // against a change that lets it wander further, not against that case.
+    // Every corner without a tie keeps its label against its own line. The few
+    // that need one are paths that climb through the markers and then dive,
+    // where the only strip clear of all eight lines sits well below the one
+    // being named.
     worst.sort((a, b) => b[0] - a[0]);
-    expect(worst[0]?.[0], worst[0]?.[1]).toBeLessThan(90);
+    expect(worst[0]?.[0], worst[0]?.[1]).toBeLessThanOrEqual(60);
   });
 });

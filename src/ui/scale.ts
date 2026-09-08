@@ -1,5 +1,5 @@
 /**
- * The calibrated track that sits under a slider, used by the six sliders on
+ * The calibrated track that sits under a slider, used by the sliders on
  * the top page and by every Learn More builder, so a mark means the same
  * thing wherever a reader meets one.
  */

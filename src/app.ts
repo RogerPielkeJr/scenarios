@@ -146,7 +146,7 @@ export function mountApp(root: Document = document): App {
     const name = displayName(scenario.name);
     const presetId = state.matchingPresetId();
     // A CMIP7 preset highlights its published path among the ghosted markers,
-    // and the ink stays the reconstruction the six sliders drive. Drawing the
+    // and the ink stays the reconstruction the sliders drive. Drawing the
     // published path as the ink instead, and swapping to the reconstruction on
     // the first slider move, made one step of the population slider look like
     // it raised warming by 0.18 degrees when it had lowered it by 0.002.

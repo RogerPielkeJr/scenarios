@@ -144,6 +144,46 @@
     "value": 380,
     "label": "today"
    }
+  },
+  {
+   "id": "improvementTiming",
+   "legacyId": "timing",
+   "kind": "level",
+   "label": "Improvement delivered by 2062",
+   "help": "The rate sliders set where energy per dollar and CO2 per unit of energy end up in 2100. This sets when the change happens. Half by the midpoint means a steady rate; more means an early push that slows later.",
+   "min": 5,
+   "max": 95,
+   "step": 1,
+   "default": 50,
+   "decimals": 0,
+   "prototypeDefault": 50,
+   "unitSuffix": "%",
+   "units": "% of the century's improvement, by 2062",
+   "signed": false,
+   "reference": {
+    "value": 50,
+    "label": "Steady rate"
+   }
+  },
+  {
+   "id": "removals",
+   "legacyId": "cdr",
+   "kind": "level",
+   "label": "Engineered CO2 removal in 2100",
+   "help": "Carbon captured and stored on purpose, counted apart from the land use sink. The four Kaya factors multiply, so on their own they approach zero without ever crossing it; this is what carries a path below zero. It ramps in slowly and accelerates, as the scenarios deploy it.",
+   "min": 0,
+   "max": 25,
+   "step": 0.5,
+   "default": 0,
+   "decimals": 1,
+   "prototypeDefault": 0,
+   "unitSuffix": " GtCO2/yr",
+   "units": "GtCO2/yr in 2100",
+   "signed": false,
+   "reference": {
+    "value": 0,
+    "label": "None today"
+   }
   }
  ]
 }

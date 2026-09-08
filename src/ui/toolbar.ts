@@ -3,7 +3,7 @@
  *
  * Each one carries the reader's scenario, so a reader who steps out to the
  * library, the bibliography or the Learn More pages and comes back finds the
- * six numbers and the name they left with. A bare href resets all of them.
+ * numbers and the name they left with. A bare href resets all of them.
  */
 import {
   bibliographyHref, hashFor, learnIndexHref, libraryHref, type Scenario,

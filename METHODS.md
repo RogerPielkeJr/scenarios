@@ -13,23 +13,35 @@ CO2 = population × (GDP ÷ population) × (energy ÷ GDP) × (CO2 ÷ energy)
       + land use CO2
 ```
 
-The reader sets six numbers: the 2100 population, three annual rates that
-compound from the base year, and 2100 values for land use CO2 and methane.
+The reader sets eight numbers: the 2100 population, three annual rates that
+compound from the base year, 2100 values for land use CO2 and methane, when
+across the century the technology improvement arrives, and how much engineered
+CO2 removal runs in 2100.
 
-Counting the stops each slider offers and multiplying them, the six span
-**519,753,168,866,151** distinct scenarios, which the front page rounds to
-almost 520 trillion. `SCENARIO_COUNT` in
-`src/model/config.ts` derives that from the slider definitions rather than
-carrying it as a literal, the front page prints what it derives, and
-`tests/config.test.ts` checks the figure in this paragraph still matches. The
-count covers what the sliders themselves address: a hand-edited `?s=` link can carry
-a value between two stops, which the model clamps to range but does not snap,
-so links address a denser set again.
+The last two joined the six because the first six fix where a trajectory ends
+and say nothing about the route there, and because a product of positive
+factors never reaches a negative number. Both gaps showed in the CMIP7 presets:
+MEDIUM landed within 1% of its marker's 2100 emissions and 12% above its
+century total, and the two deep-mitigation markers end net-negative where
+nothing built from the four Kaya terms can follow. See "Timing and removal"
+below.
+
+Counting the stops each slider offers and multiplying them, the eight span
+**2,412,174,456,707,806,791** distinct scenarios, which the front page rounds
+to just over 2.4 quintillion. `SCENARIO_COUNT` in `src/model/config.ts` derives
+that from the slider definitions rather than carrying it as a literal, the
+front page prints what it derives, and `tests/config.test.ts` checks the figure
+in this paragraph still matches. It counts in BigInt, because the product
+outgrew exact double arithmetic when the two joined: as a `number` it came out
+as ...806700 for a true ...806791, losing whole scenarios in the last digits
+without saying so. The count covers what the sliders themselves address: a
+hand-edited `?s=` link can carry a value between two stops, which the model
+clamps to range but does not snap, so links address a denser set again.
 
 Far fewer answers than scenarios come out the other end. Across the whole space
-the century total spans 130 to 38,088 GtCO2 and warming 1.45 to 5.93 °C, which
-at the precision the tiles print leaves at most 37,959 distinct totals and 448
-distinct warming figures. Four factors multiplied together, and only the
+the century total spans -778 to 44,632 GtCO2 and warming 1.37 to 6.12 °C, which
+at the precision the tiles print leaves at most 45,412 distinct totals and 477
+distinct warming figures. Several factors multiplied together, and only the
 product shows.
 
 The base year is 2025, holding the observed 2024 state, since 2025 is not

@@ -52,34 +52,48 @@ export function sliderPositions(spec: InputSpec): number {
 }
 
 /**
- * How many distinct scenarios the six sliders reach, as their product.
+ * How many distinct scenarios the sliders reach, as their product.
  *
  * Derived, never typed. The front page prints this number, and a literal
- * there would go stale the moment a slider's range or step moved. The
- * product sits inside Number.MAX_SAFE_INTEGER at 5.2e14 against 9.0e15;
- * tests/config.test.ts holds that, since past it the arithmetic would start
- * losing whole scenarios in silence.
+ * there would go stale the moment a slider's range or step moved.
+ *
+ * A BigInt, because the product outgrew exact double arithmetic when timing
+ * and removal joined the six: 2.41e18 against a MAX_SAFE_INTEGER of 9.01e15.
+ * As a number it came out as ...806700 for a true ...806791, losing whole
+ * scenarios in the last digits without saying so.
  *
  * It counts what the sliders themselves reach. A hand-edited ?s= link can
  * carry a value between two stops, which the model clamps to range but does
  * not snap, so links address a denser set than this.
  */
-export const SCENARIO_COUNT = INPUT_SPECS.reduce(
-  (total, spec) => total * sliderPositions(spec), 1,
+export const SCENARIO_COUNT: bigint = INPUT_SPECS.reduce(
+  (total, spec) => total * BigInt(sliderPositions(spec)), 1n,
 );
 
+const SCALES: ReadonlyArray<readonly [bigint, string]> = [
+  [1_000_000_000_000_000_000n, 'quintillion'],
+  [1_000_000_000_000_000n, 'quadrillion'],
+  [1_000_000_000_000n, 'trillion'],
+  [1_000_000_000n, 'billion'],
+];
+
 /**
- * The count as the front page says it: "almost 520 trillion".
+ * The count as the front page says it: "just over 2.4 quintillion".
  *
  * The qualifier comes from the comparison, not from a guess. If a slider
  * range ever pushed the product past the round figure, this would say "just
- * over" rather than going quietly wrong.
+ * over" rather than going quietly wrong. Rounded to one decimal, so a scale
+ * this large still says something the reader can hold.
  */
 export function approximateScenarioCount(): string {
-  const trillions = SCENARIO_COUNT / 1e12;
-  const rounded = Math.round(trillions);
-  const qualifier = SCENARIO_COUNT < rounded * 1e12 ? 'almost' : 'just over';
-  return `${qualifier} ${rounded} trillion`;
+  const scale = SCALES.find(([size]) => SCENARIO_COUNT >= size) ?? SCALES[SCALES.length - 1];
+  const [size, name] = scale as readonly [bigint, string];
+  // Tenths, in integer arithmetic, so the rounding never drifts.
+  const tenths = (SCENARIO_COUNT * 10n) / size;
+  const rounded = Number(tenths) / 10;
+  const qualifier = SCENARIO_COUNT * 10n < BigInt(Math.round(rounded * 10)) * size
+    ? 'almost' : 'just over';
+  return `${qualifier} ${rounded.toFixed(1)} ${name}`;
 }
 
 /** Every input at its default. */

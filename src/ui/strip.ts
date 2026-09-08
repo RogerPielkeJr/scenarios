@@ -1,7 +1,7 @@
 /**
  * The strip that carries the reader's two headline numbers with them.
  *
- * The six sliders run down a column taller than the chart beside them, and
+ * The sliders run down a column taller than the chart beside them, and
  * below 860px they sit above the chart entirely: at 360px the front page runs
  * about 8,400px, with the first slider a quarter of the way down and the chart
  * around three fifths. A reader who moves the methane slider at the foot of

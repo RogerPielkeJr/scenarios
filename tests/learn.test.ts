@@ -27,6 +27,7 @@ const SCENARIO: Scenario = {
   inputs: {
     population: 9.4, income: 2.1, energyPerDollar: -1.8,
     co2PerEnergy: -0.9, landUse: -2.5, methane: 220,
+    improvementTiming: 50, removals: 0,
   },
   name: 'Slow build-out',
 };

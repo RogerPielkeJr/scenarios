@@ -69,7 +69,7 @@ export function mountLibrary(root: Document = document): void {
   const incoming = decodeScenario(view?.location.search ?? '');
   const scenario = incoming ?? defaultScenario();
 
-  // A reader who arrives from the builder leaves with the six numbers and
+  // A reader who arrives from the builder leaves with the numbers and
   // the name they came in with; a reader who arrives cold starts fresh.
   linkToolbar(root, scenario);
 

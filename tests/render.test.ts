@@ -234,7 +234,7 @@ describe('the scenario count on the front page', () => {
     mountApp();
     const printed = document.getElementById('scenario-count')?.textContent ?? '';
     expect(printed).toBe(approximateScenarioCount());
-    expect(printed).toBe('almost 520 trillion');
+    expect(printed).toBe('just over 2.4 quintillion');
     expect(printed).not.toBe('—');
     // The markup carries no figure at all, only the placeholder.
     const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
@@ -243,11 +243,18 @@ describe('the scenario count on the front page', () => {
     expect(html).not.toContain('trillion');
   });
 
-  // "Almost" is a claim about the rounding, so it has to follow the number.
-  it('says almost only while the count sits below the round figure', () => {
-    const rounded = Math.round(SCENARIO_COUNT / 1e12);
-    expect(SCENARIO_COUNT).toBeLessThan(rounded * 1e12);
-    expect(approximateScenarioCount().startsWith('almost')).toBe(true);
+  // "Almost" and "just over" are claims about the rounding, so whichever the
+  // page prints has to follow the number.
+  it('picks almost or just over to match where the count actually sits', () => {
+    const phrase = approximateScenarioCount();
+    const match = /^(almost|just over) ([\d.]+) (\w+)$/.exec(phrase);
+    expect(match, phrase).not.toBeNull();
+    const [, qualifier, figure] = match as RegExpExecArray;
+    const scale = { billion: 1_000_000_000n, trillion: 1_000_000_000_000n,
+      quadrillion: 1_000_000_000_000_000n,
+      quintillion: 1_000_000_000_000_000_000n }[(match as RegExpExecArray)[3] as string];
+    const stated = BigInt(Math.round(Number(figure) * 10)) * (scale as bigint) / 10n;
+    expect(qualifier).toBe(SCENARIO_COUNT < stated ? 'almost' : 'just over');
   });
 
   // It stands in the opening paragraph, not down beside the sliders.
@@ -269,11 +276,14 @@ describe('a published scenario on screen', () => {
     app.apply(medium.inputs);
     const report = app.lastReport();
     // The reconstruction, which is what the six sliders drive.
-    expect(report?.outputs['tile-cumulative']).toBe('3,095');
-    expect(report?.outputs['tile-warming']).toBe('3.02 °C');
+    expect(report?.outputs['tile-cumulative']).toBe('2,767');
+    expect(report?.outputs['tile-warming']).toBe('2.94 °C');
     // The published figure stands beside it rather than replacing it.
     expect(report?.outputs['tile-cumulative-note']).toContain('CMIP7 MEDIUM publishes 2,770');
     expect(report?.outputs['tile-warming-note']).toContain('CMIP7 MEDIUM publishes 2.84 °C');
+    // The reconstruction now tracks the marker's century total: 2,767 against
+    // 2,770. What is left between the two warming figures is the emulator's
+    // own residual, which no slider reaches.
     expect(report?.outputs['chart-caption']).toContain('reconstruction of CMIP7 MEDIUM');
     expect(report?.outputs['notes']).toContain('This sits on CMIP7 MEDIUM');
   });
@@ -306,31 +316,31 @@ describe('a published scenario on screen', () => {
     if (ml === undefined) throw new Error('no CMIP7 MEDIUM-to-LOW preset');
     app.apply(ml.inputs);
     const report = app.lastReport();
-    expect(report?.outputs['tile-cumulative']).toBe('1,230');
+    expect(report?.outputs['tile-cumulative']).toBe('1,710');
     expect(report?.outputs['tile-cumulative-note']).toContain('publishes 1,710');
     const notes = report?.outputs['notes'] ?? '';
     expect(notes).toContain('This sits on CMIP7 MEDIUM-to-LOW');
-    // The only preset whose reconstruction lands under its marker.
-    expect(notes).toContain('1,230 GtCO2 against 1,710');
-    expect(notes).toContain('below it');
+    // Once timing and removal carry this marker's own values, the
+    // reconstruction lands on its century total rather than 480 GtCO2 under it.
+    expect(notes).toContain('agree within 0%, 1,710 against 1,710 GtCO2');
   });
 
   // The two technology bounds measure the reconstruction's total, which the
   // tiles now report whether or not a preset stands, so a bound sentence
-  // judges a number the reader can see either way. MEDIUM-to-LOW is where that
-  // shows: 1,710 published, 1,230 reconstructed, and the fast bound at 1,585
-  // in between, so the sentence belongs on screen from the moment the preset
-  // is picked rather than appearing on the first slider move.
+  // judges a number the reader can see either way. It has to behave the same
+  // on both sides of a slider move: a sentence that appeared or vanished on
+  // the first touch would repeat the fault that made a preset's headline jump.
   it('applies the technology bounds to the reconstruction, preset or not', () => {
     const app = mountApp();
     const ml = PRESETS.find((preset) => preset.id === 'cmip7-medium-to-low');
     if (ml === undefined) throw new Error('no CMIP7 MEDIUM-to-LOW preset');
     app.apply(ml.inputs);
-    expect(app.lastReport()?.outputs['notes']).toContain('you have passed the lowest total');
-
-    // And it stays put across a slider move rather than appearing with one.
+    const before = (app.lastReport()?.outputs['notes'] ?? '')
+      .includes('you have passed the lowest total');
     app.state.set('landUse', -8.7);
-    expect(app.lastReport()?.outputs['notes']).toContain('you have passed the lowest total');
+    const after = (app.lastReport()?.outputs['notes'] ?? '')
+      .includes('you have passed the lowest total');
+    expect(after).toBe(before);
   });
 
   it('draws the reconstruction year by year and lights up the marker behind it', () => {

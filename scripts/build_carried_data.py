@@ -14,6 +14,7 @@ reads. See DATA.md.
 Run: python3 scripts/build_carried_data.py
 """
 import json
+import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -142,6 +143,43 @@ def main() -> None:
                 'label': c['histL'],
             },
         })
+    # Two controls the prototype had no equivalent for. The four Kaya factors
+    # fix where each trajectory ends in 2100 and say nothing about the route
+    # there, and multiplying them can never produce a negative number. Both gaps
+    # showed up as CMIP7 presets that missed their own markers: MEDIUM by 12% on
+    # cumulative CO2 with its 2100 value right to within 1%, and the two deep
+    # scenarios by much more, because they end net-negative and nothing in a
+    # product of positive factors goes below zero.
+    inputs.append({
+        'id': 'improvementTiming', 'legacyId': 'timing', 'kind': 'level',
+        'label': 'Improvement delivered by 2062',
+        'help': ('The rate sliders set where energy per dollar and CO2 per unit of '
+                 'energy end up in 2100. This sets when the change happens. Half by '
+                 'the midpoint means a steady rate; more means an early push that '
+                 'slows later.'),
+        'min': 5, 'max': 95, 'step': 1,
+        'default': 50, 'decimals': 0,
+        'prototypeDefault': 50,
+        'unitSuffix': '%', 'units': '% of the century\'s improvement, by 2062',
+        'signed': False,
+        'reference': {'value': 50, 'label': 'Steady rate'},
+    })
+    inputs.append({
+        'id': 'removals', 'legacyId': 'cdr', 'kind': 'level',
+        'label': 'Engineered CO2 removal in 2100',
+        'help': ('Carbon captured and stored on purpose, counted apart from the land '
+                 'use sink. The four Kaya factors multiply, so on their own they '
+                 'approach zero without ever crossing it; this is what carries a path '
+                 'below zero. It ramps in slowly and accelerates, as the scenarios '
+                 'deploy it.'),
+        'min': 0, 'max': 25, 'step': 0.5,
+        'default': 0, 'decimals': 1,
+        'prototypeDefault': 0,
+        'unitSuffix': ' GtCO2/yr', 'units': 'GtCO2/yr in 2100',
+        'signed': False,
+        'reference': {'value': 0, 'label': 'None today'},
+    })
+
     for spec in inputs:
         if spec['id'] == 'co2PerEnergy':
             spec['help'] = (
@@ -244,6 +282,9 @@ def main() -> None:
                 'ci': rate['ci'], 'ch4': round(D['ch4'][key]),
                 'lu': round(D['afolu'][key], 1)}
 
+    MARKER_FOR_PRESET = {'CMIP7 HIGH': 'H', 'CMIP7 MEDIUM': 'M',
+                         'CMIP7 MEDIUM-to-LOW': 'ML', 'CMIP7 VERY LOW': 'VL'}
+
     pre = list(C['PRE'])
     carried = {label: values for label, values in pre}
     for key, label in (('H', 'CMIP7 HIGH'), ('M', 'CMIP7 MEDIUM')):
@@ -272,9 +313,119 @@ def main() -> None:
         steps = round((value - spec['min']) / spec['step'])
         return round(spec['min'] + steps * spec['step'], spec['decimals'])
 
+    # --- deriving the two new controls from each marker's own path ----------
+    # Timing and removal have no published Kaya rate to read off, the way the
+    # other six do. What every marker does publish is its full CO2 path, so the
+    # pair comes from that: the values that make this model's own reconstruction
+    # follow the marker year by year, at the marker's own four Kaya rates. That
+    # keeps a preset meaning "this scenario's properties" rather than "numbers
+    # someone liked", which is the same rule the four rates already follow, and
+    # the residual is printed so a preset that stops tracking says so.
+    SPAN = D['popyears'][-1] - BASE['year']
+
+    # The fit has to run on the base-year state the model itself starts from,
+    # which scripts/build_data.py rebuilds from primary sources. The prototype's
+    # own base differs -- 60.5 against 65.2 kg CO2 per GJ, nearly 8% -- and
+    # deriving against it would tune these two controls to a world the app never
+    # simulates.
+    base_path = OUT / 'base.json'
+    if not base_path.exists():
+        raise SystemExit('run scripts/build_data.py first; base.json missing')
+    APPBASE = json.loads(base_path.read_text())['base']
+
+    def _population_at(year, target):
+        curves = D['popcurves']
+        ys = D['popyears']
+
+        def interp(curve):
+            for i in range(1, len(ys)):
+                if year <= ys[i]:
+                    f = (year - ys[i - 1]) / (ys[i] - ys[i - 1])
+                    return curve[i - 1] + (curve[i] - curve[i - 1]) * f
+            return curve[-1]
+
+        a, b, c = interp(curves['SSP1']), interp(curves['SSP2']), interp(curves['SSP3'])
+        e1, e2, e3 = curves['SSP1'][-1], curves['SSP2'][-1], curves['SSP3'][-1]
+        if target <= e1:
+            return a * (target / e1)
+        if target <= e2:
+            return a + (b - a) * ((target - e1) / (e2 - e1))
+        if target <= e3:
+            return b + (c - b) * ((target - e2) / (e3 - e2))
+        return c * (target / e3)
+
+    def _accumulated(t_years, share_percent):
+        share = min(max(share_percent / 100.0, 1e-6), 1 - 1e-6)
+        lam = (2.0 / SPAN) * math.log(share / (1 - share))
+        if abs(lam) < 1e-12:
+            return float(t_years)
+        return SPAN * (1 - math.exp(-lam * t_years)) / (1 - math.exp(-lam * SPAN))
+
+    def _annual_co2(v, share, removals):
+        """This model's own path, mirroring src/model/kaya.ts."""
+        out = []
+        for t in range(SPAN + 1):
+            pop = _population_at(BASE['year'] + t, v['pop'])
+            gdppc = APPBASE['gdpPerPersonUsd'] * (1 + v['gdppc'] / 100.0) ** t
+            acc = _accumulated(t, share)
+            ei = APPBASE['energyPerDollarMj'] * math.exp(math.log(1 + v['ei'] / 100.0) * acc)
+            ci = APPBASE['co2PerEnergyKgGj'] * math.exp(math.log(1 + v['ci'] / 100.0) * acc)
+            fossil = (pop * 1e9 * gdppc * ei / 1e12) * ci / 1000.0
+            land = APPBASE['landUseGt'] + (v['lu'] - APPBASE['landUseGt']) * (t / SPAN)
+            removal = -abs(removals) * (t / SPAN) ** 2
+            out.append(fossil + land + removal)
+        return out
+
+    def _marker_annual(key):
+        years, path = D['years'], D['markers'][key]
+        out = []
+        for t in range(SPAN + 1):
+            year = BASE['year'] + t
+            for i in range(1, len(years)):
+                if year <= years[i]:
+                    f = (year - years[i - 1]) / (years[i] - years[i - 1])
+                    out.append(path[i - 1] + (path[i] - path[i - 1]) * f)
+                    break
+            else:
+                out.append(path[-1])
+        return out
+
+    def derive_timing(key, values):
+        """(timing, removals) that best track the marker, by coarse-then-fine search."""
+        target = _marker_annual(key)
+
+        def cost(share, removals):
+            got = _annual_co2(values, share, removals)
+            return sum((a - b) ** 2 for a, b in zip(got, target)) / len(target)
+
+        best, shares, rems = None, [5 + i for i in range(91)], [i * 0.5 for i in range(51)]
+        for s in shares:
+            for r in rems:
+                c = cost(s, r)
+                if best is None or c < best[0]:
+                    best = (c, s, r)
+        _, s, r = best
+        return s, round(r, 1)
+
     presets = []
     for label, values in pre:
         inputs = {INPUT_META[k][0]: snap(INPUT_META[k][0], v) for k, v in values.items()}
+        # The four CMIP7 buttons carry their marker's own timing and removal.
+        # Every other preset describes a rate the world might follow rather than
+        # a published trajectory, so it keeps the steady-rate defaults.
+        marker_key = MARKER_FOR_PRESET.get(label)
+        if marker_key is None:
+            inputs['improvementTiming'] = 50
+            inputs['removals'] = 0.0
+        else:
+            timing, removals = derive_timing(marker_key, values)
+            inputs['improvementTiming'] = timing
+            inputs['removals'] = removals
+            got = _annual_co2(values, timing, removals)
+            tgt = _marker_annual(marker_key)
+            err = 100 * (sum(got) / sum(tgt) - 1)
+            print(f'  {label}: timing {timing}% by 2062, removals {removals} Gt '
+                  f'-> cumulative {err:+.1f}% of the marker')
         # This preset takes the observed rates, so it follows the corrected
         # carbon-intensity rate rather than the prototype's.
         if label == 'Kaya at observed rates':

@@ -31,7 +31,15 @@ export const MARKER_BY_ID: Readonly<Record<string, Marker>> = Object.freeze(
   Object.fromEntries(MARKERS.map((m) => [m.id, m])),
 );
 
-/** The marker value that belongs under a given slider, or null if unpublished. */
+/**
+ * The marker value that belongs under a given slider, or null if unpublished.
+ *
+ * Timing and removal carry no published value to put a tick on. The markers
+ * report six Kaya numbers each; the pair this model needs beyond those comes
+ * from fitting each marker's CO2 path in scripts/build_carried_data.py, which
+ * makes them derived quantities rather than something a marker states. A tick
+ * would claim otherwise, so those two sliders carry none.
+ */
 export function markerValueFor(marker: Marker, input: InputId): number | null {
   switch (input) {
     case 'population': return marker.kaya.populationBn;
@@ -40,6 +48,8 @@ export function markerValueFor(marker: Marker, input: InputId): number | null {
     case 'co2PerEnergy': return marker.kaya.co2PerEnergy;
     case 'landUse': return marker.kaya.landUse;
     case 'methane': return marker.kaya.methane;
+    case 'improvementTiming': return null;
+    case 'removals': return null;
   }
 }
 

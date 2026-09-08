@@ -3,7 +3,7 @@ import { PRESETS } from './model/bounds.js';
 import type { InputId, ScenarioInputs } from './model/types.js';
 
 /**
- * A scenario is the six numbers plus whatever the reader called it. The name
+ * A scenario is the eight numbers plus whatever the reader called it. The name
  * travels with the numbers through share links and through the Learn More
  * pages, so a named scenario stays named wherever it is opened.
  */
@@ -47,15 +47,25 @@ function orderedIds(): InputId[] {
   return INPUT_SPECS.map((spec) => spec.id);
 }
 
+/**
+ * Every count of numbers a published link may carry.
+ *
+ * Six is the original set, before the timing and removal controls existed.
+ * New inputs append, so each addition adds a length here rather than changing
+ * the meaning of the numbers already in a link.
+ */
+const SHIPPED_LENGTHS: readonly number[] = [6, INPUT_SPECS.length];
+
 export function encodeInputs(inputs: ScenarioInputs): string {
   return orderedIds().map((id) => String(inputs[id])).join('_');
 }
 
 /**
- * `s=10.2_1.91_-1.62_-0.48_1_300&n=Fast%20electrification`.
+ * `s=10.2_1.91_-1.62_-0.48_1_300_50_0&n=Fast%20electrification`.
  *
- * The six numbers keep the shape they have always had, so links written
- * before scenarios could be named still open. The name rides alongside.
+ * The numbers keep the order INPUT_SPECS gives them, and new inputs append
+ * rather than insert, so a link written against a shorter list still opens.
+ * The name rides alongside.
  */
 export function encodeScenario(scenario: Scenario): string {
   const numbers = `s=${encodeInputs(scenario.inputs)}`;
@@ -76,12 +86,20 @@ export function decodeScenario(text: string): Scenario | null {
   if (numbers === null) return null;
   const parts = numbers.split('_');
   const ids = orderedIds();
-  if (parts.length !== ids.length) return null;
+  // A link written before an input existed carries fewer numbers, and opens on
+  // the defaults for whatever came later: for timing and removal that is the
+  // steady-rate, no-removal path the link was built against. Only lengths this
+  // app has actually shipped count, so a truncated or invented link is still
+  // malformed rather than being padded into something plausible.
+  if (!SHIPPED_LENGTHS.includes(parts.length)) return null;
+  // Number('') is 0, so an empty field would read as a real value and `s=`
+  // would open a scenario rather than being rejected as malformed.
+  if (parts.some((part) => part.trim() === '')) return null;
   const values = parts.map(Number);
   if (values.some((v) => !Number.isFinite(v))) return null;
   const inputs = defaultInputs();
   ids.forEach((id, i) => {
-    inputs[id] = clampInput(id, values[i] as number);
+    if (i < values.length) inputs[id] = clampInput(id, values[i] as number);
   });
   return { inputs, name: cleanName(params.get('n') ?? '') };
 }

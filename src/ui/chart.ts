@@ -268,7 +268,7 @@ function distanceTo(y: number, band: { top: number; bottom: number }): number {
  *
  * The label used to sit a fixed 11 units above the end of the reader's line,
  * which put it straight through whatever else happened to run there. Any of
- * the six sliders can move that line anywhere on the axis, so no fixed offset
+ * the sliders can move that line anywhere on the axis, so no fixed offset
  * is clear for every combination.
  *
  * Instead: the label occupies a strip of the plot, from its left edge to the
@@ -281,13 +281,15 @@ function distanceTo(y: number, band: { top: number; bottom: number }): number {
  * what makes the label that line's name rather than a caption floating in
  * the plot. `GRID_WEIGHT` prices the first in units of the second.
  */
+/** Drift past which the label stops reading as the line's name, in plot units. */
+const ACCEPTABLE_DRIFT = 60;
+
 function placeUserLabel(
   path: DrawablePath, yFor: (v: number) => number, scale: Scale, text: string,
-): { x: number; y: number } {
-  const rightEdge = xFor(END_YEAR) - 6;
-  const left = Math.max(PLOT.left, rightEdge - labelWidth(text));
+): { x: number; y: number; connector: number | null } {
   const half = TYPE.userLabel * CAP_RATIO;
   const need = half + 2;
+  const width = labelWidth(text);
 
   const userPoints = path.points.map((point) => ({
     x: xFor(point.year), y: yFor(point.co2Gt),
@@ -296,11 +298,6 @@ function placeUserLabel(
     x: xFor(year), y: yFor(at(marker.co2Gt, index)),
   })));
 
-  const bands: Array<{ top: number; bottom: number }> = [];
-  for (const line of [userPoints, ...markerPoints]) {
-    const band = bandBetween(line, left, rightEdge);
-    if (band !== null) bands.push(band);
-  }
   const grid: Array<{ top: number; bottom: number }> = [];
   const gridlines = Math.round((scale.max - scale.min) / scale.step);
   for (let i = 0; i <= gridlines; i += 1) {
@@ -310,19 +307,67 @@ function placeUserLabel(
 
   /** Room around a position, past what the text needs counting for nothing. */
   const roomAt = (y: number, obstacles: ReadonlyArray<{ top: number; bottom: number }>) =>
-    Math.min(need, ...obstacles.map((band) => distanceTo(y, band)));
+    (obstacles.length === 0 ? need
+      : Math.min(need, ...obstacles.map((band) => distanceTo(y, band))));
 
   const anchor = yFor(at(path.points, path.points.length - 1, 'final point').co2Gt);
-  let best = { y: anchor, fromLines: -1, cost: Infinity };
-  for (let y = PLOT.top + half; y <= PLOT.bottom - half; y += 0.5) {
-    const fromLines = roomAt(y, bands);
-    const cost = Math.abs(y - anchor) - GRID_WEIGHT * roomAt(y, grid);
-    if (fromLines > best.fromLines
-        || (fromLines === best.fromLines && cost < best.cost)) {
-      best = { y, fromLines, cost };
+
+  /** The best position for a label whose right edge sits at `rightEdge`. */
+  function placeAt(rightEdge: number) {
+    const left = Math.max(PLOT.left, rightEdge - width);
+    const own = bandBetween(userPoints, left, rightEdge);
+    const others: Array<{ top: number; bottom: number }> = [];
+    for (const line of markerPoints) {
+      const band = bandBetween(line, left, rightEdge);
+      if (band !== null) others.push(band);
+    }
+    const bands = own === null ? others : [own, ...others];
+
+    let best = { y: anchor, fromLines: -1, cost: Infinity };
+    for (let y = PLOT.top + half; y <= PLOT.bottom - half; y += 0.5) {
+      const fromLines = roomAt(y, bands);
+      // Nearness is measured to the band the reader's line sweeps under the
+      // label, not to its final point: on a steep path the final point is
+      // nowhere near the stretch the label actually sits over.
+      const near = own === null ? Math.abs(y - anchor) : distanceTo(y, own);
+      const cost = near - GRID_WEIGHT * roomAt(y, grid);
+      if (fromLines > best.fromLines
+          || (fromLines === best.fromLines && cost < best.cost)) {
+        best = { y, fromLines, cost };
+      }
+    }
+    const drift = own === null ? Math.abs(best.y - anchor) : distanceTo(best.y, own);
+    // Where the label ends up far from its line, the connector needs the edge
+    // of the band to run back to.
+    const reach = own === null ? anchor
+      : (best.y < own.top ? own.top : own.bottom);
+    return { x: rightEdge, y: best.y, fromLines: best.fromLines, drift, reach };
+  }
+
+  const edge = xFor(END_YEAR) - 6;
+  let best = placeAt(edge);
+  // Clearing every line comes first and absolutely, so where the right-hand
+  // edge offers nothing near the reader's line the label ends up across the
+  // plot from it. On the steepest paths -- reachable once removal and
+  // late-arriving improvement joined the sliders -- that put the name 150
+  // units from its line on a plot 310 units tall, which reads as a caption
+  // rather than as that line's name. Sliding the label back along the line
+  // finds a stretch with room beside it. Tried only when the right edge fails,
+  // so the ordinary case still costs one pass.
+  if (best.drift > ACCEPTABLE_DRIFT) {
+    for (let back = 40; back <= 200; back += 40) {
+      const candidate = placeAt(edge - back);
+      if (candidate.fromLines >= best.fromLines && candidate.drift < best.drift) {
+        best = candidate;
+      }
     }
   }
-  return { x: rightEdge, y: best.y + half };
+  // A label this far from its line has to say which line it belongs to, so it
+  // carries a hairline back to it. Every corner of the slider space that needs
+  // one is a path that climbs through the markers and then dives, where the
+  // only strip clear of all eight lines sits well below the one being named.
+  const connector = best.drift > ACCEPTABLE_DRIFT ? best.reach : null;
+  return { x: best.x, y: best.y + half, connector };
 }
 
 function userPath(
@@ -332,7 +377,15 @@ function userPath(
     + `${xFor(point.year).toFixed(1)},${yFor(point.co2Gt).toFixed(1)}`).join('');
   const text = shorten(name);
   const place = placeUserLabel(path, yFor, scale, text);
-  const label = `<text x="${place.x.toFixed(1)}" y="${place.y.toFixed(1)}" `
+  const tie = place.connector === null ? '' : (() => {
+    const x = place.x - 4;
+    const from = place.y > place.connector ? place.y - TYPE.userLabel : place.y + 4;
+    return `<line x1="${x.toFixed(1)}" y1="${from.toFixed(1)}" `
+      + `x2="${x.toFixed(1)}" y2="${place.connector.toFixed(1)}" `
+      + 'stroke="var(--you)" stroke-width="1" stroke-dasharray="2 2" '
+      + 'data-user-tie="1"/>';
+  })();
+  const label = tie + `<text x="${place.x.toFixed(1)}" y="${place.y.toFixed(1)}" `
     + `text-anchor="end" font-family="${SANS}" font-size="${TYPE.userLabel}" `
     + `font-weight="700" fill="var(--you)" data-user-label="1">`
     + `${escapeText(text)}</text>`;

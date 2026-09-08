@@ -23,16 +23,21 @@ describe('how many scenarios the sliders reach', () => {
   });
 
   it('multiplies them into the total the front page prints', () => {
-    const expected = INPUT_SPECS.reduce((total, spec) => total * sliderPositions(spec), 1);
+    const expected = INPUT_SPECS.reduce(
+      (total, spec) => total * BigInt(sliderPositions(spec)), 1n,
+    );
     expect(SCENARIO_COUNT).toBe(expected);
-    expect(SCENARIO_COUNT).toBe(519_753_168_866_151);
+    expect(SCENARIO_COUNT).toBe(2_412_174_456_707_806_791n);
   });
 
-  // Past MAX_SAFE_INTEGER the product would start losing whole scenarios
-  // without saying so, and the number on the page would quietly go wrong.
-  it('stays inside exact integer arithmetic', () => {
-    expect(Number.isSafeInteger(SCENARIO_COUNT)).toBe(true);
-    expect(SCENARIO_COUNT).toBeLessThan(Number.MAX_SAFE_INTEGER / 10);
+  // The product outgrew exact double arithmetic when timing and removal joined
+  // the six, which is why it is a BigInt. As a number it came out ...806700 for
+  // a true ...806791: whole scenarios lost in the last digits, silently. This
+  // holds that the count stays exact rather than that it stays small.
+  it('counts exactly, past where doubles stop being able to', () => {
+    expect(typeof SCENARIO_COUNT).toBe('bigint');
+    expect(SCENARIO_COUNT).toBeGreaterThan(BigInt(Number.MAX_SAFE_INTEGER));
+    expect(BigInt(Number(SCENARIO_COUNT))).not.toBe(SCENARIO_COUNT);
   });
 
   // METHODS.md quotes the figure. A slider range moving would change the
@@ -51,27 +56,22 @@ describe('how many scenarios the sliders reach', () => {
     let cumulativeHigh = -Infinity;
     let warmingLow = Infinity;
     let warmingHigh = -Infinity;
-    // Each factor moves the total in one direction, so the extremes sit at
-    // the corners: 2^6 of them, min and max on every slider.
-    const axes = INPUT_SPECS.map((spec) => [spec.min, spec.max]);
-    for (const population of axes[0] ?? []) {
-      for (const income of axes[1] ?? []) {
-        for (const energyPerDollar of axes[2] ?? []) {
-          for (const co2PerEnergy of axes[3] ?? []) {
-            for (const landUse of axes[4] ?? []) {
-              for (const methane of axes[5] ?? []) {
-                const path = computePath({ population, income, energyPerDollar,
-                  co2PerEnergy, landUse, methane } as ScenarioInputs);
-                const t = warming(path.cumulativeGt, methane);
-                cumulativeLow = Math.min(cumulativeLow, path.cumulativeGt);
-                cumulativeHigh = Math.max(cumulativeHigh, path.cumulativeGt);
-                warmingLow = Math.min(warmingLow, t);
-                warmingHigh = Math.max(warmingHigh, t);
-              }
-            }
-          }
-        }
-      }
+    // Each factor moves the total in one direction, so the extremes sit at the
+    // corners: min and max on every slider. Enumerated from INPUT_SPECS rather
+    // than nested by hand, so adding an input widens the search instead of
+    // leaving the new slider at undefined and every total at NaN.
+    const specs = [...INPUT_SPECS];
+    const corners = 2 ** specs.length;
+    for (let mask = 0; mask < corners; mask += 1) {
+      const inputs = Object.fromEntries(specs.map((spec, i) => [
+        spec.id, (mask >> i) & 1 ? spec.max : spec.min,
+      ])) as unknown as ScenarioInputs;
+      const path = computePath(inputs);
+      const t = warming(path.cumulativeGt, inputs.methane);
+      cumulativeLow = Math.min(cumulativeLow, path.cumulativeGt);
+      cumulativeHigh = Math.max(cumulativeHigh, path.cumulativeGt);
+      warmingLow = Math.min(warmingLow, t);
+      warmingHigh = Math.max(warmingHigh, t);
     }
     const totals = Math.round(cumulativeHigh - cumulativeLow + 1);
     const degrees = Math.round((warmingHigh - warmingLow) * 100 + 1);

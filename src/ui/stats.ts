@@ -20,7 +20,7 @@ export interface StatTiles {
 /**
  * The three numbers the tiles lead with.
  *
- * These always report the reconstruction the six sliders drive, including while
+ * These always report the reconstruction the sliders drive, including while
  * a CMIP7 preset sits untouched. Reporting the published totals instead until
  * the first slider move made the headline change quantity rather than value:
  * on CMIP7 MEDIUM the tiles read 2.84 degrees as published, and one step of the

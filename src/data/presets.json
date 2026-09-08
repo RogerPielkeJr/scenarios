@@ -10,7 +10,9 @@
     "energyPerDollar": -1.43,
     "co2PerEnergy": -0.15,
     "methane": 380,
-    "landUse": 2.0
+    "landUse": 2.0,
+    "improvementTiming": 50,
+    "removals": 0.0
    },
    "expected": {
     "cumulative_gt": 4177.7,
@@ -35,7 +37,9 @@
     "energyPerDollar": -0.66,
     "co2PerEnergy": -0.08,
     "methane": 533,
-    "landUse": 1.9
+    "landUse": 1.9,
+    "improvementTiming": 53,
+    "removals": 1.5
    }
   },
   {
@@ -48,7 +52,9 @@
     "energyPerDollar": -1.32,
     "co2PerEnergy": -0.87,
     "methane": 436,
-    "landUse": 1.5
+    "landUse": 1.5,
+    "improvementTiming": 61,
+    "removals": 0.0
    }
   },
   {
@@ -61,7 +67,9 @@
     "energyPerDollar": -0.89,
     "co2PerEnergy": -3.06,
     "methane": 203,
-    "landUse": -8.8
+    "landUse": -8.8,
+    "improvementTiming": 31,
+    "removals": 5.5
    }
   },
   {
@@ -74,7 +82,9 @@
     "energyPerDollar": -2.11,
     "co2PerEnergy": -2.6,
     "methane": 94,
-    "landUse": -4.7
+    "landUse": -4.7,
+    "improvementTiming": 82,
+    "removals": 11.0
    }
   },
   {
@@ -87,7 +97,9 @@
     "energyPerDollar": -1.62,
     "co2PerEnergy": -0.48,
     "methane": 300,
-    "landUse": 1.0
+    "landUse": 1.0,
+    "improvementTiming": 50,
+    "removals": 0.0
    },
    "expected": {
     "cumulative_gt": 3408.7,
@@ -107,7 +119,9 @@
     "energyPerDollar": -1.36,
     "co2PerEnergy": -0.17,
     "methane": 450,
-    "landUse": 2.0
+    "landUse": 2.0,
+    "improvementTiming": 50,
+    "removals": 0.0
    },
    "expected": {
     "cumulative_gt": 5047.2,
@@ -131,7 +145,9 @@
     "energyPerDollar": -1.57,
     "co2PerEnergy": -2.79,
     "methane": 150,
-    "landUse": -1.0
+    "landUse": -1.0,
+    "improvementTiming": 50,
+    "removals": 0.0
    },
    "expected": {
     "cumulative_gt": 1585.0,

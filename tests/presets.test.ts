@@ -73,19 +73,22 @@ describe('presets', () => {
   });
 
   // The four CMIP7 presets load a marker's Kaya factors into the sliders.
-  // HIGH lands close. The other three cannot: a constant rate carries one
-  // improvement evenly across 75 years while the markers bend, and the Kaya
-  // identity has no term for engineered carbon removal, so a marker that goes
-  // net negative is out of reach. MEDIUM-to-LOW is the one that lands BELOW
-  // its marker rather than above, because its land-use sink reaches -8.8 Gt
-  // and a straight line to it accumulates that sink from 2025. Pinned so the
-  // size and the sign of each gap stay visible.
-  // See METHODS.md, "What the tool does not represent".
+  // Every CMIP7 preset now reproduces its own marker's century total, because
+  // the timing and removal values come from fitting that marker's published
+  // path in scripts/build_carried_data.py. Before those two controls existed
+  // the same four presets missed by -12, +325, -480 and +1,031 GtCO2: a
+  // constant rate carried one improvement evenly across 75 years while the
+  // markers bend, and a product of positive Kaya terms never reached the
+  // net-negative emissions two of them end on.
+  //
+  // VERY LOW keeps the widest gap in absolute terms and the smallest in
+  // consequence: 55 GtCO2 on a total of 268, which the logarithmic emulator
+  // turns into three hundredths of a degree.
   it.each([
-    { label: 'CMIP7 HIGH', markerId: 'H', toleranceGt: 70 },
-    { label: 'CMIP7 MEDIUM', markerId: 'M', toleranceGt: 330 },
-    { label: 'CMIP7 MEDIUM-to-LOW', markerId: 'ML', toleranceGt: 500 },
-    { label: 'CMIP7 VERY LOW', markerId: 'VL', toleranceGt: 1050 },
+    { label: 'CMIP7 HIGH', markerId: 'H', toleranceGt: 20 },
+    { label: 'CMIP7 MEDIUM', markerId: 'M', toleranceGt: 20 },
+    { label: 'CMIP7 MEDIUM-to-LOW', markerId: 'ML', toleranceGt: 20 },
+    { label: 'CMIP7 VERY LOW', markerId: 'VL', toleranceGt: 60 },
   ])('reproduces $label to within $toleranceGt Gt of its marker',
     ({ label, markerId, toleranceGt }) => {
       const preset = PRESETS.find((p) => p.label === label);
@@ -98,23 +101,30 @@ describe('presets', () => {
         .toBeLessThanOrEqual(toleranceGt);
     });
 
-  // The tolerance test above passes on magnitude alone, so the sign goes in
-  // separately: three presets overshoot their marker and MEDIUM-to-LOW
-  // undershoots it. A flip either way means the model moved.
+  // What is left between a preset's warming and its marker's is the emulator's
+  // own residual, not the path's. Feeding the emulator the marker's published
+  // cumulative gives nearly the same answer as feeding it the reconstruction,
+  // which is what says the reconstruction has stopped being the source of the
+  // difference. The emulator misses the markers by up to 0.26 C on its own;
+  // no arrangement of sliders reaches past that.
   it.each([
-    { label: 'CMIP7 HIGH', markerId: 'H', direction: 'above' },
-    { label: 'CMIP7 MEDIUM', markerId: 'M', direction: 'above' },
-    { label: 'CMIP7 MEDIUM-to-LOW', markerId: 'ML', direction: 'below' },
-    { label: 'CMIP7 VERY LOW', markerId: 'VL', direction: 'above' },
-  ])('lands $direction the marker $label names', ({ label, markerId, direction }) => {
+    { label: 'CMIP7 HIGH', markerId: 'H' },
+    { label: 'CMIP7 MEDIUM', markerId: 'M' },
+    { label: 'CMIP7 MEDIUM-to-LOW', markerId: 'ML' },
+    { label: 'CMIP7 VERY LOW', markerId: 'VL' },
+  ])('leaves only the emulator between $label and its marker', ({ label, markerId }) => {
     const preset = PRESETS.find((p) => p.label === label);
-    if (preset === undefined) throw new Error(`no preset ${label}`);
     const marker = MARKER_BY_ID[markerId];
-    if (marker === undefined) throw new Error(`no marker ${markerId}`);
-    const gap = computePath(preset.inputs).cumulativeGt - marker.cumulativeGt;
-    if (direction === 'above') expect(gap).toBeGreaterThan(0);
-    else expect(gap).toBeLessThan(0);
+    expect(preset).toBeDefined();
+    expect(marker).toBeDefined();
+    if (!preset || !marker) return;
+    const ours = warming(computePath(preset.inputs).cumulativeGt, preset.inputs.methane);
+    const onMarkerTotal = warming(marker.cumulativeGt, preset.inputs.methane);
+    // VERY LOW is the loosest at 0.031: its 55 GtCO2 gap sits on a total of
+    // 268, where the logarithm is steepest.
+    expect(Math.abs(ours - onMarkerTotal), label).toBeLessThanOrEqual(0.04);
   });
+
 
   // The brief states 4,600 Gt and 3.4 degC for the slow bound and 1,400 and
   // 2.2 for the fast one. Recalibrating the base year moved the totals but

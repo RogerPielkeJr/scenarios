@@ -235,7 +235,7 @@ export const METHANE_PAGE: LearnPageSpec = {
 
   markers: {
     heading: 'What the CMIP7 markers assume',
-    note: 'The widest spread of any of the six sliders.',
+    note: 'The widest spread of any of the rate and level sliders.',
     paragraphs: [
       `The markers range from ${mt(VERY_LOW_CH4)} in VERY LOW to ${mt(HIGH_CH4)} in HIGH, a `
       + `spread of ${(HIGH_CH4 / VERY_LOW_CH4).toFixed(1)} times. HIGH assumes `
