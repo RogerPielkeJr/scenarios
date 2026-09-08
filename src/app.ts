@@ -69,10 +69,22 @@ function buildPresets(
   };
 }
 
+// Subscript digits become their plain form before slugging. The site writes
+// CO₂ with the subscript glyph, and the character class below drops anything
+// outside a-z0-9, so a figure called "Land use CO₂" downloaded as
+// "land-use-co-..." with the 2 silently gone.
+const PLAIN_DIGITS: ReadonlyArray<[RegExp, string]> = [[/\u2082/g, '2'], [/\u2081/g, '1'],
+  [/\u2083/g, '3'], [/\u2084/g, '4']];
+
+function plainDigits(text: string): string {
+  return PLAIN_DIGITS.reduce((out, [from, to]) => out.replace(from, to), text);
+}
+
 /** A filename from the scenario's name, or the plain one when unnamed. */
 function fileStem(name: string): string {
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  return slug === '' ? 'emissions-scenario' : slug.slice(0, 48);
+  const slug = plainDigits(name).toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return slug === '' ? 'climate-scenario' : slug.slice(0, 48);
 }
 
 function buildLegend(container: HTMLElement, readerLabel: string): void {

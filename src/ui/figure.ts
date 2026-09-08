@@ -345,10 +345,22 @@ export function toSpreadsheet(data: FigureData): string {
 export function figureToXls(data: FigureData, filename: string): void {
   save(new Blob([toSpreadsheet(data)], { type: 'application/vnd.ms-excel' }), filename);
 }
+// Subscript digits become their plain form before slugging. The site writes
+// CO₂ with the subscript glyph, and the character class below drops anything
+// outside a-z0-9, so a figure called "Land use CO₂" downloaded as
+// "land-use-co-..." with the 2 silently gone.
+const PLAIN_DIGITS: ReadonlyArray<[RegExp, string]> = [[/\u2082/g, '2'], [/\u2081/g, '1'],
+  [/\u2083/g, '3'], [/\u2084/g, '4']];
+
+function plainDigits(text: string): string {
+  return PLAIN_DIGITS.reduce((out, [from, to]) => out.replace(from, to), text);
+}
+
 
 /** A filename stem from a title, or a fallback when it reduces to nothing. */
 export function fileStem(title: string, fallback: string): string {
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const slug = plainDigits(title).toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   return slug === '' ? fallback : slug.slice(0, 60);
 }
 
