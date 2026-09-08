@@ -11,7 +11,7 @@ import { formatInput } from '../../format.js';
 import { LEARN_ENTRIES } from '../../learn/registry.js';
 import type { KeyEntry, LearnPageSpec, ProseBlock, Source } from '../../learn/types.js';
 import {
-  decodeScenario, defaultScenario, hashFor, learnHref,
+  decodeScenario, defaultScenario, hashFor, learnHref, learnIndexHref,
   type Scenario,
 } from '../../state.js';
 import { plotTable, renderPlot, renderStrip, stripTable } from '../plot.js';
@@ -174,6 +174,48 @@ function siblingNav(root: Document, slug: string, scenario: Scenario): HTMLEleme
   return nav;
 }
 
+/**
+ * The strip of sibling pages at the head of every Learn More page.
+ *
+ * The foot of the page already lists the others with a line of description
+ * each, which serves a reader who has finished. This serves one who has not:
+ * it sits above the fold so moving between factors never means scrolling to
+ * the bottom first, and it names the page you are on so the set reads as a set.
+ *
+ * Every link goes through learnHref, never a bare path. A bare one drops the
+ * reader's eight numbers and their name, and the next Use button then carries
+ * the defaults back to the builder over everything they had set.
+ */
+function pageBanner(root: Document, slug: string, scenario: Scenario): HTMLElement {
+  const nav = element(root, 'nav', 'learn-banner');
+  nav.setAttribute('aria-label', 'The Learn More pages');
+  const list = element(root, 'div', 'learn-banner-list');
+  for (const entry of LEARN_ENTRIES) {
+    if (entry.slug === slug) {
+      const here = element(root, 'span', 'learn-chip learn-chip-here', entry.title);
+      here.setAttribute('aria-current', 'page');
+      list.appendChild(here);
+    } else if (entry.status === 'live') {
+      const link = root.createElement('a');
+      link.className = 'learn-chip';
+      link.href = learnHref(entry.slug, scenario);
+      link.textContent = entry.title;
+      list.appendChild(link);
+    } else {
+      const soon = element(root, 'span', 'learn-chip learn-chip-soon', entry.title);
+      soon.title = 'In preparation';
+      list.appendChild(soon);
+    }
+  }
+  const all = root.createElement('a');
+  all.className = 'learn-chip learn-chip-index';
+  all.href = learnIndexHref(scenario);
+  all.textContent = 'All pages';
+  list.appendChild(all);
+  nav.appendChild(list);
+  return nav;
+}
+
 function backLink(root: Document, scenario: Scenario, fresh: boolean): HTMLElement {
   const nav = element(root, 'nav', 'back-strip');
   const link = root.createElement('a');
@@ -215,6 +257,7 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
 
   linkToolbar(root, scenario);
 
+  main.appendChild(pageBanner(root, spec.slug, scenario));
   main.appendChild(backLink(root, scenario, fresh));
 
   // The builder comes first: a reader arrives here to set a number, and the

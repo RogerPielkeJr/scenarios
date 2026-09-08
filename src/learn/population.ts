@@ -315,7 +315,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
       `The 95% prediction interval works differently and does not add up this way. Summing the `
       + `regional lower bounds gives ${bn(C.world2100.regionalLo95Sum)} against the UN's world `
       + `figure of ${bn(C.world2100.lo95)}, because the regions do not all reach the bottom of `
-      + 'their own ranges in the same century.',
+      + 'their own ranges at the same time.',
     ],
     action: 'Use this population in my scenario',
     modes: [{

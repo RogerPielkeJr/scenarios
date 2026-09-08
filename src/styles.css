@@ -547,6 +547,39 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .notes p { margin: 0 0 9px; overflow-wrap: break-word; }
 .notes b.you { color: var(--you); }
 
+/* The sibling strip at the head of a Learn More page. Chips rather than the
+   toolbar's ghost buttons: this is a set of peers with one of them current,
+   and the current one has to look unclickable without looking disabled. */
+.learn-banner { margin: 0 0 20px; }
+.learn-banner-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.learn-chip {
+  font-family: var(--sans);
+  font-size: 14.5px;
+  line-height: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.12s, background 0.12s;
+}
+a.learn-chip:hover, a.learn-chip:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+.learn-chip-here {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--panel);
+  font-weight: 600;
+}
+.learn-chip-soon { color: var(--dim); border-style: dashed; }
+.learn-chip-index { font-style: italic; color: var(--dim); }
+@media (max-width: 620px) {
+  .learn-chip { font-size: 13.5px; padding: 7px 10px; }
+}
+
 /* --- the bibliography page ---------------------------------------------- */
 /* The acknowledgement at the head of the bibliography. A tinted panel rather
    than another reference block, because it credits the people whose work the
