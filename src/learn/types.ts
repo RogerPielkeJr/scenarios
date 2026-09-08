@@ -65,7 +65,13 @@ export interface BuilderPart {
   unitSuffix: string;
   /** A line under the label, for context the reader needs while sliding. */
   note?: string;
-  marks: Array<{ value: number; label: string; kind: 'low' | 'medium' | 'high' | 'observed' }>;
+  marks: Array<{
+    value: number;
+    label: string;
+    kind: 'low' | 'medium' | 'high' | 'observed';
+    /** Overrides the colour `kind` would give, for a scenario's own. */
+    color?: string;
+  }>;
 }
 
 /** What a builder makes of its parts. */

@@ -35,7 +35,7 @@ function ticksFor(part: BuilderPart): Tick[] {
   return part.marks.map((mark) => ({
     position: ((mark.value - part.min) / (part.max - part.min)) * 100,
     label: mark.label,
-    color: MARK_COLORS[mark.kind] ?? 'var(--dim)',
+    color: mark.color ?? MARK_COLORS[mark.kind] ?? 'var(--dim)',
     id: mark.label,
     priority: mark.kind === 'medium' || mark.kind === 'observed',
   }));

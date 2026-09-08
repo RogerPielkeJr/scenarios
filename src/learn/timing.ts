@@ -205,9 +205,9 @@ export const TIMING_PAGE: LearnPageSpec = {
     heading: 'Build your value',
     note: 'One control, and the curve it draws.',
     paragraphs: [
-      `Set how much of the century's improvement lands by ${MID_YEAR}. The chart above shows `
-      + 'what the world managed on each factor; the readout below shows what your choice does '
-      + 'to the annual rate at each end of the century.',
+      `Set how much of the century's improvement lands by ${MID_YEAR}. The readout beneath `
+      + 'the slider says what your choice does to the annual rate at each end of the century, '
+      + 'and the chart further down shows what the world managed on each factor.',
       'Nothing here changes where the technology sliders end up in 2100. The endpoint is '
       + 'exact for every setting, which is what makes this a question about route rather than '
       + 'about ambition.',

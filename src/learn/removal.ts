@@ -25,29 +25,50 @@ function rampAt(year: number, target2100: number): number {
   return target2100 * f * f;
 }
 
+/**
+ * The four CMIP7 markers as ticks, for either control.
+ *
+ * Each marker's figure is its whole 2100 removal, because that is what the fit
+ * in scripts/build_carried_data.py recovers from a published CO2 path: the
+ * markers do not publish a split between forests and machinery. So the same
+ * tick belongs on both controls, and both notes say it is a total rather than
+ * that family's share.
+ */
+const MARKER_MARKS = data.markers
+  .filter((m) => m.removals > 0)
+  .map((m) => ({
+    value: m.removals,
+    label: `${m.id} ${m.removals.toFixed(1)}`,
+    kind: 'high' as const,
+    color: m.color,
+  }));
+
 const PARTS: BuilderPart[] = [
   {
     id: 'conventional',
     label: 'Forests and soils in 2100',
     min: 0,
-    max: 10,
+    max: 12,
     step: 0.5,
     default: 2,
     decimals: 1,
     unitSuffix: ' GtCO₂',
     note: `Planting, restoration, soil carbon and durable wood products. These already take `
       + `back ${gt(TODAY.conventionalGt)}, ${TODAY.shareOfGrossPercent}% of gross CO₂ `
-      + 'emissions, and they compete for the same land the land-use slider covers.',
+      + 'emissions, and they compete for the same land the land-use slider covers. The '
+      + 'scenario ticks give each marker’s whole removal, not the part of it that comes '
+      + 'from land.',
     marks: [
-      { value: TODAY.conventionalGt, label: 'today', kind: 'observed' },
-      { value: 5, label: '5 Gt', kind: 'high' },
+      { value: TODAY.conventionalGt, label: `today ${TODAY.conventionalGt.toFixed(1)}`,
+        kind: 'observed' },
+      ...MARKER_MARKS,
     ],
   },
   {
     id: 'novel',
     label: 'Capture and storage in 2100',
     min: 0,
-    max: 15,
+    max: 12,
     step: 0.5,
     default: 0,
     decimals: 1,
@@ -55,10 +76,11 @@ const PARTS: BuilderPart[] = [
     note: `Bioenergy with carbon capture, direct air capture, biochar and enhanced `
       + `weathering. These run at ${mt(TODAY.novelGt)} today, `
       + `${TODAY.novelSharePercent}% of all removal, growing `
-      + `${TODAY.novelGrowthPercent}% a year.`,
+      + `${TODAY.novelGrowthPercent}% a year. The scenario ticks give each marker’s whole `
+      + 'removal, not the part of it that comes from machinery.',
     marks: [
-      { value: 0, label: 'today', kind: 'observed' },
-      { value: AHEAD.novel2050Gt, label: '2050 scenarios', kind: 'high' },
+      { value: 0, label: 'today 0.0', kind: 'observed' },
+      ...MARKER_MARKS,
     ],
   },
 ];
@@ -225,7 +247,7 @@ export const REMOVAL_PAGE: LearnPageSpec = {
               : `${multiple.toFixed(1)} times all the removal running today`,
             `Forests and soils ${gt(conventional)}, capture and storage ${gt(novel)}`,
             novel > AHEAD.novel2050Gt
-              ? `Capture and storage above the ${gt(AHEAD.novel2050Gt)} assessed scenarios `
+              ? `Capture and storage above the ${gt(AHEAD.novel2050Gt)} assessed pathways `
                 + 'reach by 2050'
               : `Cumulatively about ${Math.round(total * (END_YEAR - BASE_YEAR) / 3)} GtCO₂ `
                 + 'taken back over the century on this ramp',
