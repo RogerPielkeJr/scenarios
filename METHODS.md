@@ -34,14 +34,25 @@ byte-identical, and about half of all settings repeat another. Methane changes
 no CO2 point at all, but it does change the warming, so it counts as part of an
 outcome.
 
-Which factors collapse depends on the timing slider. Income compounds over
-calendar years while the two technology rates compound over the redistributed
-clock, so at any timing but 50% income stands apart and only the technology pair
-collapses; at exactly 50% the two clocks coincide and all three collapse into a
-single product. Counting the distinct products exactly in each case and adding
-them gives **1,200,628,952,606,294,829** distinct scenarios, just over 1.2
-quintillion, which is what the front page states and what the parenthetical
-beside it explains.
+Counting the distinct products the two rates reach rather than the pairs they
+offer gives
+
+```
+population 81 x income 401 x technology rates 101,341 x land use 151
+  x methane 521 x timing 91 x removal 51
+```
+
+which is **1,201,823,843,625,281,331** distinct scenarios, just over 1.2
+quintillion. That is the figure the front page states, and the parenthetical
+beside it writes out the same seven factors.
+
+One further collapse sits inside that and is not deducted. At a timing of
+exactly 50% income compounds over the same clock as the two technology rates, so
+all three collapse into a single product rather than two. Counting that one
+slice separately gives 1,200,628,952,606,294,829, which is 0.1% lower and rounds
+to the same figure. The page states the seven-factor product because a reader
+can multiply it back; `rateProducts.triples` in `src/data/config.json` carries
+the 36,961,039 three-rate products for anyone who wants the exact form.
 
 `SCENARIO_COUNT` and `DISTINCT_SCENARIO_COUNT` in `src/model/config.ts` derive
 both from the slider definitions rather than carrying either as a literal, the

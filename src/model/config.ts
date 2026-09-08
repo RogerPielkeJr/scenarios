@@ -80,32 +80,42 @@ const SCALES: ReadonlyArray<readonly [bigint, string]> = [
 const RATE_PRODUCTS = configJson.rateProducts;
 
 /**
- * How many distinct scenarios the sliders actually reach.
+ * The factors behind the count of distinct scenarios, in the order the front
+ * page multiplies them.
  *
- * SCENARIO_COUNT above counts settings. It is not the same thing: energy per
- * dollar and CO2 per unit of energy enter the identity only through their
- * product, so swapping one for the other leaves the path byte-identical and
- * about half of all settings repeat another. Methane changes no CO2 point at
- * all, but it does change the warming, so it counts as part of an outcome.
- *
- * Which factors collapse depends on the timing slider. Income compounds over
- * calendar years while the two technology rates compound over the redistributed
- * clock, so at any timing but 50% income stands apart and only the technology
- * pair collapses. At exactly 50% the two clocks coincide and all three collapse
- * into a single product. The two cases are counted separately and added.
- *
- * `rateProducts` comes from scripts/build_carried_data.py, which counts the
- * distinct products exactly. The three-rate case is 81.5 million of them, which
- * is a build-time job rather than a page-load one.
+ * Seven numbers for eight sliders. Energy per dollar and CO2 per unit of energy
+ * enter the identity only through their product, so swapping one rate for the
+ * other leaves the path byte-identical; the pair contributes the count of
+ * distinct products they reach rather than the 203,401 pairs they offer.
  */
-export const DISTINCT_SCENARIO_COUNT: bigint = (() => {
-  const stops = (id: InputId) => BigInt(sliderPositions(SPEC_BY_ID[id]));
-  const timings = stops('improvementTiming');
-  const shaped = (timings - 1n) * stops('income') * BigInt(RATE_PRODUCTS.pairs);
-  const steady = BigInt(RATE_PRODUCTS.triples);
-  return stops('population') * stops('landUse') * stops('removals')
-    * stops('methane') * (shaped + steady);
-})();
+export const SCENARIO_FACTORS: ReadonlyArray<{ label: string; count: number }> = [
+  { label: 'population', count: sliderPositions(SPEC_BY_ID.population) },
+  { label: 'income', count: sliderPositions(SPEC_BY_ID.income) },
+  { label: 'the two technology rates', count: RATE_PRODUCTS.pairs },
+  { label: 'land use', count: sliderPositions(SPEC_BY_ID.landUse) },
+  { label: 'methane', count: sliderPositions(SPEC_BY_ID.methane) },
+  { label: 'timing', count: sliderPositions(SPEC_BY_ID.improvementTiming) },
+  { label: 'removal', count: sliderPositions(SPEC_BY_ID.removals) },
+];
+
+/**
+ * How many distinct scenarios the sliders reach, as the product of the factors
+ * above.
+ *
+ * SCENARIO_COUNT counts settings, which is not the same thing: about half of
+ * them repeat another, because the two technology rates are interchangeable.
+ * Methane changes no CO2 point at all, but it does change the warming, so it
+ * belongs to an outcome.
+ *
+ * One further collapse this does not deduct. At a timing of exactly 50% income
+ * compounds over the same clock as the two technology rates, so all three
+ * collapse into a single product rather than two; counting that slice
+ * separately would take 0.1% off the total. `rateProducts.triples` carries the
+ * figure for anyone who wants it, and METHODS.md states both.
+ */
+export const DISTINCT_SCENARIO_COUNT: bigint = SCENARIO_FACTORS.reduce(
+  (total, factor) => total * BigInt(factor.count), 1n,
+);
 
 /**
  * The count as the front page says it: "just over 2.4 quintillion".

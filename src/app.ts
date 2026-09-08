@@ -2,7 +2,7 @@ import { PRESETS } from './model/bounds.js';
 import { computeFlags, markerIdForPreset } from './model/flags.js';
 import { computePath } from './model/kaya.js';
 import { MARKERS, MARKER_BY_ID, publishedPath } from './model/markers.js';
-import { approximateScenarioCount, approximateSettingsCount, defaultInputs } from './model/config.js';
+import { INPUT_SPECS, SCENARIO_FACTORS, approximateScenarioCount, defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import {
   ScenarioState, decodeScenario, displayName, pathWithScenario,
@@ -209,8 +209,17 @@ export function mountApp(root: Document = document): App {
   // slider definitions, not on where the reader has put them.
   const count = root.getElementById('scenario-count');
   if (count !== null) count.textContent = approximateScenarioCount();
-  const settings = root.getElementById('settings-count');
-  if (settings !== null) settings.textContent = approximateSettingsCount();
+  // Both the count of variables and the arithmetic behind the total are
+  // derived, so adding a slider carries the sentence with it.
+  const variables = root.getElementById('variable-count');
+  if (variables !== null) variables.textContent = String(INPUT_SPECS.length);
+  // The arithmetic behind it, written out so a reader can multiply it back.
+  const arithmetic = root.getElementById('scenario-arithmetic');
+  if (arithmetic !== null) {
+    arithmetic.textContent = SCENARIO_FACTORS
+      .map((factor) => `${factor.label} ${factor.count.toLocaleString('en-US')}`)
+      .join(' \u00d7 ');
+  }
 
   strip = installStrip(root, chart.closest('.chart-figure') ?? chart);
 
