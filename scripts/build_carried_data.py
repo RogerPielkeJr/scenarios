@@ -474,6 +474,22 @@ def main() -> None:
             entry['expected'] = DOCUMENTED[label]
         presets.append(entry)
 
+    # CO2 reads as CO2 with a subscript wherever the site shows it, and these
+    # files carry the slider labels, units and help text. Applied to the values
+    # this script emits rather than to the strings it was handed, so the
+    # prototype constants stay as they were extracted. Identifier-bearing keys
+    # keep their raw spelling: those name code, not text.
+    RAW_KEYS = {'id', 'legacyId', 'slug', 'url', 'href', 'color', 'generated_by'}
+
+    def subscript(value, key=None):
+        if isinstance(value, str):
+            return value if key in RAW_KEYS else value.replace('CO2', 'CO\u2082')
+        if isinstance(value, dict):
+            return {k: subscript(v, k) for k, v in value.items()}
+        if isinstance(value, list):
+            return [subscript(v, key) for v in value]
+        return value
+
     OUT.mkdir(parents=True, exist_ok=True)
     notes = {
         'meta': {'generated_by': 'scripts/build_carried_data.py',
@@ -484,7 +500,8 @@ def main() -> None:
     for name, payload in (('config', config), ('emulator', emulator),
                           ('markers', markers_json), ('population', population),
                           ('presets', {'presets': presets}), ('notes', notes)):
-        (OUT / f'{name}.json').write_text(json.dumps(payload, indent=1, ensure_ascii=False) + '\n')
+        text = json.dumps(subscript(payload), indent=1, ensure_ascii=False)
+        (OUT / f'{name}.json').write_text(text + '\n')
         print(f'  wrote src/data/{name}.json')
     missing = [m['id'] for m in markers if m['kaya']['co2PerEnergy'] is None]
     if missing:

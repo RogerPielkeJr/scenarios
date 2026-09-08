@@ -322,7 +322,7 @@ describe('a published scenario on screen', () => {
     expect(notes).toContain('This sits on CMIP7 MEDIUM-to-LOW');
     // Once timing and removal carry this marker's own values, the
     // reconstruction lands on its century total rather than 480 GtCO2 under it.
-    expect(notes).toContain('agree within 0%, 1,710 against 1,710 GtCO2');
+    expect(notes).toContain('agree within 0%, 1,710 against 1,710 GtCO₂');
   });
 
   // The two technology bounds measure the reconstruction's total, which the

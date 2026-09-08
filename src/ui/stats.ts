@@ -64,13 +64,13 @@ export function renderStats(
 ): void {
   const summary = scenarioSummary(inputs, path);
   tiles.cumulative.textContent = thousands(summary.cumulativeGt);
-  const highNote = HIGH === undefined ? 'GtCO2'
-    : `GtCO2 · CMIP7 HIGH reaches ${thousands(HIGH.cumulativeGt)}`;
+  const highNote = HIGH === undefined ? 'GtCO₂'
+    : `GtCO₂ · CMIP7 HIGH reaches ${thousands(HIGH.cumulativeGt)}`;
   // With a preset on screen the note carries what that scenario publishes, so
   // the reader reads the reconstruction and the published figure together.
   tiles.cumulativeNote.textContent = published === null
     ? highNote
-    : `GtCO2 · ${published.label} publishes ${thousands(published.cumulativeGt)}`;
+    : `GtCO₂ · ${published.label} publishes ${thousands(published.cumulativeGt)}`;
 
   tiles.warming.textContent = degrees(summary.warmingC);
   tiles.warmingNote.textContent = published === null
@@ -97,7 +97,7 @@ export function renderStats(
  * worse than saying nothing.
  */
 export function analogueTile(intensity: number): { value: string; note: string } {
-  const per = `${perDollar(intensity)} kg CO2 per dollar`;
+  const per = `${perDollar(intensity)} kg CO₂ per dollar`;
   const verdict = analogueFor(intensity);
   if (verdict === null) return { value: 'no comparison', note: per };
   if (verdict.kind === 'match') {

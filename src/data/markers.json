@@ -2,7 +2,7 @@
  "meta": {
   "generated_by": "scripts/build_carried_data.py",
   "provenance": "ScenarioMIP CMIP7 marker runs; carried over from prototype/kaya_scenario_builder.html; no primary source on this machine (see DATA.md)",
-  "note": "co2Gt is total CO2 including land use, on the markers' own basis"
+  "note": "co2Gt is total CO₂ including land use, on the markers' own basis"
  },
  "years": [
   2025,

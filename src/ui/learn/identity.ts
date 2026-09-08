@@ -12,7 +12,7 @@ const CHAIN: Array<{ input: InputId; short: string }> = [
   { input: 'population', short: 'People' },
   { input: 'income', short: 'GDP per person' },
   { input: 'energyPerDollar', short: 'Energy per dollar' },
-  { input: 'co2PerEnergy', short: 'CO2 per unit of energy' },
+  { input: 'co2PerEnergy', short: 'CO₂ per unit of energy' },
 ];
 
 function factorNode(
@@ -70,7 +70,7 @@ export function buildIdentity(root: Document, options: IdentityOptions): HTMLEle
   line.appendChild(equals);
   const result = root.createElement('span');
   result.className = 'identity-result';
-  result.textContent = 'Fossil and industrial CO2';
+  result.textContent = 'Fossil and industrial CO₂';
   line.appendChild(result);
   wrapper.appendChild(line);
 
@@ -80,20 +80,20 @@ export function buildIdentity(root: Document, options: IdentityOptions): HTMLEle
   plus.className = 'op';
   plus.textContent = '+';
   tail.appendChild(plus);
-  tail.appendChild(factorNode(root, 'landUse', 'Land use CO2', active, linked, scenario));
+  tail.appendChild(factorNode(root, 'landUse', 'Land use CO₂', active, linked, scenario));
   const total = root.createElement('span');
   total.className = 'op op-equals';
   total.textContent = '=';
   tail.appendChild(total);
   const totalLabel = root.createElement('span');
   totalLabel.className = 'identity-result';
-  totalLabel.textContent = 'Total CO2';
+  totalLabel.textContent = 'Total CO₂';
   tail.appendChild(totalLabel);
   wrapper.appendChild(tail);
 
   const aside = root.createElement('p');
   aside.className = 'identity-aside';
-  aside.appendChild(root.createTextNode('The identity above covers CO2 only. Methane warms '
+  aside.appendChild(root.createTextNode('The identity above covers CO₂ only. Methane warms '
     + 'the world through a coefficient of its own: '));
   aside.appendChild(factorNode(root, 'methane', 'Methane', active, linked, scenario));
   aside.appendChild(root.createTextNode('.'));

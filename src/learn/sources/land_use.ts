@@ -17,7 +17,7 @@ export const LAND_USE_SOURCES: readonly Source[] = [
     publisher: 'Global Carbon Project and Our World in Data',
     vintage: 'accessed 2026',
     url: 'https://github.com/owid/co2-data',
-    used: 'The annual land-use CO2 series drawn on the chart, 1965 to 2024.',
+    used: 'The annual land-use CO₂ series drawn on the chart, 1965 to 2024.',
   },
   {
     title: '2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 4 '
@@ -36,7 +36,7 @@ export const LAND_USE_SOURCES: readonly Source[] = [
     publisher: 'Griscom and colleagues, PNAS 114(44)',
     vintage: '2017',
     url: 'https://doi.org/10.1073/pnas.1710465114',
-    used: 'The maximum potential of land-based mitigation, 23.8 PgCO2e a year with food and '
+    used: 'The maximum potential of land-based mitigation, 23.8 PgCO₂e a year with food and '
       + 'biodiversity safeguards, of which about half counts as cost-effective.',
   },
   {

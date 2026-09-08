@@ -19,7 +19,7 @@ const FACTORS = C.factors;
 const SPAN = END_YEAR - BASE_YEAR;
 
 const rate = (value: number) => `${value > 0 ? '+' : '−'}${Math.abs(value).toFixed(2)}%/yr`;
-const kg = (value: number) => `${value.toFixed(1)} kgCO2 per GJ`;
+const kg = (value: number) => `${value.toFixed(1)} kgCO₂ per GJ`;
 const pc = (value: number) => `${value.toFixed(0)}%`;
 
 function series(id: string) {
@@ -142,7 +142,7 @@ const SHARE_PARTS: BuilderPart[] = FACTORS.map((factor) => ({
   unitSuffix: '%',
   note: `${factor.share1965.toFixed(1)}% of world energy in ${C.firstYear}, `
     + `${factor.share2024.toFixed(1)}% in ${C.lastYear}. Carries `
-    + `${factor.co2KgPerGj.toFixed(1)} kgCO2 per GJ.`,
+    + `${factor.co2KgPerGj.toFixed(1)} kgCO₂ per GJ.`,
   marks: [
     { value: Math.round(factor.share1965), label: String(C.firstYear), kind: 'low' },
     { value: Math.round(factor.share2024), label: String(C.lastYear), kind: 'observed' },
@@ -151,7 +151,7 @@ const SHARE_PARTS: BuilderPart[] = FACTORS.map((factor) => ({
 
 const PROCESS_PART: BuilderPart = {
   id: 'process',
-  label: 'Cement, flaring and other industrial CO2',
+  label: 'Cement, flaring and other industrial CO₂',
   min: 0,
   max: 150,
   step: 5,
@@ -183,26 +183,26 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
   slug: 'carbon-intensity',
   accent: '#8c2f39',
   input: 'co2PerEnergy',
-  title: 'CO2 per unit of energy',
+  title: 'CO₂ per unit of energy',
   standfirst: 'One slider sets how fast the carbon comes out of the world’s energy. '
     + 'This page shows what the fuel mix has done since 1965, why this term has moved so '
     + 'much more slowly than efficiency, and how to build a rate from a mix of your own.',
 
   definition: {
-    quantity: 'CO2 released per unit of primary energy',
-    units: 'kilograms of CO2 per gigajoule; the slider sets how fast it changes, in %/yr',
+    quantity: 'CO₂ released per unit of primary energy',
+    units: 'kilograms of CO₂ per gigajoule; the slider sets how fast it changes, in %/yr',
     place: 'The fourth of the four factors that multiply',
     today: `${kg(C.levels.sliderBasis2024)} (${C.lastYear})`,
     paragraphs: [
       'The fuel mix decides this term. Coal releases '
-      + `${factorFor('coal').toFixed(1)} kgCO2 for every gigajoule it delivers, oil `
+      + `${factorFor('coal').toFixed(1)} kgCO₂ for every gigajoule it delivers, oil `
       + `${factorFor('oil').toFixed(1)} and natural gas ${factorFor('gas').toFixed(1)}. `
       + 'Nuclear, hydro, wind and solar release none at the point of use. Shifting energy '
       + "between those columns does the whole of this factor's work.",
       `This page counts carbon two ways. Burning fuel released `
       + `${kg(C.levels.energyBasis2024)} in ${C.lastYear}. The slider measures `
       + `${kg(C.levels.sliderBasis2024)}, because it also carries the cement, flaring and `
-      + 'other industrial CO2 the CMIP7 scenarios count, '
+      + 'other industrial CO₂ the CMIP7 scenarios count, '
       + `${kg(C.nonCombustion.kgPerGj)} of it, spread across every unit of energy. Cement `
       + `alone supplies ${C.nonCombustion.components.cement.toFixed(2)} of that.`,
       `The difference matters for the rate as well as the level. Measured on the slider's own `
@@ -233,7 +233,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + `${pc(FACTORS.find((f) => f.id === 'coal')?.share2024 ?? 0)} and gas rose from `
       + `${pc(FACTORS.find((f) => f.id === 'gas')?.share1965 ?? 0)} to `
       + `${pc(FACTORS.find((f) => f.id === 'gas')?.share2024 ?? 0)}. Gas carries `
-      + `${(100 - (factorFor('gas') / factorFor('coal')) * 100).toFixed(0)}% less CO2 per `
+      + `${(100 - (factorFor('gas') / factorFor('coal')) * 100).toFixed(0)}% less CO₂ per `
       + 'gigajoule than coal, so that swap alone lowered the intensity.',
       `Together those movements took the term from ${kg(C.levels.sliderBasis1965)} in `
       + `${C.firstYear} to ${kg(C.levels.sliderBasis2024)} in ${C.lastYear}, a fall of `
@@ -266,10 +266,10 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
     },
     extra: {
       kind: 'plot',
-      caption: 'CO2 per unit of energy on the basis the slider measures, which includes '
-        + 'cement, flaring and other industrial CO2: the record, then each rate compounding '
+      caption: 'CO₂ per unit of energy on the basis the slider measures, which includes '
+        + 'cement, flaring and other industrial CO₂: the record, then each rate compounding '
         + 'forward from 2025.',
-      dataSource: 'Global Carbon Budget fossil and industrial CO2 over Energy Institute total energy supply; ScenarioMIP CMIP7 markers',
+      dataSource: 'Global Carbon Budget fossil and industrial CO₂ over Energy Institute total energy supply; ScenarioMIP CMIP7 markers',
       key: [
         { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
         { label: 'Observed rate, continued', color: 'var(--navy)', dash: true },
@@ -281,7 +281,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
           xMin: C.firstYear,
           xMax: END_YEAR,
           xTicks: [C.firstYear, 1990, 2010, 2025, 2050, 2075, END_YEAR],
-          yLabel: 'kgCO2 per GJ',
+          yLabel: 'kgCO₂ per GJ',
           yDecimals: 0,
           series: [
             {
@@ -332,11 +332,11 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       `Fuel switching inside the fossil block helps, then stops helping. Replacing every remaining `
       + `tonne of coal with gas would cut about `
       + `${((factorFor('coal') - factorFor('gas')) * (FACTORS.find((f) => f.id === 'coal')?.share2024 ?? 0) / 100).toFixed(1)} `
-      + 'kgCO2 per GJ, worth roughly a decade of the observed rate, and then the term would '
+      + 'kgCO₂ per GJ, worth roughly a decade of the observed rate, and then the term would '
       + 'settle at the carbon content of gas and stop falling.',
       `This factor cannot fall to zero. Take every fossil fuel out of the mix and the slider still `
       + `reads ${kg(C.zeroCarbonFloor.kgPerGj)}, the cement, flaring and industrial process `
-      + `CO2 that no change of fuel touches. Reaching that floor by 2100 implies `
+      + `CO₂ that no change of fuel touches. Reaching that floor by 2100 implies `
       + `${rate(C.zeroCarbonFloor.impliedRate)}, and no faster rate exists on this page `
       + 'unless those industrial emissions fall too.',
     ],
@@ -358,7 +358,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + 'entirely.',
       'Three of the seven publish no rate for this term, and the reason follows from the '
       + 'arithmetic above. LOW, LOW-to-NEGATIVE and VERY LOW all reach 2100 with fossil and '
-      + 'industrial CO2 below zero: −3.7, −23.2 and −1.1 GtCO2 a year once their land-use '
+      + 'industrial CO₂ below zero: −3.7, −23.2 and −1.1 GtCO₂ a year once their land-use '
       + 'term comes out. A rate applied to a positive quantity never reaches a negative one, '
       + 'so those three scenarios have no carbon-intensity rate to publish. They decarbonise '
       + 'by removing carbon, which this page cannot represent and the land use page can.',
@@ -371,7 +371,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
     paragraphs: [
       'Set a share for each fuel in 2100. The shares need not add to 100, because the builder '
       + 'normalises them; their proportions carry the answer. Published emission factors turn '
-      + 'the mix into kilograms of CO2 per gigajoule, and the distance from today’s '
+      + 'the mix into kilograms of CO₂ per gigajoule, and the distance from today’s '
       + `${kg(C.levels.sliderBasis2024)} across 75 years gives the rate the slider takes.`,
       `Two adjustments separate the mix from the answer, and the result shows you both. The `
       + `page scales the emission factors by ${C.calibration.factor.toFixed(3)}, because applied `
@@ -379,7 +379,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + `${kg(C.calibration.observed2024)} the world actually emitted from energy, the `
       + 'difference falling to oil that becomes plastics, lubricants and bitumen rather than '
       + `exhaust. It then adds ${kg(C.nonCombustion.kgPerGj)} of cement, flaring and `
-      + 'industrial CO2 on top, which the last control lets you change.',
+      + 'industrial CO₂ on top, which the last control lets you change.',
     ],
     action: 'Use this rate in my scenario',
     modes: [{

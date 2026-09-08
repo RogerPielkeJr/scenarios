@@ -40,7 +40,7 @@ describe('presets', () => {
   });
 
   it.each(DOCUMENTED_PRESETS.map((p) => [p.label, p] as const))(
-    'reproduces the documented cumulative CO2 and warming for %s',
+    'reproduces the documented cumulative CO₂ and warming for %s',
     (_label, preset) => {
       const expected = preset.expected;
       expect(expected).toBeDefined();
@@ -131,7 +131,7 @@ describe('presets', () => {
   // barely moved the warming, because the emulator is logarithmic in
   // cumulative CO2. Pinned so the gap against the published figures stays
   // visible rather than being quietly absorbed.
-  it('moves cumulative CO2 away from the figures the brief states, but not warming', () => {
+  it('moves cumulative CO₂ away from the figures the brief states, but not warming', () => {
     for (const preset of DOCUMENTED_PRESETS) {
       const stated = preset.expected?.brief_stated;
       if (!stated || !preset.expected) continue;

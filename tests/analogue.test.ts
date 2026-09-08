@@ -88,7 +88,7 @@ describe('the country the 2100 world resembles', () => {
     for (const target of sweep()) {
       const tile = analogueTile(target);
       expect(tile.value.length, `${target} value`).toBeGreaterThan(0);
-      expect(tile.note, `${target} note`).toContain('kg CO2 per dollar');
+      expect(tile.note, `${target} note`).toContain('kg CO₂ per dollar');
       expect(tile.value).not.toContain('undefined');
       expect(tile.note).not.toContain('undefined');
       expect(tile.note).not.toContain('NaN');

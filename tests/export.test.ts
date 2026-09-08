@@ -36,7 +36,7 @@ describe('the downloaded scenario sheet', () => {
       const value = (label: string) => rows.find((row) => row[0].startsWith(label))?.[1];
       const note = (label: string) => rows.find((row) => row[0].startsWith(label))?.[2];
 
-      expect(value('Cumulative CO2'), preset.label).toBe(text('tile-cumulative'));
+      expect(value('Cumulative CO₂'), preset.label).toBe(text('tile-cumulative'));
       expect(value('Warming in 2100'), preset.label).toBe(text('tile-warming'));
       expect(value('Added warming'), preset.label).toBe(text('tile-added'));
       expect(value('Your 2100 world'), preset.label).toBe(text('tile-analogue'));

@@ -48,8 +48,8 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
   {
     slug: 'carbon-intensity',
     input: 'co2PerEnergy',
-    title: 'CO2 per unit of energy',
-    linkText: 'Learn more about CO2 per unit of energy',
+    title: 'CO₂ per unit of energy',
+    linkText: 'Learn more about CO₂ per unit of energy',
     summary: 'The fuel mix, and the arithmetic of adding zero-carbon supply '
       + 'while total energy grows.',
     status: 'live',
@@ -57,8 +57,8 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
   {
     slug: 'land-use',
     input: 'landUse',
-    title: 'Land use CO2',
-    linkText: 'Learn more about land use CO2',
+    title: 'Land use CO₂',
+    linkText: 'Learn more about land use CO₂',
     summary: 'Deforestation minus regrowth, why nobody knows the number precisely, '
       + 'and what turns the term negative.',
     status: 'live',

@@ -20,7 +20,7 @@
     "superseded": {
      "cumulative_gt": 4083.9,
      "warming_c": 3.19,
-     "why": "the rate measured combustion CO2 alone, at -0.21%/yr"
+     "why": "the rate measured combustion CO₂ alone, at -0.21%/yr"
     },
     "tolerance_gt": 0.5,
     "tolerance_c": 0.01,

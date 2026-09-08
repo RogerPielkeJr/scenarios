@@ -179,7 +179,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       + `CMIP7 HIGH's ${rate(HIGH_RATE)} reaches `
       + `${mj(compound(BASE.energyPerDollarMj, HIGH_RATE, END_YEAR - BASE_YEAR))}.`,
       `Between 1990 and ${C.lastYear} this term improved ${rate(OBSERVED)} while the fuel `
-      + `mix improved ${rate(OBSERVED_RATES.co2PerEnergy)}. Of the fall in CO2 per dollar of `
+      + `mix improved ${rate(OBSERVED_RATES.co2PerEnergy)}. Of the fall in CO₂ per dollar of `
       + `output across those 34 years, energy intensity supplied `
       + `${((OBSERVED / (OBSERVED + OBSERVED_RATES.co2PerEnergy)) * 100).toFixed(0)}%.`,
     ],

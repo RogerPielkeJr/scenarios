@@ -34,12 +34,12 @@ describe('emulator', () => {
     expect(hl?.error).toBeCloseTo(-0.256, 2);
   });
 
-  it('is monotonic in cumulative CO2 and in methane', () => {
+  it('is monotonic in cumulative CO₂ and in methane', () => {
     expect(warming(3000, 380)).toBeGreaterThan(warming(2000, 380));
     expect(warming(2000, 500)).toBeGreaterThan(warming(2000, 380));
   });
 
-  it('treats negative cumulative CO2 as zero rather than taking log of a negative', () => {
+  it('treats negative cumulative CO₂ as zero rather than taking log of a negative', () => {
     expect(Number.isFinite(warming(-500, 380))).toBe(true);
     expect(warming(-500, 380)).toBe(warming(0, 380));
   });

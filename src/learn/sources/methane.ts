@@ -42,7 +42,7 @@ export const METHANE_SOURCES: readonly Source[] = [
     publisher: 'Riahi and colleagues, Global Environmental Change 42',
     vintage: '2017',
     url: 'https://doi.org/10.1016/j.gloenvcha.2016.05.009',
-    used: 'How the marker scenarios set methane alongside their CO2 assumptions.',
+    used: 'How the marker scenarios set methane alongside their CO₂ assumptions.',
   },
   {
     title: 'Global Methane Pledge',

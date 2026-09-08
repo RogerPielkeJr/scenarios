@@ -6,17 +6,17 @@ not represent. `DATA.md` covers where the numbers come from.
 ## The emissions calculation
 
 Emissions follow the Kaya identity. Four factors multiply together, and land use
-CO2 is added on top as a separate term:
+CO₂ is added on top as a separate term:
 
 ```
-CO2 = population × (GDP ÷ population) × (energy ÷ GDP) × (CO2 ÷ energy)
-      + land use CO2
+CO₂ = population × (GDP ÷ population) × (energy ÷ GDP) × (CO₂ ÷ energy)
+      + land use CO₂
 ```
 
 The reader sets eight numbers: the 2100 population, three annual rates that
-compound from the base year, 2100 values for land use CO2 and methane, when
+compound from the base year, 2100 values for land use CO₂ and methane, when
 across the century the technology improvement arrives, and how much engineered
-CO2 removal runs in 2100.
+CO₂ removal runs in 2100.
 
 The last two joined the six because the first six fix where a trajectory ends
 and say nothing about the route there, and because a product of positive
@@ -28,10 +28,10 @@ below.
 
 Counting the stops each slider offers and multiplying them, the eight reach
 **2,412,174,456,707,806,791** settings. That is not the same as the number of
-scenarios. Energy per dollar and CO2 per unit of energy enter the identity only
+scenarios. Energy per dollar and CO₂ per unit of energy enter the identity only
 through their product, so swapping one rate for the other leaves the path
 byte-identical, and about half of all settings repeat another. Methane changes
-no CO2 point at all, but it does change the warming, so it counts as part of an
+no CO₂ point at all, but it does change the warming, so it counts as part of an
 outcome.
 
 Counting the distinct products the two rates reach rather than the pairs they
@@ -68,7 +68,7 @@ stops, which the model clamps to range but does not snap, so links address a
 denser set again.
 
 Far fewer answers than scenarios come out the other end. Across the whole space
-the century total spans -778 to 44,632 GtCO2 and warming 1.37 to 6.12 °C, which
+the century total spans -778 to 44,632 GtCO₂ and warming 1.37 to 6.12 °C, which
 at the precision the tiles print leaves at most 45,412 distinct totals and 477
 distinct warming figures. Several factors multiplied together, and only the
 product shows.
@@ -79,19 +79,19 @@ cumulative total sums every year.
 
 ### What the four factors cover
 
-They cover **all fossil and industrial CO2, cement included**. This matters,
+They cover **all fossil and industrial CO₂, cement included**. This matters,
 because the whole chart is the reader's line drawn against the seven CMIP7
 marker lines, and those count all of it.
 
-The prototype set base CO2 per unit of energy from the Energy Institute's
-energy CO2 plus flaring, at 60.5 kg per GJ. That leaves out cement and other
-industrial process emissions, roughly 1.9 GtCO2 a year, and it started every
-path at 38.70 GtCO2 in 2025 while the markers started between 42.4 and 43.8. On
+The prototype set base CO₂ per unit of energy from the Energy Institute's
+energy CO₂ plus flaring, at 60.5 kg per GJ. That leaves out cement and other
+industrial process emissions, roughly 1.9 GtCO₂ a year, and it started every
+path at 38.70 GtCO₂ in 2025 while the markers started between 42.4 and 43.8. On
 2026-09-04 the base was recalibrated to 65.181 kg per GJ, taken from Global
-Carbon Budget fossil and industry CO2 over Energy Institute total energy supply.
+Carbon Budget fossil and industry CO₂ over Energy Institute total energy supply.
 Paths now start at 42.47, inside the marker range.
 
-This changed results. Kaya at observed rates moved from 3,707 GtCO2 to 4,084,
+This changed results. Kaya at observed rates moved from 3,707 GtCO₂ to 4,084,
 which puts it above CMIP7 HIGH's 3,777 rather than below it. `presets.json`
 keeps the figures stated before the recalibration under `brief_stated`, and a
 test pins the size of the shift.
@@ -112,11 +112,11 @@ pins the behaviour so it cannot change unnoticed.
 
 ### Land use
 
-Land use CO2 runs in a straight line from 3.83 GtCO2 today to whatever the
+Land use CO₂ runs in a straight line from 3.83 GtCO₂ today to whatever the
 reader sets for 2100.
 
 A line is a placeholder. The marker paths carry land use folded into their total
-CO2 and publish no separate land use series here, so there is no shape to borrow
+CO₂ and publish no separate land use series here, so there is no shape to borrow
 from them. If those series become available, the shape should follow them.
 
 ### Timing and removal
@@ -144,7 +144,7 @@ for a midpoint share `s`, the endpoint is exact -- `accumulated(span) = span` fo
 every `L` -- so the 2100 level the reader set on the rate slider stays put
 whatever the timing. `accumulatedYears` in `src/model/rates.ts`.
 
-**Engineered CO2 removal in 2100** is the additive term that carries a path below
+**Engineered CO₂ removal in 2100** is the additive term that carries a path below
 zero. The four Kaya factors multiply, so the fossil term approaches zero without
 ever crossing it, and no arrangement of the four reaches the net-negative
 emissions the deep-mitigation markers reach. Removal ramps as the square of
@@ -168,7 +168,7 @@ Warming in 2100 above 1850 to 1900:
 T = 1.7274 + 1.3100 × ln(1 + max(0, C) ÷ 1989.74) + 0.0012 × (CH4 − 380)
 ```
 
-`C` is cumulative CO2 from 2025 to 2100 in gigatonnes and `CH4` is methane in
+`C` is cumulative CO₂ from 2025 to 2100 in gigatonnes and `CH4` is methane in
 2100 in megatonnes a year. Methane adds about 0.12 °C per 100 Mt a year.
 
 This is a curve fitted to FaIR v2.2 runs of the seven CMIP7 markers, using the
@@ -178,7 +178,7 @@ decimal places.
 
 ### How well it reproduces FaIR
 
-| Scenario | Cumulative CO2 (Gt) | Methane (Mt/yr) | Emulator | FaIR | Error |
+| Scenario | Cumulative CO₂ (Gt) | Methane (Mt/yr) | Emulator | FaIR | Error |
 |---|---|---|---|---|---|
 | VERY LOW | 268 | 94.0 | 1.55 | 1.61 | −0.06 |
 | LOW-to-NEGATIVE | 373 | 216.0 | 1.76 | 1.68 | +0.08 |
@@ -193,9 +193,9 @@ HIGH-to-LOW does not.
 
 ### What the emulator cannot see
 
-It reads cumulative CO2 and methane, and nothing else. Two paths reaching the
+It reads cumulative CO₂ and methane, and nothing else. Two paths reaching the
 same total give the same answer however differently they got there. HIGH-to-LOW
-is where that bites: it climbs to 51.6 GtCO2 a year in 2065, falls steeply
+is where that bites: it climbs to 51.6 GtCO₂ a year in 2065, falls steeply
 after that, and carries the second-lowest methane of the seven. A fit with no term for
 the shape of the path has no way to tell it apart from a scenario that arrives
 at 2,524 Gt smoothly, and it lands 0.26 °C low.
@@ -212,7 +212,7 @@ that a scenario halting them describes technical regression rather than business
 as usual. **Neither bound assumes poverty. Neither assumes a technology stops
 working.**
 
-| Preset | Population | Income | Energy/$ | CO2/energy | Land use | Methane | Cumulative | Warming |
+| Preset | Population | Income | Energy/$ | CO₂/energy | Land use | Methane | Cumulative | Warming |
 |---|---|---|---|---|---|---|---|---|
 | Kaya at observed rates | 10.2 | +1.91 | −1.43 | −0.15 | 2.0 | 380 | 4,178 | 3.21 |
 | Trend continues | 10.2 | +1.91 | −1.62 | −0.48 | 1.0 | 300 | 3,409 | 2.94 |
@@ -220,7 +220,7 @@ working.**
 | Ausubel methane economy | 9.0 | +1.91 | −1.57 | −2.79 | −1.0 | 150 | 1,585 | 2.22 |
 
 **Kaya at observed rates.** The 1990 to 2024 record projected forward unchanged.
-Income +1.91, energy per dollar −1.43 and CO2 per unit of energy −0.15 all come
+Income +1.91, energy per dollar −1.43 and CO₂ per unit of energy −0.15 all come
 straight out of the Energy Institute, World Bank and Global Carbon Budget
 series. The carbon-intensity figure was −0.21 until 2026-09-05, on a narrower
 basis; "The corrected carbon-intensity rate" below gives the change and what
@@ -252,7 +252,7 @@ alongside it.
 
 Four further buttons load the Kaya factors that a marker itself reports. These
 are the four markers of the seven that publish a carbon-intensity rate; the
-other three do not, because their 2100 fossil CO2 runs negative. HIGH lands
+other three do not, because their 2100 fossil CO₂ runs negative. HIGH lands
 close to the scenario it names. The other three cannot:
 
 | Preset | Marker total | Preset reproduces | Gap |
@@ -348,24 +348,24 @@ slowly than the chosen rate, so a faster rate scores higher.
 The series behind all of it splices two sources at 1990; DATA.md gives the
 method and the size of the difference between them.
 
-### The CO2 per unit of energy builder
+### The CO₂ per unit of energy builder
 
-Seven fuel shares for 2100 plus one control for industrial CO2, in four steps:
+Seven fuel shares for 2100 plus one control for industrial CO₂, in four steps:
 
 1. **Normalise.** The seven shares are scaled to sum to 100, so only their
    proportions matter.
 2. **Burn.** Each share meets its emission factor, and the sum is scaled by
    0.9201, the calibration that makes the 2024 mix reproduce the 2024 observed
    intensity. DATA.md explains where that factor comes from.
-3. **Add what does not burn.** 5.237 kgCO2 per GJ of cement, flaring and other
-   industrial CO2, times whatever the last control is set to.
-4. **Take the rate.** From 65.181 kgCO2 per GJ today to that number in 2100:
+3. **Add what does not burn.** 5.237 kgCO₂ per GJ of cement, flaring and other
+   industrial CO₂, times whatever the last control is set to.
+4. **Take the rate.** From 65.181 kgCO₂ per GJ today to that number in 2100:
 
        rate = ((intensity[2100] / 65.181) ^ (1 / 75) - 1) x 100
 
 The page shows every intermediate number, because the interesting part of this
 builder is the arithmetic rather than the answer. A mix with no fossil fuel in
-it still leaves step 3, so the fastest rate reachable with industrial CO2
+it still leaves step 3, so the fastest rate reachable with industrial CO₂
 unchanged is −3.31%/yr.
 
 ### The income per person builder
@@ -404,24 +404,24 @@ Four flows netted into one 2100 figure:
         - restored area x sequestration rate
         - engineered removal
 
-with today's flows from the Global Carbon Budget: 6.23 GtCO2 of gross
+with today's flows from the Global Carbon Budget: 6.23 GtCO₂ of gross
 deforestation, 2.20 of other transitions and peat, and 4.40 of regrowth. The
 restoration term is a straight area-times-rate product, in millions of hectares
-times tonnes of CO2 a hectare a year, divided by a thousand to reach GtCO2.
+times tonnes of CO₂ a hectare a year, divided by a thousand to reach GtCO₂.
 
 Engineered removal sits on this control because a product of four positive
-factors cannot go below zero. Every marker that reaches net negative CO2 does
+factors cannot go below zero. Every marker that reaches net negative CO₂ does
 it through terms that land on this line.
 
 ## What a CMIP7 preset does and does not reproduce
 
 Loading a CMIP7 preset sets the eight sliders to that marker's own properties:
 the six Kaya factors it reports, plus the timing and removal values derived from
-its published CO2 path in `scripts/build_carried_data.py`. The interface reports
+its published CO₂ path in `scripts/build_carried_data.py`. The interface reports
 how closely the reconstruction follows, computed rather than asserted
 (`markerFidelity` in `src/model/flags.ts`).
 
-| Preset | 2100 CO2, this tool | Marker | Cumulative, this tool | Marker | 2050, this tool | Marker |
+| Preset | 2100 CO₂, this tool | Marker | Cumulative, this tool | Marker | 2050, this tool | Marker |
 |---|---|---|---|---|---|---|
 | CMIP7 HIGH | 54.5 | 55.0 | 3,765 | 3,777 | 48.1 | 47.1 |
 | CMIP7 MEDIUM | 34.1 | 34.4 | 2,767 | 2,770 | 37.0 | 36.1 |
@@ -429,7 +429,7 @@ how closely the reconstruction follows, computed rather than asserted
 | CMIP7 VERY LOW | −11.1 | −5.8 | 323 | 268 | 6.3 | −1.2 |
 
 Before timing and removal existed the same four presets missed their markers'
-century totals by −12, +325, −480 and +1,031 GtCO2. Three causes drove that, and
+century totals by −12, +325, −480 and +1,031 GtCO₂. Three causes drove that, and
 two of them are now controls rather than limitations:
 
 **Shape, solved.** A constant rate spread one improvement evenly across 75 years
@@ -438,9 +438,9 @@ still accumulated 12% more over the century, because MEDIUM cuts hardest in the
 2030s and 2040s: its own implied rate runs −0.77%/yr to 2050 and −0.03%/yr after
 2075. Its timing value of 61% carries that.
 
-**Sign, solved.** MEDIUM-to-LOW and VERY LOW remove more CO2 than they emit
+**Sign, solved.** MEDIUM-to-LOW and VERY LOW remove more CO₂ than they emit
 before 2100, and four factors multiplied together stay positive. The removal
-term reaches those totals: 5.5 and 11.0 GtCO2 a year by 2100.
+term reaches those totals: 5.5 and 11.0 GtCO₂ a year by 2100.
 
 **Land use timing, still a line.** Land use runs straight from today's source to
 the 2100 value, so a marker that builds its sink late is banked from 2025. With
@@ -448,7 +448,7 @@ removal carrying the deep sinks this no longer dominates any preset, but the
 shape remains a placeholder for want of a published land use series.
 
 What is left is not the reconstruction. VERY LOW keeps the widest absolute gap,
-55 GtCO2 on a total of 268, which the logarithmic emulator turns into three
+55 GtCO₂ on a total of 268, which the logarithmic emulator turns into three
 hundredths of a degree. The remaining distance between a preset's warming and
 its marker's published warming is the emulator's own residual, measured in "How
 well it reproduces FaIR" below: up to 0.26 °C when the emulator is fed the
@@ -462,9 +462,9 @@ divergence sits in front of the reader rather than in a footnote.
 
 ## The corrected carbon-intensity rate
 
-Until 2026-09-05 the mark under the CO2-per-energy slider read −0.21 %/yr,
-which measures CO2 from energy over total energy supply. The slider itself
-moves a wider quantity: the fossil and industrial CO2 the CMIP7 markers count,
+Until 2026-09-05 the mark under the CO₂-per-energy slider read −0.21 %/yr,
+which measures CO₂ from energy over total energy supply. The slider itself
+moves a wider quantity: the fossil and industrial CO₂ the CMIP7 markers count,
 cement included. On that basis the world improved **−0.15 %/yr** from 1990 to
 2024, and the mark, the observed rate the notes compare against, and the "Kaya
 at observed rates" preset now all use it.
@@ -474,7 +474,7 @@ What moved with it:
 | | Before | After |
 |---|---|---|
 | Mark under the slider | −0.21 %/yr | −0.15 %/yr |
-| "Kaya at observed rates", cumulative | 4,083.9 GtCO2 | 4,177.7 GtCO2 |
+| "Kaya at observed rates", cumulative | 4,083.9 GtCO₂ | 4,177.7 GtCO₂ |
 | "Kaya at observed rates", warming | 3.19 °C | 3.21 °C |
 
 `config.json` keeps the old figure under `supersededRates` and the preset keeps
@@ -498,7 +498,7 @@ three others take SSP2's 9.89, HIGH-to-LOW and VERY LOW take SSP1's 8.09 to
 **The rates reconcile with each marker's own 2100 total, where a rate can
 exist.** Compounding population, income and energy per dollar from the base
 year, then solving for the carbon intensity rate that lands on the marker's own
-2100 fossil CO2:
+2100 fossil CO₂:
 
 | Marker | Published rate | Rate implied by its own 2100 total |
 |---|---|---|
@@ -512,8 +512,8 @@ HIGH and MEDIUM agree within 0.02 percentage points, which is as much
 corroboration as an internal check can give. HIGH-to-LOW is 0.72 points out.
 
 The last four rows are the interesting result. Those four markers reach 2100
-with fossil and industrial CO2 **below zero** once their land-use term is
-separated: −0.4, −3.7, −23.2 and −1.1 GtCO2 a year. A rate applied to a
+with fossil and industrial CO₂ **below zero** once their land-use term is
+separated: −0.4, −3.7, −23.2 and −1.1 GtCO₂ a year. A rate applied to a
 positive quantity cannot reach a negative one, which explains why three of them
 publish no carbon-intensity rate at all. It is the same structural limit the
 CMIP7 preset note reports on the front page.
@@ -523,12 +523,12 @@ CMIP7 preset note reports on the front page.
 **Engineered carbon removal.** The four factors multiply to a positive number
 whenever there are people, income and energy. Nothing in them can go below zero,
 so a scenario that removes more carbon than it emits cannot be built here. Five
-of the seven markers reach net negative CO2, VERY LOW from 2050 and HIGH-to-LOW
+of the seven markers reach net negative CO₂, VERY LOW from 2050 and HIGH-to-LOW
 only in 2100, and the low ones rely on it.
-The land use slider reaches −10 GtCO2 a year, which is the only sink the tool
+The land use slider reaches −10 GtCO₂ a year, which is the only sink the tool
 has, and it stands in for land and engineered removal together.
 
-**Gases other than CO2 and methane.** No nitrous oxide, no fluorinated gases.
+**Gases other than CO₂ and methane.** No nitrous oxide, no fluorinated gases.
 
 **Aerosols.** Sulphate and other aerosols cool, and scenarios that burn less
 coal lose that cooling as well as the warming. The emulator absorbs whatever
@@ -554,10 +554,10 @@ efficiency and fuel mix could be built, financed or fuelled.
 
 ## The country comparison
 
-The tile names the **largest** economy whose 2024 CO2 per dollar of GDP sits
+The tile names the **largest** economy whose 2024 CO₂ per dollar of GDP sits
 within 5% of the reader's 2100 world, where largest means GDP, the denominator
-of the ratio being compared. It uses Energy Institute CO2 over World Bank
-purchasing power GDP, restricted to 66 economies above 25 Mt CO2 and $40
+of the ratio being compared. It uses Energy Institute CO₂ over World Bank
+purchasing power GDP, restricted to 66 economies above 25 Mt CO₂ and $40
 billion, so a small or poorly measured economy cannot become the answer. It
 compares one ratio and nothing else: it does not say the world would resemble
 that country in any other respect.
@@ -597,5 +597,5 @@ compressing when the reader's path dwarfs them.
 
 ## Rounding
 
-Warming is shown to two decimal places, never more. Cumulative CO2 is shown as a
+Warming is shown to two decimal places, never more. Cumulative CO₂ is shown as a
 whole number. Rates carry their sign, so +1.91 and −1.43 read as a pair.

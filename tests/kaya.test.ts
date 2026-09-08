@@ -40,13 +40,13 @@ describe('computePath', () => {
     }
   });
 
-  it('adds land use to fossil CO2 rather than folding it in', () => {
+  it('adds land use to fossil CO₂ rather than folding it in', () => {
     for (const point of path.points) {
       expect(point.co2Gt).toBeCloseTo(point.fossilGt + point.landUseGt, 9);
     }
   });
 
-  it('sums cumulative CO2 over every year of the path', () => {
+  it('sums cumulative CO₂ over every year of the path', () => {
     const summed = path.points.reduce((total, p) => total + p.co2Gt, 0);
     expect(path.cumulativeGt).toBeCloseTo(summed, 6);
   });
@@ -61,14 +61,14 @@ describe('computePath', () => {
     expect(start).toBeLessThanOrEqual(Math.max(...starts) + 0.1);
   });
 
-  it('counts the industrial CO2 the markers count', () => {
+  it('counts the industrial CO₂ the markers count', () => {
     // Cement and other process CO2 push base CO2 per unit of energy well
     // above EI's energy-only 60.5 kg/GJ. See src/data/base.json.
     expect(BASE.co2PerEnergyKgGj).toBeGreaterThan(64);
     expect(BASE.co2PerEnergyKgGj).toBeLessThan(66);
   });
 
-  it('reports CO2 per dollar consistent with the two technology terms', () => {
+  it('reports CO₂ per dollar consistent with the two technology terms', () => {
     const final = path.final;
     const gdpUsd = final.populationBn * 1e9 * final.gdpPerPersonUsd;
     expect(final.kgCo2PerUsd).toBeCloseTo((final.fossilGt * 1e12) / gdpUsd, 6);

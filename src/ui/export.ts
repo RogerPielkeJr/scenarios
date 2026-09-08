@@ -73,11 +73,11 @@ export function summaryOf(
   const summary = scenarioSummary(inputs, path);
   const country = analogueTile(path.final.kgCo2PerUsd);
   return [
-    ['Cumulative CO2, 2025 to 2100', thousands(summary.cumulativeGt),
+    ['Cumulative CO₂, 2025 to 2100', thousands(summary.cumulativeGt),
       published !== null
-        ? `GtCO2 · ${published.label} publishes ${thousands(published.cumulativeGt)}`
-        : (high === undefined ? 'GtCO2'
-          : `GtCO2 · CMIP7 HIGH reaches ${thousands(high.cumulativeGt)}`)],
+        ? `GtCO₂ · ${published.label} publishes ${thousands(published.cumulativeGt)}`
+        : (high === undefined ? 'GtCO₂'
+          : `GtCO₂ · CMIP7 HIGH reaches ${thousands(high.cumulativeGt)}`)],
     [`Warming in 2100 above ${ANCHORS.baseline}`, degrees(summary.warmingC),
       published === null ? placeAmongMarkers(summary.warmingC)
         : `${published.label} publishes ${degrees(published.warmingC)}`],

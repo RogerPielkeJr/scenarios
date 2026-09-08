@@ -7,7 +7,7 @@ export const CARBON_INTENSITY_SOURCES: readonly Source[] = [
     publisher: 'Energy Institute',
     vintage: '2026 edition, data to 2024',
     url: 'https://www.energyinst.org/statistical-review',
-    used: 'Consumption of each fuel and total energy supply, world, 1965 to 2024, and CO2 '
+    used: 'Consumption of each fuel and total energy supply, world, 1965 to 2024, and CO₂ '
       + 'from energy over the same years.',
   },
   {
@@ -19,14 +19,14 @@ export const CARBON_INTENSITY_SOURCES: readonly Source[] = [
     url: 'https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/'
       + 'V2_1_Ch1_Introduction.pdf',
     used: 'Default carbon content by fuel: 25.8 kgC per GJ for other bituminous coal, 20.0 '
-      + 'for crude oil, 15.3 for natural gas, converted to CO2 at 44/12.',
+      + 'for crude oil, 15.3 for natural gas, converted to CO₂ at 44/12.',
   },
   {
     title: 'Global Carbon Budget 2024',
     publisher: 'Friedlingstein and colleagues, Earth System Science Data 17',
     vintage: '2025',
     url: 'https://doi.org/10.5194/essd-17-965-2025',
-    used: 'World fossil and industrial CO2 with its cement, flaring and other industry '
+    used: 'World fossil and industrial CO₂ with its cement, flaring and other industry '
       + 'components, which the slider’s basis includes and combustion accounting does not.',
   },
   {

@@ -415,7 +415,7 @@ export function renderChart(
     // and the export clips, so the label lost its first character in the PNG.
     + `<text x="0" y="${PLOT.top - 18}" text-anchor="start" `
     + `font-family="${SANS}" font-size="${TYPE.axisLabel}" font-weight="600" `
-    + `fill="var(--dim)">GtCO2/yr</text>`
+    + `fill="var(--dim)">GtCO₂/yr</text>`
     + yearLabels()
     + markerPaths(yFor, highlight)
     + markerLabels(yFor, highlight)

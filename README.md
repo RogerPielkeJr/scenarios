@@ -1,6 +1,6 @@
 # Build your own THB climate scenario
 
-The dashboard published at **scenarios.thehonestbroker.org**. A reader sets six
+The dashboard published at **scenarios.thehonestbroker.org**. A reader sets eight
 assumptions and sees where the century lands, against what the world has
 actually done and against the seven published CMIP7 marker scenarios.
 
@@ -119,12 +119,12 @@ it, so a missing PDF fails CI rather than 404ing on the live site.
 | `/` | `index.html` | The THB Scenario Builder |
 | `/bibliography.html` | `bibliography.html` | The book, the scenarios work, the sources |
 | `/library.html` | `library.html` | The Honest Broker posts on scenarios, in `src/library/entries.ts` |
-| `/learn/` | `learn/index.html` | Index of the six Learn More pages |
+| `/learn/` | `learn/index.html` | Index of the Learn More pages |
 | `/learn/population/` | `learn/population/index.html` | Population |
 | `/learn/income/` | `learn/income/index.html` | Income per person |
 | `/learn/energy-intensity/` | `learn/energy-intensity/index.html` | Energy per dollar |
-| `/learn/carbon-intensity/` | `learn/carbon-intensity/index.html` | CO2 per unit of energy |
-| `/learn/land-use/` | `learn/land-use/index.html` | Land use CO2 |
+| `/learn/carbon-intensity/` | `learn/carbon-intensity/index.html` | CO₂ per unit of energy |
+| `/learn/land-use/` | `learn/land-use/index.html` | Land use CO₂ |
 | `/learn/methane/` | `learn/methane/index.html` | Methane |
 | `/404.html` | `404.html` | What GitHub Pages serves for any address it cannot match |
 
@@ -135,7 +135,7 @@ builds nothing in the browser, carries no scenario, tells crawlers to skip it,
 and stays out of the sitemap.
 
 The front page also carries the **scenario strip** (`src/ui/strip.ts`), fixed to
-the foot of the window and shown only while the chart sits off screen. The six
+the foot of the window and shown only while the chart sits off screen. The
 sliders run down a column taller than the chart beside them, and below 860px
 they sit above it entirely, so a reader working the lower sliders would
 otherwise have no way to watch the answer change. The strip and the four tiles
@@ -154,7 +154,8 @@ every page -- turns those words into a link everywhere at once.
 
 ## Adding a Learn More page
 
-All six pages exist, one per slider, listed in `src/learn/registry.ts`. To add
+Six pages exist, one per Kaya slider, listed in `src/learn/registry.ts`.
+Timing and removal have none yet. To add
 another, or to rebuild one from scratch:
 
 1. **Data.** Write a build script under `scripts/` that fetches from a primary
@@ -197,7 +198,7 @@ them under the figure, the XLS writes them into the workbook, and the PNG
 draws them in a band under the drawing, so a figure that leaves the site says
 where it came from.
 
-Rules the six pages hold to: import the model from `src/model/`, duplicate no
+Rules the pages hold to: import the model from `src/model/`, duplicate no
 arithmetic and no constants, put every number in `src/data/*.json`, give no
 text block a ch-based maximum width, and label the reader's own line with
 `readerLabel(scenario, fallback)` so a named scenario carries its name onto
@@ -224,10 +225,10 @@ npm test
 ```
 
 - `kaya.test.ts`, `population.test.ts`, `emulator.test.ts` cover the model.
-- `presets.test.ts` checks each preset reproduces its documented cumulative CO2
+- `presets.test.ts` checks each preset reproduces its documented cumulative CO₂
   and warming, and pins the gaps that are known and deliberate.
 - `render.test.ts` mounts the whole page against a DOM stub and asserts that
-  every summary tile fills, for all seven presets and at both ends of all six
+  every summary tile fills, for all eight presets and at both ends of all eight
   sliders. This is the guard against a broken edit killing the render halfway
   through and leaving tiles empty. It also covers naming a scenario, the
   preset buttons and a value arriving from a Learn More builder.

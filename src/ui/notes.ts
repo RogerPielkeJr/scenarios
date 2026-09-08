@@ -42,7 +42,7 @@ const COHERENCE_PHRASES: Record<keyof ScenarioFlags['coherence'], string> = {
  * page, computed rather than asserted.
  */
 function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): string {
-  const gt = (value: number) => `${value.toFixed(1)} GtCO2`;
+  const gt = (value: number) => `${value.toFixed(1)} GtCO₂`;
   const sentences: string[] = showingPublished
     ? [
       `<b>This sits on CMIP7 ${fit.label}.</b> The chart draws a reconstruction from the `
@@ -66,8 +66,8 @@ function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): strin
   const percent = Math.abs(fit.cumulativePercent);
   sentences.push(percent < 3
     ? `The two century totals agree within ${percent.toFixed(0)}%, `
-      + `${thousands(fit.ourCumulativeGt)} against ${thousands(fit.markerCumulativeGt)} GtCO2.`
-    : `Over the century this path totals ${thousands(fit.ourCumulativeGt)} GtCO2 against `
+      + `${thousands(fit.ourCumulativeGt)} against ${thousands(fit.markerCumulativeGt)} GtCO₂.`
+    : `Over the century this path totals ${thousands(fit.ourCumulativeGt)} GtCO₂ against `
       + `${thousands(fit.markerCumulativeGt)}, ${percent.toFixed(0)}% `
       + `${fit.cumulativePercent > 0 ? 'above' : 'below'} it.`);
 
@@ -77,7 +77,7 @@ function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): strin
       + `${fit.label} emits ${gt(fit.markerMidGt)}.`);
   }
   if (fit.markerGoesNegative) {
-    sentences.push(`${fit.label} also removes more CO2 than it emits before 2100. Four `
+    sentences.push(`${fit.label} also removes more CO₂ than it emits before 2100. Four `
       + 'factors multiplied together stay positive, so the fossil term here cannot turn '
       + 'negative and only the land use slider can pull a path below zero.');
   }
@@ -110,12 +110,12 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
   // report whether or not a preset stands, so the bounds apply throughout.
   {
     if (flags.aboveSlowBound) {
-      parts.push(`<p>Above ${thousands(BOUNDS.slow)} GtCO2 you have passed the highest total `
+      parts.push(`<p>Above ${thousands(BOUNDS.slow)} GtCO₂ you have passed the highest total `
         + 'reachable with every technological trajectory held at the slowest rate the world '
         + 'has recorded.</p>');
     }
     if (flags.belowFastBound) {
-      parts.push(`<p>Below ${thousands(BOUNDS.fast)} GtCO2 you have passed the lowest total `
+      parts.push(`<p>Below ${thousands(BOUNDS.fast)} GtCO₂ you have passed the lowest total `
         + 'reachable with every technological trajectory at its fastest recorded rate.</p>');
     }
   }
@@ -136,13 +136,13 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
     + 'multiplied '
     + 'together: how many people, how much each of them earns, how much energy each dollar of '
     + 'that income needs, and how much carbon each unit of energy carries. Economists call the '
-    + 'middle two energy intensity and carbon intensity. Land use CO2 joins them from its '
-    + 'own slider. The four cover fossil and industrial CO2, cement included, so they count '
+    + 'middle two energy intensity and carbon intensity. Land use CO₂ joins them from its '
+    + 'own slider. The four cover fossil and industrial CO₂, cement included, so they count '
     + 'the same emissions the CMIP7 scenarios count.</p>');
 
   parts.push('<p><b>Where the warming figure comes from.</b> A curve fitted to FaIR runs of '
     + 'the seven CMIP7 markers, so treat it as indicative rather than as a model result. It reads the total '
-    + 'CO2 you emit and your methane, and nothing else, which means two paths reaching the same '
+    + 'CO₂ you emit and your methane, and nothing else, which means two paths reaching the same '
     + 'total give the same answer however differently they got there. Methane adds about '
     + `${(METHANE.k * 100).toFixed(2)} °C per 100 Mt a year. It takes the form `
     + `${EMULATOR_FORM}.</p>`);
@@ -157,17 +157,17 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
     + `${Math.abs(BOUND_RATES.slowestFuelMix.value).toFixed(2)}% a year, the weakest `
     + `${BOUND_RATES.slowestFuelMix.window} window. Income grows at the fastest observed rate and `
     + 'population reaches the top of the UN range, so emissions climb as high as slow technology '
-    + `permits, about ${thousands(BOUNDS.slow)} GtCO2. <b>Ausubel methane economy</b> uses his `
+    + `permits, about ${thousands(BOUNDS.slow)} GtCO₂. <b>Ausubel methane economy</b> uses his `
     + 'own 1988 published trajectory, which squeezes carbon out of primary energy to 0.06 tonnes '
     + 'of carbon per kilowatt-year by 2100, implying the fuel mix improving 2.79% a year, with '
     + `the energy each dollar needs at its fastest observed rate of `
     + `${Math.abs(BOUND_RATES.fastestEfficiency.value).toFixed(2)}% a year and income still growing at the `
-    + `historical pace, about ${thousands(BOUNDS.fast)} GtCO2. Neither bound assumes poverty, `
+    + `historical pace, about ${thousands(BOUNDS.fast)} GtCO₂. Neither bound assumes poverty, `
     + 'and neither assumes a technology stops working.</p>');
 
   parts.push(`<p><b>Sources.</b> Observed rates come from the Energy Institute Statistical `
-    + 'Review and the World Bank. Fossil and industrial CO2 for the base year comes from the '
-    + `Global Carbon Budget. The country comparison uses ${ANALOGUE_META.year} CO2 over World `
+    + 'Review and the World Bank. Fossil and industrial CO₂ for the base year comes from the '
+    + `Global Carbon Budget. The country comparison uses ${ANALOGUE_META.year} CO₂ over World `
     + `Bank purchasing-power GDP for ${ANALOGUE_META.count} economies. Analysis by Roger `
     + 'Pielke Jr., The Honest Broker.</p>');
 

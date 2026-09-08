@@ -194,7 +194,7 @@ export const LIBRARY_SECTIONS: LibrarySection[] = [
         image: `${CDN}/$s_!95om!,w_600,c_limit,f_auto,q_auto:good,fl_progressive:steep/`
           + 'https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F'
           + '6694e94c-1a17-4633-8952-219506e9a023_576x720.png',
-        gloss: 'The final CMIP7 scenarios cut cumulative fossil CO2 again. The highest '
+        gloss: 'The final CMIP7 scenarios cut cumulative fossil CO₂ again. The highest '
           + 'path falls from SSP5-8.5’s 7,380 Gt to 3,438 Gt, and the current-policy '
           + 'path to 2,528 Gt. The set that survived that cut is the seven this tool '
           + 'measures every scenario against.',

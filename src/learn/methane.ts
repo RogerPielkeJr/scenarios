@@ -100,15 +100,15 @@ export const METHANE_PAGE: LearnPageSpec = {
   definition: {
     quantity: 'Anthropogenic methane emissions in 2100',
     units: 'million tonnes of CH4 a year',
-    place: 'Alongside the four CO2 factors, reaching the warming figure through its own '
+    place: 'Alongside the four CO₂ factors, reaching the warming figure through its own '
       + 'coefficient',
     today: `${mt(BASE.methaneMt)} (base year ${BASE_YEAR})`,
     paragraphs: [
-      'Methane differs from CO2 in the one way that matters most here. A molecule of CO2 '
+      'Methane differs from CO₂ in the one way that matters most here. A molecule of CO₂ '
       + 'emitted today still warms the planet in a century; a molecule of methane breaks down '
       + 'within about a decade. Cumulative methane emissions therefore do little work, and '
       + 'the flow in a given year does almost all of it.',
-      'That turns this slider into a level rather than a rate. The four CO2 factors set rates '
+      'That turns this slider into a level rather than a rate. The four CO₂ factors set rates '
       + 'of change and the tool adds up everything they emit. Methane asks one question: how '
       + 'much does the world still emit in 2100?',
       `The tool converts that answer at ${degrees(METHANE.k * 100)} per 100 Mt a year against `
@@ -244,7 +244,7 @@ export const METHANE_PAGE: LearnPageSpec = {
       `That whole spread moves this tool's warming figure by `
       + `${degrees(METHANE.k * (HIGH_CH4 - VERY_LOW_CH4))}, against the 1.65 °C separating `
       + 'those two scenarios overall. Methane '
-      + 'matters here, and the CO2 factors decide the century.',
+      + 'matters here, and the CO₂ factors decide the century.',
       'Treat the coefficient with care. It comes from fitting a straight line to seven FaIR '
       + 'runs, so it reproduces those seven and carries no information about a methane path '
       + 'outside their range. It also ignores when the methane leaves the ground, a real '

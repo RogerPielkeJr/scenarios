@@ -7,33 +7,43 @@ where each number came from, when, and in what units.
 
 ## What the tool does
 
-The builder turns six assumptions into one emissions path from 2025 to 2100,
+The builder turns eight assumptions into one emissions path from 2025 to 2100,
 draws that path against the seven CMIP7 marker scenarios, and reports what the
 path adds up to.
 
-Nothing about the exercise depends on agreeing with any of the six numbers. The
+Nothing about the exercise depends on agreeing with any of the eight numbers. The
 point is the arithmetic that connects them: a reader who thinks the world will
 decarbonise faster than the record can set that rate and watch what it does to
 2100, on the same axis and against the same seven published scenarios as
 everybody else.
 
-## The six assumptions
+## The eight assumptions
 
-Four of them multiply together in the Kaya identity, and two sit outside it:
+Four of them multiply together in the Kaya identity, and four sit outside it:
 
 | Slider | Sets | Range | Today |
 |---|---|---|---|
 | People in 2100 | A level | 6 to 14 billion | 8.14 billion |
 | Income growth per person | A rate that compounds | −0.5 to +3.5 %/yr | $21,393 in 2024 |
 | Energy needed per dollar | A rate that compounds | −4 to +0.5 %/yr | 3.40 MJ per dollar |
-| Carbon per unit of energy | A rate that compounds | −4 to +0.5 %/yr | 65.18 kgCO2 per GJ |
-| Land use CO2 in 2100 | A level | −10 to +5 GtCO2/yr | 3.83 GtCO2/yr |
+| Carbon per unit of energy | A rate that compounds | −4 to +0.5 %/yr | 65.18 kgCO₂ per GJ |
+| Land use CO₂ in 2100 | A level | −10 to +5 GtCO₂/yr | 3.83 GtCO₂/yr |
 | Methane in 2100 | A level | 80 to 600 Mt/yr | 380 Mt/yr |
+| Improvement delivered by 2062 | A share of the century's technology improvement | 5 to 95 % | 50 % is a steady rate |
+| Engineered CO₂ removal in 2100 | A level | 0 to 25 GtCO₂/yr | close to zero today |
 
-The first four decide fossil and industrial CO2, cement included. Land use CO2
+The first four decide fossil and industrial CO₂, cement included. Land use CO₂
 adds on top as a separate term, running in a straight line from today to
-whatever the reader sets. Methane changes nothing about the CO2 path and enters
+whatever the reader sets. Methane changes nothing about the CO₂ path and enters
 only through the warming figure.
+
+The last two exist because the four Kaya factors fix where a path ends and say
+nothing about the route, and because multiplying positive factors never reaches
+a negative number. Timing redistributes the two technology rates across the
+century while holding their 2100 level exactly. Removal is the additive term
+that carries a path below zero, ramping as the square of elapsed time rather
+than as a line, which is both how the scenarios deploy it and what keeps it
+from duplicating the land use slider. Part 2 sets out both.
 
 The base year is 2025, carrying the observed 2024 world, because 2025 has not
 closed in every source.
@@ -41,7 +51,7 @@ closed in every source.
 ## What the chart shows
 
 One heavy line for the reader's scenario, seven lighter lines for the CMIP7
-markers, and annual CO2 including land use on the vertical axis.
+markers, and annual CO₂ including land use on the vertical axis.
 
 That axis moves. Every render picks an axis that covers the reader's path and
 all seven markers together, on round steps, with zero always on it. A scenario
@@ -53,20 +63,20 @@ chart, the column in the table, and every file the page hands back.
 
 ## The four figures under the chart
 
-- **Cumulative CO2, 2025 to 2100.** Every year of the path, summed, in
+- **Cumulative CO₂, 2025 to 2100.** Every year of the path, summed, in
   gigatonnes.
 - **Warming in 2100 above 1850–1900.** A curve fitted to FaIR v2.2 runs of the
-  seven markers, reading cumulative CO2 and 2100 methane and nothing else.
+  seven markers, reading cumulative CO₂ and 2100 methane and nothing else.
   Indicative, not a model result, and never shown to more than two decimals.
 - **Added warming from now.** The same figure measured against the 2015–2024
   average of 1.24 °C rather than against 1850–1900.
-- **Your 2100 world looks like.** The largest economy whose 2024 CO2 per dollar
+- **Your 2100 world looks like.** The largest economy whose 2024 CO₂ per dollar
   of GDP sits within 5% of the reader's 2100 world, drawn from 66 economies
   large enough to measure well. Largest, rather than nearest, so the comparison
   lands on an economy the reader recognises instead of whichever small one
   happens to sit on the number. Where nothing sits within 5% the tile says so
   instead of naming an economy, and names the one at the edge of the table
-  instead: a world at 0.011 kg CO2 per dollar resembles nothing on earth today.
+  instead: a world at 0.011 kg CO₂ per dollar resembles nothing on earth today.
   It compares that one ratio and says nothing else about the country.
 
 Load one of the four CMIP7 presets and the first three figures report what
@@ -78,7 +88,7 @@ Four presets come from the record and from the two technology bounds; four load
 the Kaya factors a CMIP7 marker reports. Those four are the markers of the seven
 that publish a carbon-intensity rate.
 
-| Preset | Cumulative CO2 | Warming in 2100 |
+| Preset | Cumulative CO₂ | Warming in 2100 |
 |---|---|---|
 | Kaya at observed rates | 4,178 Gt | 3.21 °C |
 | Trend continues | 3,409 Gt | 2.94 °C |
@@ -108,8 +118,8 @@ has done, and hands back a value the reader built rather than guessed:
 - **Energy per dollar** takes a compound rate from any two years of the record,
   or a multiple of the observed rate, and says where the answer falls among the
   35 twenty-five-year windows the world has actually run.
-- **CO2 per unit of energy** builds a 2100 fuel mix out of seven shares, burns
-  it against the IPCC emission factors, adds the industrial CO2 that no fuel
+- **CO₂ per unit of energy** builds a 2100 fuel mix out of seven shares, burns
+  it against the IPCC emission factors, adds the industrial CO₂ that no fuel
   switch touches, and takes the rate that lands there.
 - **Land use** nets four flows — deforestation, other transitions and peat,
   existing regrowth, restored area — plus engineered removal.
@@ -118,7 +128,7 @@ has done, and hands back a value the reader built rather than guessed:
 
 A page shows the arithmetic at every step, not just the answer. **Use in my
 scenario** carries the value back to the builder, which names it, scrolls to
-that slider and lights it; **Back to my scenario** returns the six numbers
+that slider and lights it; **Back to my scenario** returns the eight numbers
 untouched.
 
 ## What travels with a scenario
@@ -163,7 +173,7 @@ Stated in full in **Methods**, and worth having up front:
 - One warming number, not a range. The FaIR ensemble behind the fit spans well
   over a degree at any given cumulative total.
 - Only 2100, not the path of warming to it or anything after it.
-- No check that six assumptions belong together. A handful of combinations no
+- No check that eight assumptions belong together. A handful of combinations no
   marker contains get named as an observation, not blocked.
 
 ## How to check any of it

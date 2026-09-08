@@ -172,7 +172,7 @@ export function mountApp(root: Document = document): App {
     panel(results, 'chart', chart, () => {
       renderChart(chart, path, { name: label, highlightMarker: markerId });
       chart.setAttribute('aria-label',
-        `Annual CO2 to 2100 for ${label} and the seven CMIP7 markers`);
+        `Annual CO₂ to 2100 for ${label} and the seven CMIP7 markers`);
       // Built from nodes rather than a string, because the scenario name is
       // whatever the reader typed and the caption sets it in bold. Appending a
       // text node escapes nothing and needs nothing escaped.
@@ -184,12 +184,12 @@ export function mountApp(root: Document = document): App {
       chartCaption.textContent = '';
       if (published === null) {
         chartCaption.append(
-          'Annual CO2 including land use, 2025 to 2100. ', bold(name),
+          'Annual CO₂ emissions including land use, 2025 to 2100. ', bold(name),
           ' in black along with the seven CMIP7 markers.',
         );
       } else {
         chartCaption.append(
-          'Annual CO2 including land use, 2025 to 2100. This reconstruction of ',
+          'Annual CO₂ emissions including land use, 2025 to 2100. This reconstruction of ',
           bold(published.label), ' in black along with the seven CMIP7 markers, with ',
           `${published.label} itself picked out among them. The two differ, and the `,
           'tiles below report both.',

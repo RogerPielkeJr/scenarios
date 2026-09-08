@@ -22,7 +22,7 @@
  },
  "supersededRates": {
   "co2PerEnergy": -0.21,
-  "why": "CO2 from energy over total energy supply, which leaves out the cement and industrial CO2 the slider carries"
+  "why": "CO₂ from energy over total energy supply, which leaves out the cement and industrial CO₂ the slider carries"
  },
  "inputs": [
   {
@@ -90,7 +90,7 @@
    "legacyId": "ci",
    "kind": "rate",
    "label": "Carbon per unit of energy",
-   "help": "The fuel mix improved only 0.15% a year since 1990, and 0.40% over the past decade, counting the cement and industrial CO2 the scenarios count.",
+   "help": "The fuel mix improved only 0.15% a year since 1990, and 0.40% over the past decade, counting the cement and industrial CO₂ the scenarios count.",
    "min": -4,
    "max": 0.5,
    "step": 0.01,
@@ -109,7 +109,7 @@
    "id": "landUse",
    "legacyId": "lu",
    "kind": "level",
-   "label": "Land use CO2 in 2100",
+   "label": "Land use CO₂ in 2100",
    "help": "Forests and farming release about 3.8 Gt a year now. CMIP7 spans a sink of 8.8 Gt to a source of 1.9.",
    "min": -10,
    "max": 5,
@@ -118,7 +118,7 @@
    "decimals": 1,
    "prototypeDefault": 0,
    "unitSuffix": " Gt/yr",
-   "units": "GtCO2/yr in 2100",
+   "units": "GtCO₂/yr in 2100",
    "signed": false,
    "reference": {
     "value": 3.8,
@@ -150,7 +150,7 @@
    "legacyId": "timing",
    "kind": "level",
    "label": "Improvement delivered by 2062",
-   "help": "The rate sliders set where energy per dollar and CO2 per unit of energy end up in 2100. This sets when the change happens. Half by the midpoint means a steady rate; more means an early push that slows later.",
+   "help": "The rate sliders set where energy per dollar and CO₂ per unit of energy end up in 2100. This sets when the change happens. Half by the midpoint means a steady rate; more means an early push that slows later.",
    "min": 5,
    "max": 95,
    "step": 1,
@@ -169,7 +169,7 @@
    "id": "removals",
    "legacyId": "cdr",
    "kind": "level",
-   "label": "Engineered CO2 removal in 2100",
+   "label": "Engineered CO₂ removal in 2100",
    "help": "Carbon captured and stored on purpose, counted apart from the land use sink. The four Kaya factors multiply, so on their own they approach zero without ever crossing it; this is what carries a path below zero. It ramps in slowly and accelerates, as the scenarios deploy it.",
    "min": 0,
    "max": 25,
@@ -177,8 +177,8 @@
    "default": 0,
    "decimals": 1,
    "prototypeDefault": 0,
-   "unitSuffix": " GtCO2/yr",
-   "units": "GtCO2/yr in 2100",
+   "unitSuffix": " GtCO₂/yr",
+   "units": "GtCO₂/yr in 2100",
    "signed": false,
    "reference": {
     "value": 0,
@@ -189,6 +189,6 @@
  "rateProducts": {
   "pairs": 101341,
   "triples": 36961039,
-  "note": "energy x CO2 rate products, and all three including income, counted exactly"
+  "note": "energy x CO₂ rate products, and all three including income, counted exactly"
  }
 }

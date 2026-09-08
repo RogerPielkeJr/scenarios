@@ -23,9 +23,9 @@ describe('what actually makes two scenarios different', () => {
     expect(keys.size).toBe(1);
   });
 
-  it('methane changes no CO2 point at all', () => {
+  it('methane changes no CO₂ point at all', () => {
     const keys = new Set([80, 300, 380, 600].map((methane) => pathKey(mk({ methane }))));
-    console.log(`4 methane settings -> ${keys.size} distinct CO2 path(s)`);
+    console.log(`4 methane settings -> ${keys.size} distinct CO₂ path(s)`);
     expect(keys.size).toBe(1);
   });
 
@@ -44,7 +44,7 @@ describe('what actually makes two scenarios different', () => {
     const paths = POP * G * LU * TIMING * REMOVALS;
     const states = paths * CH4;
     const raw = Number(SCENARIO_COUNT);
-    console.log(`\ndistinct CO2 paths          : ${paths.toLocaleString('en-US')}`);
+    console.log(`\ndistinct CO₂ paths          : ${paths.toLocaleString('en-US')}`);
     console.log(`   with warming (x methane)  : ${states.toLocaleString('en-US')}`);
     console.log(`raw slider settings          : ${raw.toLocaleString('en-US')}`);
     console.log(`settings per distinct path   : ${(raw / paths).toFixed(1)}`);

@@ -16,9 +16,9 @@ import { LAND_USE_SOURCES } from './sources/land_use.js';
 const C = data.constants;
 const D = C.decomposition;
 
-const gt = (value: number) => `${value.toFixed(2)} GtCO2 a year`;
+const gt = (value: number) => `${value.toFixed(2)} GtCO₂ a year`;
 const signedGt = (value: number) =>
-  `${value >= 0 ? '' : '−'}${Math.abs(value).toFixed(2)} GtCO2 a year`;
+  `${value >= 0 ? '' : '−'}${Math.abs(value).toFixed(2)} GtCO₂ a year`;
 
 function series(id: string) {
   const found = data.series.find((candidate) => candidate.id === id);
@@ -90,9 +90,9 @@ const PARTS: BuilderPart[] = [
     step: 0.5,
     default: C.growthRates.matureTropical,
     decimals: 1,
-    unitSuffix: ' tCO2/ha/yr',
+    unitSuffix: ' tCO₂/ha/yr',
     note: `IPCC defaults for above-ground growth in natural forest, converted at the 0.47 `
-      + `carbon fraction: ${C.growthRates.matureTropical} tCO2 a hectare for a tropical stand `
+      + `carbon fraction: ${C.growthRates.matureTropical} tCO₂ a hectare for a tropical stand `
       + `over 20 years old, ${C.growthRates.youngTropicalSouthAmerica} for young South `
       + `American regrowth, ${C.growthRates.youngTropicalAsiaInsular} for young insular Asian `
       + 'regrowth. Below-ground carbon and soil add more.',
@@ -109,7 +109,7 @@ const PARTS: BuilderPart[] = [
     step: 0.5,
     default: 0,
     decimals: 1,
-    unitSuffix: ' GtCO2',
+    unitSuffix: ' GtCO₂',
     note: 'Bioenergy with carbon capture, direct air capture and the rest, counted here '
       + 'because the four Kaya factors cannot produce a negative number and this slider can.',
     marks: [
@@ -127,14 +127,14 @@ export const LAND_USE_PAGE: LearnPageSpec = {
   slug: 'land-use',
   accent: '#2f6b3a',
   input: 'landUse',
-  title: 'Land use CO2',
+  title: 'Land use CO₂',
   standfirst: 'One slider sets what forests and farming do to the atmosphere in 2100. This '
     + 'term stays the smallest of the six, nobody knows it as precisely as the others, and '
     + 'alone among them it turns negative on its own.',
 
   definition: {
-    quantity: 'Net CO2 from land use, land-use change and forestry in 2100',
-    units: 'GtCO2 a year; a negative value removes carbon from the air',
+    quantity: 'Net CO₂ from land use, land-use change and forestry in 2100',
+    units: 'GtCO₂ a year; a negative value removes carbon from the air',
     place: 'Added on top of the four factors that multiply',
     today: `${gt(BASE.landUseGt)} in the tool’s base year`,
     paragraphs: [
@@ -146,7 +146,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + 'fuels and industry. Its share of the total has fallen for thirty years while fossil '
       + 'emissions grew.',
       `Two large flows netted against each other produce a small number with a large `
-      + `uncertainty. The Global Carbon Budget reports ±${C.uncertaintyGtCo2} GtCO2 at one `
+      + `uncertainty. The Global Carbon Budget reports ±${C.uncertaintyGtCo2} GtCO₂ at one `
       + `standard deviation, ${(C.uncertaintyGtCo2 / D.net * 100).toFixed(0)}% of the net `
       + 'figure itself.',
     ],
@@ -156,24 +156,24 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     heading: 'What the world has done',
     note: 'The band shows the published uncertainty rather than a spread of scenarios.',
     paragraphs: [
-      `Land-use CO2 reached ${gt(C.levels.first)} in ${C.firstYear}, peaked at `
+      `Land-use CO₂ reached ${gt(C.levels.first)} in ${C.firstYear}, peaked at `
       + `${gt(C.levels.peak)} in ${C.levels.peakYear}, and reached ${gt(C.levels.last)} in `
       + `${C.lastYear}. The Global Carbon Budget records a statistically significant decline `
-      + 'of about 0.7 GtCO2 per decade since the late 1990s.',
-      `The uncertainty swamps the trend in any single year. At ±${C.uncertaintyGtCo2} GtCO2 `
+      + 'of about 0.7 GtCO₂ per decade since the late 1990s.',
+      `The uncertainty swamps the trend in any single year. At ±${C.uncertaintyGtCo2} GtCO₂ `
       + 'the band spans both a substantial source and something close to neutral, which '
       + 'explains why the scenarios disagree about this term more than about any other.',
       `Two figures from the same project show what that means. The series drawn here averages `
       + `${gt(C.vintageGap.seriesDecadeMean)} over 2014 to 2023, while the Global Carbon `
       + `Budget's 2024 paper reports ${gt(C.vintageGap.paperDecadeMean)} for that decade. `
       + `The ${(C.vintageGap.seriesDecadeMean - C.vintageGap.paperDecadeMean).toFixed(2)} `
-      + 'GtCO2 between them falls short of the uncertainty on either, and exceeds most of '
+      + 'GtCO₂ between them falls short of the uncertainty on either, and exceeds most of '
       + 'what the sliders on this page argue about.',
     ],
-    caption: `World land-use CO2, ${C.firstYear} to ${C.lastYear}, with the Global Carbon `
-      + `Budget's one-sigma uncertainty of ±${C.uncertaintyGtCo2} GtCO2, then a straight line `
+    caption: `World land-use CO₂, ${C.firstYear} to ${C.lastYear}, with the Global Carbon `
+      + `Budget's one-sigma uncertainty of ±${C.uncertaintyGtCo2} GtCO₂, then a straight line `
       + 'to the 2100 flux you set above. Dots at 2100 mark the seven CMIP7 scenarios.',
-    dataSource: 'Global Carbon Budget 2024, land-use change CO2, via Our World in Data; ScenarioMIP CMIP7 markers',
+    dataSource: 'Global Carbon Budget 2024, land-use change CO₂, via Our World in Data; ScenarioMIP CMIP7 markers',
     key: [
       { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
       { label: 'Published uncertainty, 1σ', color: 'var(--navy)' },
@@ -195,7 +195,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
         xMin: C.firstYear,
         xMax: END_YEAR,
         xTicks: [C.firstYear, 1985, 2005, 2025, 2050, 2075, END_YEAR],
-        yLabel: 'GtCO2 a year',
+        yLabel: 'GtCO₂ a year',
         yDecimals: 0,
         includeZero: true,
         bands: [{
@@ -257,7 +257,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + 'of this page make the size of that requirement explicit.',
       `Engineered removal belongs with those three. In this tool it goes on this slider, `
       + 'because a product of four positive factors cannot go below zero however fast the '
-      + 'fuel mix changes. Every CMIP7 marker that reaches net negative CO2 does it through '
+      + 'fuel mix changes. Every CMIP7 marker that reaches net negative CO₂ does it through '
       + 'terms this slider covers.',
     ],
   },
@@ -286,8 +286,8 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       'Set what the world clears, what regrows, how much land comes back into forest and how '
       + 'much carbon engineering removes. The builder nets them into a single 2100 flux.',
       `The restoration arithmetic multiplies area by rate: a million hectares taking up `
-      + `${C.growthRates.matureTropical} tonnes of CO2 a hectare each year removes `
-      + `${(C.growthRates.matureTropical / 1000).toFixed(3)} GtCO2 a year. Reaching a gigatonne `
+      + `${C.growthRates.matureTropical} tonnes of CO₂ a hectare each year removes `
+      + `${(C.growthRates.matureTropical / 1000).toFixed(3)} GtCO₂ a year. Reaching a gigatonne `
       + `at that rate needs ${Math.round(1000 / C.growthRates.matureTropical)} Mha. At the `
       + `young-forest rate of ${C.growthRates.youngTropicalSouthAmerica} it needs `
       + `${Math.round(1000 / C.growthRates.youngTropicalSouthAmerica)} Mha.`,
@@ -314,7 +314,7 @@ export const LAND_USE_PAGE: LearnPageSpec = {
             restored === 0
               ? 'No newly restored land'
               : `${Math.round(values['area'] ?? 0)} Mha restored at `
-                + `${(values['rate'] ?? 0).toFixed(1)} tCO2 a hectare removes ${gt(restored)}`,
+                + `${(values['rate'] ?? 0).toFixed(1)} tCO₂ a hectare removes ${gt(restored)}`,
             engineered === 0
               ? 'No engineered removal'
               : `Engineered removal takes ${gt(engineered)}`,

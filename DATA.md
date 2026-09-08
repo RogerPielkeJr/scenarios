@@ -25,11 +25,11 @@ a primary source on this machine.
 Downloaded by hand each June, held at `/home/rpielke/EI-Stats-Review-2026.xlsx`
 outside this repository because of its size. Sheets used:
 
-- `CO2 from Energy`, world row, 1965 to 2024, million tonnes CO2. Covers CO2
+- `CO₂ from Energy`, world row, 1965 to 2024, million tonnes CO₂. Covers CO₂
   from energy only, with no cement or other industrial process emissions.
 - `Total Energy Supply (TES) -EJ`, world row and country rows, 1965 to 2024,
   exajoules.
-- `CO2 from Flaring`, world row, 1975 to 2024, million tonnes CO2. Used only in
+- `CO₂ from Flaring`, world row, 1975 to 2024, million tonnes CO₂. Used only in
   a base-year check.
 
 The 2026 edition carries a 2025 estimate. It is excluded; the series stop at
@@ -72,17 +72,17 @@ Fetched from the Our World in Data redistribution
 world rows only, cached in `scripts/_gcb_cache.json`.
 
 Used for the base year, because the CMIP7 markers count all fossil and
-industrial CO2 while the Energy Institute series covers energy and flaring
+industrial CO₂ while the Energy Institute series covers energy and flaring
 alone. For 2024:
 
-| Component | GtCO2 |
+| Component | GtCO₂ |
 |---|---|
 | Fossil and industry, total | 38.599 |
 | of which cement | 1.473 |
 | of which flaring | 0.416 |
 | of which other industry | 0.424 |
 | Land use change | 4.586 |
-| **Total CO2** | **43.185** |
+| **Total CO₂** | **43.185** |
 
 That total is the basis the marker paths are on, which is what the marker values
 for 2025 confirm: they span 42.4 to 43.8 with a mean of 43.08.
@@ -91,7 +91,7 @@ for 2025 confirm: they span 42.4 to 43.8 with a mean of 43.08.
 
 The seven marker emissions paths, their cumulative totals, their 2100 methane
 and land use values, and the Kaya factors that place each marker's tick under
-each slider. Five-yearly from 2025 to 2100, GtCO2 including land use.
+each slider. Five-yearly from 2025 to 2100, GtCO₂ including land use.
 
 **No primary source on this machine.** These came into the prototype from
 ScenarioMIP and are lifted out of it by `scripts/extract_prototype.py`. Three
@@ -134,20 +134,20 @@ remaining growth on a control of its own.
 ### IPCC 2006 Guidelines, default carbon content
 
 `Volume 2 (Energy), Chapter 1, Table 1.3`, read from the published PDF. Values
-in kilograms of carbon per gigajoule, converted to CO2 at 44/12:
+in kilograms of carbon per gigajoule, converted to CO₂ at 44/12:
 
-| Fuel | kgC/GJ | kgCO2/GJ |
+| Fuel | kgC/GJ | kgCO₂/GJ |
 |---|---|---|
 | Other bituminous coal | 25.8 | 94.6 |
 | Crude oil | 20.0 | 73.3 |
 | Natural gas | 15.3 | 56.1 |
 
 Nuclear, hydro, wind and solar carry none. Bioenergy carries none in
-energy-sector accounting, where biogenic CO2 is reported under land use, which
-is also how the Energy Institute's CO2 series treats it.
+energy-sector accounting, where biogenic CO₂ is reported under land use, which
+is also how the Energy Institute's CO₂ series treats it.
 
 **Applied raw, these overstate what the world emits.** The 2024 mix gives
-65.15 kgCO2 per GJ against the 59.94 the Energy Institute reports from energy
+65.15 kgCO₂ per GJ against the 59.94 the Energy Institute reports from energy
 that year, mostly because part of the oil supply becomes plastics, lubricants
 and bitumen rather than exhaust. `build_fuel_mix.py` records the ratio, 0.9201,
 and the page applies it so today's mix reproduces today's intensity.
@@ -201,13 +201,13 @@ The base-year state, all from 2024, the last complete year, applied at 2025.
 | `populationBn` | 8.1409 | billions | World Bank `SP.POP.TOTL` |
 | `gdpPerPersonUsd` | 21,393.2 | constant 2021 international $ | World Bank PPP GDP over population |
 | `energyPerDollarMj` | 3.4002 | MJ per dollar | EI total energy supply over World Bank PPP GDP |
-| `co2PerEnergyKgGj` | 65.181 | kg CO2 per GJ | Global Carbon Budget fossil and industry CO2 over EI total energy supply |
-| `landUseGt` | 3.83 | GtCO2/yr | stated in the brief |
+| `co2PerEnergyKgGj` | 65.181 | kg CO₂ per GJ | Global Carbon Budget fossil and industry CO₂ over EI total energy supply |
+| `landUseGt` | 3.83 | GtCO₂/yr | stated in the brief |
 | `methaneMt` | 380 | Mt/yr | stated in the brief |
 
 `superseded` records what the prototype used and why it changed. The old value
-of 60.5 kg per GJ came from energy CO2 plus flaring alone, which started every
-path about 4.4 GtCO2 below all seven markers.
+of 60.5 kg per GJ came from energy CO₂ plus flaring alone, which started every
+path about 4.4 GtCO₂ below all seven markers.
 
 Land use stays at the brief's 3.83 rather than the Global Carbon Budget's 4.59
 for the same year. The gap sits well inside the uncertainty on that term, unlike
@@ -222,10 +222,10 @@ windows the notes quote.
 |---|---|---|
 | Income per person | +1.90 %/yr | 1990 to 2024 |
 | Energy per dollar | −1.43 %/yr | 1990 to 2024 |
-| CO2 per unit energy | −0.21 %/yr | 1990 to 2024 |
+| CO₂ per unit energy | −0.21 %/yr | 1990 to 2024 |
 | Income per person | +2.02 %/yr | 2015 to 2024 |
 | Energy per dollar | −1.62 %/yr | 2015 to 2024 |
-| CO2 per unit energy | −0.48 %/yr | 2015 to 2024 |
+| CO₂ per unit energy | −0.48 %/yr | 2015 to 2024 |
 
 Window extremes, each reported with the window that produced it:
 
@@ -233,7 +233,7 @@ Window extremes, each reported with the window that produced it:
 |---|---|---|
 | Income, 25 years since 1990 | +2.23 %/yr (1994–2019) | +1.86 %/yr (1990–2015) |
 | Energy per dollar, 25 years since 1990 | −1.36 %/yr (1990–2015) | −1.57 %/yr (1996–2021) |
-| CO2 per unit energy, 30 years since 1965 | −0.17 %/yr (1992–2022) | −0.56 %/yr (1965–1995) |
+| CO₂ per unit energy, 30 years since 1965 | −0.17 %/yr (1992–2022) | −0.56 %/yr (1965–1995) |
 
 Reported as plain highest and lowest rather than slowest and fastest, because
 which end counts as slow progress flips with the sign of the series.
@@ -318,8 +318,8 @@ so the shares add to the total energy supply exactly. The build exits if they
 do not sum to 100 in any year.
 
 **Two intensities, and they differ.** On the basis the slider measures, which
-includes cement, flaring and other industrial CO2 as the CMIP7 markers do, the
-world ran 75.56 kgCO2 per GJ in 1965 and 65.18 in 2024. On combustion alone,
+includes cement, flaring and other industrial CO₂ as the CMIP7 markers do, the
+world ran 75.56 kgCO₂ per GJ in 1965 and 65.18 in 2024. On combustion alone,
 74.79 and 59.94. The 2024 slider-basis figure reproduces `base.json` exactly.
 
 That gap changes the rate as well as the level: **−0.15%/yr from 1990 to 2024
@@ -328,10 +328,10 @@ under the front page's slider used −0.21 until 2026-09-05 and now uses −0.15
 so the mark and the slider measure the same quantity; `config.json` keeps the
 old figure under `supersededRates`. METHODS.md records what moved with it.
 
-The non-combustion term, 5.237 kgCO2 per GJ in 2024, breaks down as cement
+The non-combustion term, 5.237 kgCO₂ per GJ in 2024, breaks down as cement
 2.487, other industry 0.717, flaring 0.702, and 1.331 for the difference
 between the Energy Institute and Global Carbon Budget inventories. Holding it
-where it stands puts a floor of 5.237 kgCO2 per GJ under any fuel mix, which
+where it stands puts a floor of 5.237 kgCO₂ per GJ under any fuel mix, which
 caps the improvement this page can reach at −3.31%/yr.
 
 ### `learn_income.json`
@@ -386,18 +386,18 @@ decomposition, and the forest growth rates the restoration control uses.
 
 | Field | Value |
 |---|---|
-| Flux, 1965 | 6.39 GtCO2/yr |
-| Flux, peak | 8.02 GtCO2/yr in 1997 |
-| Flux, 2024 | 4.59 GtCO2/yr |
-| Uncertainty | ±2.57 GtCO2/yr (±0.7 GtC, 1σ) |
-| Gross deforestation, 2014–2023 | 6.23 GtCO2/yr |
-| Regrowth, 2014–2023 | 4.40 GtCO2/yr |
-| Other transitions and peat | 2.20 GtCO2/yr (the remainder) |
-| Net, 2014–2023 | 4.03 GtCO2/yr |
+| Flux, 1965 | 6.39 GtCO₂/yr |
+| Flux, peak | 8.02 GtCO₂/yr in 1997 |
+| Flux, 2024 | 4.59 GtCO₂/yr |
+| Uncertainty | ±2.57 GtCO₂/yr (±0.7 GtC, 1σ) |
+| Gross deforestation, 2014–2023 | 6.23 GtCO₂/yr |
+| Regrowth, 2014–2023 | 4.40 GtCO₂/yr |
+| Other transitions and peat | 2.20 GtCO₂/yr (the remainder) |
+| Net, 2014–2023 | 4.03 GtCO₂/yr |
 
 **Two figures for the same decade.** The Our World in Data redistribution
-drawn on the chart averages 5.21 GtCO2 over 2014–2023; the Global Carbon
-Budget 2024 paper reports 4.03 for that decade. The 1.18 GtCO2 between them,
+drawn on the chart averages 5.21 GtCO₂ over 2014–2023; the Global Carbon
+Budget 2024 paper reports 4.03 for that decade. The 1.18 GtCO₂ between them,
 most likely a vintage difference, sits well inside the ±2.57 uncertainty. The
 page says so rather than choosing one silently.
 
@@ -405,7 +405,7 @@ Forest growth rates come from IPCC 2006 Volume 4, Table 4.9, in tonnes of dry
 matter a hectare a year, converted at the 0.47 carbon fraction (Table 4.3) and
 44/12:
 
-| Stand | t d.m./ha/yr | tCO2/ha/yr |
+| Stand | t d.m./ha/yr | tCO₂/ha/yr |
 |---|---|---|
 | Tropical rain forest, South America, over 20 years | 3.1 | 5.3 |
 | Young regrowth, Africa | 10.0 | 17.2 |
@@ -416,8 +416,8 @@ Above-ground biomass only; below-ground carbon and soil add more.
 
 ### `analogues.json`
 
-66 economies, their 2024 CO2 and PPP GDP, and CO2 per dollar in kilograms.
-Restricted to economies above 25 Mt CO2 and $40 billion. The build asserts the
+66 economies, their 2024 CO₂ and PPP GDP, and CO₂ per dollar in kilograms.
+Restricted to economies above 25 Mt CO₂ and $40 billion. The build asserts the
 count and prints anything dropped at the join. GDP carries the comparison as
 well as the ratio: the tile names the largest economy within 5% of the reader's
 2100 world, not the nearest of any size, and says plainly that there is none
