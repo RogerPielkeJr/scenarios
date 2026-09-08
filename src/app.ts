@@ -1,7 +1,7 @@
 import { PRESETS } from './model/bounds.js';
 import { computeFlags, markerIdForPreset } from './model/flags.js';
 import { computePath } from './model/kaya.js';
-import { MARKERS, MARKER_BY_ID, MARKER_YEARS, publishedPath } from './model/markers.js';
+import { MARKERS, MARKER_BY_ID, publishedPath } from './model/markers.js';
 import { approximateScenarioCount, defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import {
@@ -11,7 +11,6 @@ import { renderChart } from './ui/chart.js';
 import { downloadScenarioPdf, downloadScenarioPng } from './ui/export.js';
 import { renderNotes } from './ui/notes.js';
 import { renderSliders, type SliderPanel } from './ui/sliders.js';
-import { attachFigureButtons } from './ui/figure.js';
 import { announceHandoff, appliedInput } from './ui/handoff.js';
 import { installStrip, type Strip } from './ui/strip.js';
 import { installShare, syncHash } from './ui/share.js';
@@ -67,31 +66,6 @@ function buildPresets(
         button.setAttribute('aria-pressed', String(id === presetId));
       }
     },
-  };
-}
-
-/**
- * The numbers behind the front page's chart: the reader's own path year by
- * year, and every marker at the five-yearly points it publishes.
- */
-const CHART_SOURCE = 'ScenarioMIP CMIP7 marker scenarios; Energy Institute, World Bank and '
-  + 'Global Carbon Budget for the base year';
-function chartTable(label: string, drawn: ReadonlyArray<{ year: number; co2Gt: number }>) {
-  const years = drawn.map((point) => point.year);
-  return {
-    title: `${label} — annual CO2 to 2100`,
-    source: CHART_SOURCE,
-    columns: [
-      { header: 'Year', values: years },
-      { header: `${label}, GtCO2`, values: drawn.map((point) => point.co2Gt) },
-      ...MARKERS.map((marker) => ({
-        header: `CMIP7 ${marker.label}, GtCO2`,
-        values: years.map((year) => {
-          const index = MARKER_YEARS.indexOf(year);
-          return index < 0 ? null : marker.co2Gt[index] ?? null;
-        }),
-      })),
-    ],
   };
 }
 
@@ -171,13 +145,18 @@ export function mountApp(root: Document = document): App {
     const scenario = state.scenario();
     const name = displayName(scenario.name);
     const presetId = state.matchingPresetId();
-    // A CMIP7 preset, untouched, shows that scenario as it was published.
-    // The first slider move takes the six values off the preset and the
-    // reconstruction takes over.
+    // A CMIP7 preset highlights its published path among the ghosted markers,
+    // and the ink stays the reconstruction the six sliders drive. Drawing the
+    // published path as the ink instead, and swapping to the reconstruction on
+    // the first slider move, made one step of the population slider look like
+    // it raised warming by 0.18 degrees when it had lowered it by 0.002.
     const markerId = markerIdForPreset(presetId);
     const marker = markerId === null ? undefined : MARKER_BY_ID[markerId];
     const published = marker === undefined ? null : publishedPath(marker);
-    const label = published === null ? name : `${published.label} as published`;
+    // A preset still names the scenario, and says which of the two curves the
+    // ink is: the marker itself sits highlighted behind it under the same name,
+    // so calling the ink "CMIP7 MEDIUM" alone left two lines sharing one label.
+    const label = published === null ? name : `${published.label} reconstructed`;
     const results: PanelResult[] = [];
 
     // Computed once and shared, so a slow panel cannot disagree with a fast one.
@@ -191,20 +170,21 @@ export function mountApp(root: Document = document): App {
     panel(results, 'presets', null, () => presets?.update(presetId));
     panel(results, 'legend', legend, () => buildLegend(legend, label));
     panel(results, 'chart', chart, () => {
-      renderChart(chart, published ?? path, { name: label, highlightMarker: null });
-      figureButtons.update(chartTable(label, (published ?? path).points));
+      renderChart(chart, path, { name: label, highlightMarker: markerId });
       chart.setAttribute('aria-label',
         `Annual CO2 to 2100 for ${label} and the seven CMIP7 markers`);
       chartCaption.textContent = published === null
         ? `Annual CO2 including land use, 2025 to 2100. ${name} in ink, `
           + 'the seven CMIP7 markers ghosted behind it.'
-        : `Annual CO2 including land use, 2025 to 2100, exactly as ${published.label} `
-          + 'publishes it. Move any slider to draw your own path instead.';
+        : `Annual CO2 including land use, 2025 to 2100. This reconstruction of `
+          + `${published.label} in ink, with ${published.label} itself picked out `
+          + 'among the markers behind it. The two differ, and the tiles below '
+          + 'report both.';
     });
     panel(results, 'stats', tiles.cumulative,
       () => renderStats(tiles, inputs, path, published));
     panel(results, 'strip', null,
-      () => strip?.update(label, scenarioSummary(inputs, path, published)));
+      () => strip?.update(label, scenarioSummary(inputs, path)));
     panel(results, 'table', table, () => renderTable(table, inputs, label));
     panel(results, 'notes', notes, () => {
       renderNotes(notes, computeFlags(inputs, path, presetId));
@@ -224,12 +204,6 @@ export function mountApp(root: Document = document): App {
     const marker = markerId === null ? undefined : MARKER_BY_ID[markerId];
     return marker === undefined ? null : publishedPath(marker);
   }
-
-  const figureButtons = attachFigureButtons(
-    root, chart, { title: 'Emissions scenario', source: CHART_SOURCE, columns: [] },
-    'emissions-scenario',
-  );
-  chart.parentElement?.insertAdjacentElement('afterend', figureButtons.element);
 
   // How many scenarios the sliders reach. Written once: it depends on the
   // slider definitions, not on where the reader has put them.

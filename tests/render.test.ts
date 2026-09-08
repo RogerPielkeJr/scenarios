@@ -262,18 +262,42 @@ describe('the scenario count on the front page', () => {
 describe('a published scenario on screen', () => {
   beforeEach(() => { loadPage(); });
 
-  it('draws the marker\'s own path and reports its own totals', () => {
+  it('reports the reconstruction and names what the marker publishes beside it', () => {
     const app = mountApp();
     const medium = PRESETS.find((preset) => preset.id === 'cmip7-medium');
     if (medium === undefined) throw new Error('no CMIP7 MEDIUM preset');
     app.apply(medium.inputs);
     const report = app.lastReport();
-    expect(report?.outputs['tile-cumulative']).toBe('2,770');
-    expect(report?.outputs['tile-warming']).toBe('2.84 °C');
-    expect(report?.outputs['tile-cumulative-note']).toContain('as published');
-    expect(report?.outputs['chart']).toContain('CMIP7 MEDIUM as published');
-    expect(report?.outputs['chart-caption']).toContain('exactly as CMIP7 MEDIUM publishes it');
-    expect(report?.outputs['notes']).toContain('This shows CMIP7 MEDIUM as published');
+    // The reconstruction, which is what the six sliders drive.
+    expect(report?.outputs['tile-cumulative']).toBe('3,095');
+    expect(report?.outputs['tile-warming']).toBe('3.02 °C');
+    // The published figure stands beside it rather than replacing it.
+    expect(report?.outputs['tile-cumulative-note']).toContain('CMIP7 MEDIUM publishes 2,770');
+    expect(report?.outputs['tile-warming-note']).toContain('CMIP7 MEDIUM publishes 2.84 °C');
+    expect(report?.outputs['chart-caption']).toContain('reconstruction of CMIP7 MEDIUM');
+    expect(report?.outputs['notes']).toContain('This sits on CMIP7 MEDIUM');
+  });
+
+  // The defect this replaced: the tiles reported the published totals until the
+  // first slider move and the reconstruction afterwards, so one step of the
+  // population slider changed which quantity was on screen. Lowering the 2100
+  // population from 9.9 to 9.8 billion -- which lowers emissions -- showed
+  // warming rising from 2.84 to 3.02 degrees.
+  it('never raises warming when the population slider comes down', () => {
+    const app = mountApp();
+    const medium = PRESETS.find((preset) => preset.id === 'cmip7-medium');
+    if (medium === undefined) throw new Error('no CMIP7 MEDIUM preset');
+    app.apply(medium.inputs);
+    const before = app.lastReport()?.outputs['tile-warming'] ?? '';
+    const beforeC = Number.parseFloat(before);
+
+    app.state.set('population', 9.8);
+    const afterC = Number.parseFloat(app.lastReport()?.outputs['tile-warming'] ?? '');
+
+    expect(Number.isFinite(beforeC) && Number.isFinite(afterC)).toBe(true);
+    expect(afterC).toBeLessThanOrEqual(beforeC);
+    // And the step is a step, not a mode switch.
+    expect(Math.abs(afterC - beforeC)).toBeLessThan(0.05);
   });
 
   it('reports MEDIUM-to-LOW as published, and names the gap the right way round', () => {
@@ -282,36 +306,34 @@ describe('a published scenario on screen', () => {
     if (ml === undefined) throw new Error('no CMIP7 MEDIUM-to-LOW preset');
     app.apply(ml.inputs);
     const report = app.lastReport();
-    expect(report?.outputs['tile-cumulative']).toBe('1,710');
-    expect(report?.outputs['tile-warming']).toBe('2.20 °C');
+    expect(report?.outputs['tile-cumulative']).toBe('1,230');
+    expect(report?.outputs['tile-cumulative-note']).toContain('publishes 1,710');
     const notes = report?.outputs['notes'] ?? '';
-    expect(notes).toContain('This shows CMIP7 MEDIUM-to-LOW as published');
+    expect(notes).toContain('This sits on CMIP7 MEDIUM-to-LOW');
     // The only preset whose reconstruction lands under its marker.
     expect(notes).toContain('1,230 GtCO2 against 1,710');
     expect(notes).toContain('below it');
   });
 
-  // The two technology bounds measure the reconstruction's total. With a
-  // published scenario on screen the tiles report the marker instead, so a
-  // bound sentence would judge a number the reader cannot see. MEDIUM-to-LOW
-  // is where that showed: 1,710 on the tile, 1,230 behind it, and the fast
-  // bound at 1,585 in between.
-  it('leaves the technology bounds alone while a published scenario stands', () => {
+  // The two technology bounds measure the reconstruction's total, which the
+  // tiles now report whether or not a preset stands, so a bound sentence
+  // judges a number the reader can see either way. MEDIUM-to-LOW is where that
+  // shows: 1,710 published, 1,230 reconstructed, and the fast bound at 1,585
+  // in between, so the sentence belongs on screen from the moment the preset
+  // is picked rather than appearing on the first slider move.
+  it('applies the technology bounds to the reconstruction, preset or not', () => {
     const app = mountApp();
     const ml = PRESETS.find((preset) => preset.id === 'cmip7-medium-to-low');
     if (ml === undefined) throw new Error('no CMIP7 MEDIUM-to-LOW preset');
     app.apply(ml.inputs);
-    expect(app.lastReport()?.outputs['notes']).not.toContain('you have passed the lowest total');
+    expect(app.lastReport()?.outputs['notes']).toContain('you have passed the lowest total');
 
-    // One slider move hands the reader their own reconstruction, and the
-    // sentence comes back.
+    // And it stays put across a slider move rather than appearing with one.
     app.state.set('landUse', -8.7);
-    const notes = app.lastReport()?.outputs['notes'] ?? '';
-    expect(notes).not.toContain('as published');
-    expect(notes).toContain('you have passed the lowest total');
+    expect(app.lastReport()?.outputs['notes']).toContain('you have passed the lowest total');
   });
 
-  it('draws the published path through the marker\'s own points', () => {
+  it('draws the reconstruction year by year and lights up the marker behind it', () => {
     const app = mountApp();
     const veryLow = PRESETS.find((preset) => preset.id === 'cmip7-very-low');
     const marker = MARKERS.find((candidate) => candidate.id === 'VL');
@@ -319,7 +341,10 @@ describe('a published scenario on screen', () => {
     app.apply(veryLow.inputs);
     const path = document.querySelector('#chart [data-user-path]')?.getAttribute('d') ?? '';
     const points = path.split(/[ML]/).filter(Boolean);
-    expect(points).toHaveLength(marker.co2Gt.length);
+    // Annual, so far more points than the marker's five-yearly publication.
+    expect(points.length).toBeGreaterThan(marker.co2Gt.length);
+    // And VERY LOW itself is the marker picked out behind it.
+    expect(document.querySelector('#chart [data-marker="VL"][data-highlight="1"]')).not.toBeNull();
   });
 
   it('hands back to the reconstruction as soon as a slider moves', () => {

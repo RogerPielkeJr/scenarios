@@ -45,9 +45,10 @@ function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): strin
   const gt = (value: number) => `${value.toFixed(1)} GtCO2`;
   const sentences: string[] = showingPublished
     ? [
-      `<b>This shows CMIP7 ${fit.label} as published.</b> The chart draws that `
-      + 'scenario\'s own path and the totals above come from it. Move any slider and both '
-      + `switch to your reconstruction from the six Kaya factors ${fit.label} reports.`,
+      `<b>This sits on CMIP7 ${fit.label}.</b> The chart draws a reconstruction from the `
+      + `six Kaya factors ${fit.label} reports, and picks out ${fit.label} itself among the `
+      + 'markers behind it. The tiles report the reconstruction, with the published figure '
+      + 'beside it.',
     ]
     : [
       `<b>Against the published CMIP7 ${fit.label}.</b> These sliders carry the Kaya `
@@ -80,9 +81,7 @@ function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): strin
       + 'factors multiplied together stay positive, so the fossil term here cannot turn '
       + 'negative and only the land use slider can pull a path below zero.');
   }
-  sentences.push(showingPublished
-    ? 'The other six markers stay ghosted behind it.'
-    : `The chart draws ${fit.label}'s published path behind yours.`);
+  sentences.push(`The chart draws ${fit.label}'s published path behind yours.`);
   return `<p>${sentences.join(' ')}</p>`;
 }
 
@@ -107,12 +106,9 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
     parts.push('<p>The fuel mix has never changed this fast. CMIP7 MEDIUM assumes about '
       + 'four times the observed rate and the low scenarios assume more.</p>');
   }
-  // Both bounds judge the reconstruction's own total. While a published
-  // scenario stands untouched the tiles report that scenario instead, so
-  // these would measure a number the reader cannot see. CMIP7 MEDIUM-to-LOW
-  // is where that shows: its published total reads 1,710 GtCO2 while the
-  // reconstruction behind it totals 1,230, below the fast bound.
-  if (!flags.showingPublished) {
+  // Both bounds judge the reconstruction's own total, which the tiles now
+  // report whether or not a preset stands, so the bounds apply throughout.
+  {
     if (flags.aboveSlowBound) {
       parts.push(`<p>Above ${thousands(BOUNDS.slow)} GtCO2 you have passed the highest total `
         + 'reachable with every technological trajectory held at the slowest rate the world '

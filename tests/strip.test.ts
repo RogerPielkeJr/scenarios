@@ -72,7 +72,8 @@ describe('the scenario strip', () => {
     const high = PRESETS.find((preset) => preset.id === 'cmip7-high');
     if (high === undefined) throw new Error('no preset with id cmip7-high');
     app.apply(high.inputs);
-    expect(text('strip-name')).toContain('as published');
+    // The strip names the scenario; the published figure lives in the tiles.
+    expect(text('strip-name')).toContain('CMIP7 HIGH');
   });
 
   // The button swaps a long label for a short one below 480px by hiding one

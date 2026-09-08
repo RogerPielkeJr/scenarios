@@ -30,7 +30,7 @@
    "label": "CMIP7 HIGH",
    "documented": false,
    "inputs": {
-    "population": 12.98,
+    "population": 13.0,
     "income": 0.57,
     "energyPerDollar": -0.66,
     "co2PerEnergy": -0.08,
@@ -43,7 +43,7 @@
    "label": "CMIP7 MEDIUM",
    "documented": false,
    "inputs": {
-    "population": 9.89,
+    "population": 9.9,
     "income": 1.73,
     "energyPerDollar": -1.32,
     "co2PerEnergy": -0.87,
@@ -56,7 +56,7 @@
    "label": "CMIP7 MEDIUM-to-LOW",
    "documented": false,
    "inputs": {
-    "population": 9.89,
+    "population": 9.9,
     "income": 1.24,
     "energyPerDollar": -0.89,
     "co2PerEnergy": -3.06,
@@ -69,7 +69,7 @@
    "label": "CMIP7 VERY LOW",
    "documented": false,
    "inputs": {
-    "population": 8.09,
+    "population": 8.1,
     "income": 1.97,
     "energyPerDollar": -2.11,
     "co2PerEnergy": -2.6,

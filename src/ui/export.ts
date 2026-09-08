@@ -68,16 +68,17 @@ export function summaryOf(
   // 1.24 and "2015-2024" as literals, so a refit would have moved the page and
   // left the download behind.
   const high = MARKER_BY_ID['H'];
-  const summary = scenarioSummary(inputs, path, published);
+  const summary = scenarioSummary(inputs, path);
   const country = analogueTile(path.final.kgCo2PerUsd);
   return [
     ['Cumulative CO2, 2025 to 2100', thousands(summary.cumulativeGt),
-      published !== null ? `GtCO2 · as published by ${published.label}`
+      published !== null
+        ? `GtCO2 · ${published.label} publishes ${thousands(published.cumulativeGt)}`
         : (high === undefined ? 'GtCO2'
           : `GtCO2 · CMIP7 HIGH reaches ${thousands(high.cumulativeGt)}`)],
     [`Warming in 2100 above ${ANCHORS.baseline}`, degrees(summary.warmingC),
       published === null ? placeAmongMarkers(summary.warmingC)
-        : `as published by ${published.label}`],
+        : `${published.label} publishes ${degrees(published.warmingC)}`],
     ['Added warming from now', signedDegrees(summary.addedC),
       `above the ${ANCHORS.recentPeriod} average of ${ANCHORS.recentMeanC.toFixed(2)} °C`],
     ['Your 2100 world looks like', country.value, country.note],

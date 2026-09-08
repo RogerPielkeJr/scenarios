@@ -258,9 +258,23 @@ def main() -> None:
         after = next(i for i, (label, _) in enumerate(pre) if label == 'CMIP7 MEDIUM')
         pre.insert(after + 1, (ml_label, cmip7_preset('ML')))
 
+    # Every preset value has to sit on its own slider's step, or the slider
+    # shows one number while the state holds another and the preset stops being
+    # reachable. Four CMIP7 presets carried a 2100 population off the 0.1 step
+    # -- MEDIUM held 9.89 under a slider reading 9.9 -- so one step down from
+    # the displayed value un-matched the preset and swapped the whole readout.
+    # Land use and methane were already rounded this way above; this applies the
+    # same rule to every field rather than to the two that happened to need it.
+    spec_by_key = {s['id']: s for s in config['inputs']}
+
+    def snap(key: str, value: float) -> float:
+        spec = spec_by_key[key]
+        steps = round((value - spec['min']) / spec['step'])
+        return round(spec['min'] + steps * spec['step'], spec['decimals'])
+
     presets = []
     for label, values in pre:
-        inputs = {INPUT_META[k][0]: v for k, v in values.items()}
+        inputs = {INPUT_META[k][0]: snap(INPUT_META[k][0], v) for k, v in values.items()}
         # This preset takes the observed rates, so it follows the corrected
         # carbon-intensity rate rather than the prototype's.
         if label == 'Kaya at observed rates':

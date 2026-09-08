@@ -20,9 +20,15 @@ export interface StatTiles {
 /**
  * The three numbers the tiles lead with.
  *
- * With a published scenario on screen these report that scenario's published
- * totals rather than the reconstruction's, because the chart above them draws
- * its published path.
+ * These always report the reconstruction the six sliders drive, including while
+ * a CMIP7 preset sits untouched. Reporting the published totals instead until
+ * the first slider move made the headline change quantity rather than value:
+ * on CMIP7 MEDIUM the tiles read 2.84 degrees as published, and one step of the
+ * population slider -- from 9.9 down to 9.8, which lowers emissions -- swapped
+ * them onto the reconstruction at 3.02. The reader saw warming rise by 0.18
+ * degrees after cutting population, when their own move had lowered it by
+ * 0.002. The published figure now sits in the note beside the number instead,
+ * where the gap between the two reads as the finding it is.
  *
  * The tiles and the readout strip both draw from here, so a reader looking at
  * one and then the other can never be handed two different answers.
@@ -36,15 +42,7 @@ export interface ScenarioSummary {
 export function scenarioSummary(
   inputs: ScenarioInputs,
   path: ScenarioPath,
-  published: PublishedPath | null = null,
 ): ScenarioSummary {
-  if (published !== null) {
-    return {
-      cumulativeGt: published.cumulativeGt,
-      warmingC: published.warmingC,
-      addedC: published.warmingC - ANCHORS.recentMeanC,
-    };
-  }
   return {
     cumulativeGt: path.cumulativeGt,
     warmingC: warming(path.cumulativeGt, inputs.methane),
@@ -64,18 +62,20 @@ export function renderStats(
   path: ScenarioPath,
   published: PublishedPath | null = null,
 ): void {
-  const summary = scenarioSummary(inputs, path, published);
+  const summary = scenarioSummary(inputs, path);
   tiles.cumulative.textContent = thousands(summary.cumulativeGt);
   const highNote = HIGH === undefined ? 'GtCO2'
     : `GtCO2 · CMIP7 HIGH reaches ${thousands(HIGH.cumulativeGt)}`;
+  // With a preset on screen the note carries what that scenario publishes, so
+  // the reader reads the reconstruction and the published figure together.
   tiles.cumulativeNote.textContent = published === null
     ? highNote
-    : `GtCO2 · as published by ${published.label}`;
+    : `GtCO2 · ${published.label} publishes ${thousands(published.cumulativeGt)}`;
 
   tiles.warming.textContent = degrees(summary.warmingC);
   tiles.warmingNote.textContent = published === null
     ? placeAmongMarkers(summary.warmingC)
-    : `as published by ${published.label}`;
+    : `${published.label} publishes ${degrees(published.warmingC)}`;
 
   tiles.added.textContent = signedDegrees(summary.addedC);
   tiles.addedNote.textContent =
