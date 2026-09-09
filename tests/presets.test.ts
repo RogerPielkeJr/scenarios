@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DOCUMENTED_PRESETS, PRESETS, presetByLabel } from '../src/model/bounds.js';
 import { warming } from '../src/model/emulator.js';
@@ -7,6 +9,31 @@ import {
   DEFAULT_PRESET, INPUT_SPECS, OBSERVED_RATES, SPEC_BY_ID, defaultInputs,
 } from '../src/model/config.js';
 import { MARKER_BY_ID } from '../src/model/markers.js';
+
+// The methodology PDF is built from METHODOLOGY.md, METHODS.md and DATA.md, so
+// it is current exactly when they are. Nothing here reads the PDF: extracting
+// its text needs a binary that this machine has and a CI runner does not. What
+// this checks is the thing that actually goes stale -- a recalibration that
+// moves the frozen figures and leaves the documents behind. Both documents
+// print all four, so both are checked, and `npm run build:pdf` is a release
+// step in LAUNCH.md.
+describe('the documents state the figures the model produces', () => {
+  const read = (name: string) =>
+    readFileSync(resolve(process.cwd(), name), 'utf8');
+
+  it.each(['METHODS.md', 'METHODOLOGY.md'])('%s carries every frozen preset', (name) => {
+    const document = read(name);
+    for (const preset of DOCUMENTED_PRESETS) {
+      const expected = preset.expected;
+      if (expected === undefined) continue;
+      const cumulative = Math.round(expected.cumulative_gt).toLocaleString('en-US');
+      expect(document, `${name} no longer states ${preset.label} at ${cumulative} GtCO₂`)
+        .toContain(cumulative);
+      expect(document, `${name} no longer states ${preset.label} at ${expected.warming_c} °C`)
+        .toContain(expected.warming_c.toFixed(2));
+    }
+  });
+});
 
 describe('presets', () => {
   it('offers the four the brief documents', () => {

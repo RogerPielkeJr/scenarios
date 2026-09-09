@@ -202,16 +202,19 @@ The base-year state, all from 2024, the last complete year, applied at 2025.
 | `gdpPerPersonUsd` | 21,393.2 | constant 2021 international $ | World Bank PPP GDP over population |
 | `energyPerDollarMj` | 3.4002 | MJ per dollar | EI total energy supply over World Bank PPP GDP |
 | `co2PerEnergyKgGj` | 65.181 | kg CO₂ per GJ | Global Carbon Budget fossil and industry CO₂ over EI total energy supply |
-| `landUseGt` | 3.83 | GtCO₂/yr | stated in the brief |
+| `landUseGt` | 4.586 | GtCO₂/yr | Global Carbon Budget land-use change CO₂ |
 | `methaneMt` | 380 | Mt/yr | stated in the brief |
 
 `superseded` records what the prototype used and why it changed. The old value
 of 60.5 kg per GJ came from energy CO₂ plus flaring alone, which started every
 path about 4.4 GtCO₂ below all seven markers.
 
-Land use stays at the brief's 3.83 rather than the Global Carbon Budget's 4.59
-for the same year. The gap sits well inside the uncertainty on that term, unlike
-the cement omission, which was definite.
+Land use moved on 2026-09-09 from the brief's 3.83 to the Global Carbon Budget's
+4.586 for the same year, the source the rest of the base year already used. The
+`basis` block counted 4.586 for the marker-comparable total while the path
+started from 3.83, so the path ran 0.76 GtCO₂ below the basis it was drawn
+against and the land use chart stepped where the record met the reader's line.
+METHODS.md records what the change moved.
 
 ### `observed.json`
 

@@ -7,7 +7,7 @@ anything except the step before it.
 
 ## Where things stand tonight
 
-- 49 commits on `main`, **nothing pushed** — `origin/main` has no ref.
+- 59 commits on `main`, **nothing pushed** — `origin/main` has no ref.
 - **The GitHub repository does not exist.** `git remote -v` points at
   `github.com/RogerPielkeJr/scenarios`, which returns 404. The remote was
   configured and the repository never created.
@@ -25,6 +25,17 @@ anything except the step before it.
   robots but live in a browser.
 
 ## Part 1 — the site itself
+
+0. **Rebuild what is generated**, in this order, and commit whatever moves:
+   `python3 scripts/build_data.py`, `python3 scripts/build_carried_data.py`,
+   `python3 scripts/build_removal.py`, `python3 scripts/build_timing.py`,
+   `python3 scripts/build_sitemap.py`, then `npm run build:pdf`. The
+   methodology PDF is built from METHODOLOGY.md, METHODS.md and DATA.md and is
+   the one artefact no test can check on a runner, because reading its text
+   needs a binary CI does not have. `tests/presets.test.ts` checks that those
+   documents still state the figures the model produces, so a stale document
+   fails the suite; a stale PDF does not, and this step is what prevents one.
+   Its build is not byte-reproducible, so `git status` alone says nothing.
 
 1. **Create the repository.** `gh repo create RogerPielkeJr/scenarios --public
    --source=. --remote=origin --push` creates it and pushes `main` in one step.

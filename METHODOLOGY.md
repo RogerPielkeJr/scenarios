@@ -27,7 +27,7 @@ Four of them multiply together in the Kaya identity, and four sit outside it:
 | Income growth per person | A rate that compounds | −0.5 to +3.5 %/yr | $21,393 in 2024 |
 | Energy needed per dollar | A rate that compounds | −4 to +0.5 %/yr | 3.40 MJ per dollar |
 | Carbon per unit of energy | A rate that compounds | −4 to +0.5 %/yr | 65.18 kgCO₂ per GJ |
-| Land use CO₂ in 2100 | A level | −10 to +5 GtCO₂/yr | 3.83 GtCO₂/yr |
+| Land use CO₂ in 2100 | A level | −10 to +5 GtCO₂/yr | 4.59 GtCO₂/yr |
 | Methane in 2100 | A level | 80 to 600 Mt/yr | 380 Mt/yr |
 | Improvement delivered by 2062 | A share of the century's technology improvement | 5 to 95 % | 50 % is a steady rate |
 | Engineered CO₂ removal in 2100 | A level | 0 to 25 GtCO₂/yr | close to zero today |
@@ -142,7 +142,7 @@ untouched.
 
 ## What travels with a scenario
 
-Six numbers and a name, encoded in the address. Every link off every page
+Eight numbers and a name, encoded in the address. Every link off every page
 carries them, so a reader who steps out to a Learn More page, the library or
 the bibliography comes back to the scenario they left. **Copy link to this
 scenario** hands over that same address.
