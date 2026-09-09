@@ -19,12 +19,13 @@ const LINKS: Array<[string, (scenario: Scenario) => string]> = [
 /**
  * Where feedback on the tool goes.
  *
- * The Substack until the post announcing the site exists, so the words in the
- * footer lead somewhere from the first day rather than sitting dead. Point
- * this at the announcement post once it stands and `linkFeedback` moves every
- * page at once.
+ * The announcement post, which went up after the site did so that it could
+ * link a live tool. Until then this pointed at the Substack front page, so the
+ * words in the footer led somewhere from the first day rather than sitting
+ * dead. `linkFeedback` moves every page at once.
  */
-export const FEEDBACK_URL: string | null = 'https://rogerpielkejr.substack.com';
+export const FEEDBACK_URL: string | null =
+  'https://rogerpielkejr.substack.com/p/introducing-the-thb-build-your-own';
 
 /** Makes the footer's "Provide feedback" a link, once there is one to make. */
 export function linkFeedback(root: Document): void {

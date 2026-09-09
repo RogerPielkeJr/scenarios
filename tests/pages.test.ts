@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { FEEDBACK_URL } from '../src/ui/toolbar.js';
 
 import { existsSync } from 'node:fs';
 import { LEARN_ENTRIES } from '../src/learn/registry.js';
@@ -75,6 +76,19 @@ describe('both pages', () => {
     expect(html).toContain('This is work in progress');
     expect(html).toContain('caveat lector');
     expect(html).toContain('data-feedback>Provide feedback</span>');
+  });
+
+  // The markup ships the words and `linkFeedback` makes them a link at
+  // runtime, so nothing above this catches where they point. Between the
+  // site going live and the announcement post going up, they pointed at the
+  // Substack front page: a reader with an error to report landed on a list of
+  // posts. That was deliberate and temporary; this makes it visible if it
+  // ever becomes permanent by accident.
+  it('sends feedback to the announcement post, not the Substack front page', () => {
+    expect(FEEDBACK_URL).not.toBeNull();
+    expect(FEEDBACK_URL).toMatch(/^https:\/\//);
+    expect(FEEDBACK_URL, 'a /p/ path is what makes it a post rather than the front page')
+      .toContain('/p/');
   });
 });
 
