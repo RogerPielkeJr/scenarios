@@ -68,8 +68,8 @@ stops, which the model clamps to range but does not snap, so links address a
 denser set again.
 
 Far fewer answers than scenarios come out the other end. Across the whole space
-the century total spans -778 to 44,632 GtCO₂ and warming 1.37 to 6.12 °C, which
-at the precision the tiles print leaves at most 45,412 distinct totals and 477
+the century total spans -720 to 44,027 GtCO₂ and warming 1.37 to 6.11 °C, which
+at the precision the tiles print leaves at most 44,748 distinct totals and 475
 distinct warming figures. Several factors multiplied together, and only the
 product shows.
 
@@ -96,6 +96,22 @@ which puts it above CMIP7 HIGH's 3,777 rather than below it. `presets.json`
 keeps the figures stated before the recalibration under `brief_stated`, and a
 test pins the size of the shift.
 
+**Land use followed on 2026-09-09.** The base kept the brief's 3.83 GtCO₂ while
+the same block of `base.json` counted the Global Carbon Budget's 4.586 for the
+marker-comparable total, so the path started 0.76 GtCO₂ below the basis it was
+drawn against and the land use chart showed a step where the record met the
+reader's line. Land use now comes from the same source as the rest of the base
+year, and the 2025 start is 43.23 against a marker range of 42.4 to 43.8.
+
+That improved three of the four CMIP7 presets against their published
+cumulative totals and made one worse: HIGH from −12 to +4 GtCO₂, MEDIUM from −3
+to −2, MEDIUM-to-LOW from 0 to +2, and VERY LOW from +55 to +68. VERY LOW pays
+for it because its own land use is a sink of −4.71, so raising the base raises
+the whole early ramp against it. Every documented preset moved by about 29
+GtCO₂ and by 0.01 °C or less. `presets.json` carries each earlier freeze under
+`superseded`, newest first, so a figure published against any of them stays
+traceable.
+
 ### Population
 
 Population interpolates between the real IIASA SSP1, SSP2 and SSP3 world
@@ -105,19 +121,54 @@ smoothstep between two endpoints could not do that.
 
 Outside the SSP1 to SSP3 span, which is 8.09 to 12.98 billion in 2100, the
 nearest curve is scaled by the ratio of the target to its own endpoint. That
-keeps the shape and moves the level, and it also moves the 2025 end of the
-curve: at the extremes of the slider the path starts from 6.04 or 8.79 billion
-rather than 8.15. Both ends of the 6 to 14 billion slider reach this. A test
-pins the behaviour so it cannot change unnoticed.
+keeps the shape and moves the level.
+
+**Scaling used to move the base year, and no longer does.** Multiplying a curve
+multiplies its first point along with the rest, so at 6 billion the path began
+from 6.04 and at 14 billion from 8.79, against an observed 8.15. Both ends of
+the 6 to 14 billion slider reached it, and the reader saw the whole line lift
+or drop when the slider moved. 2025 is an observation and every other slider
+held it exactly, so this one now does too: the scaled curve carries an additive
+correction, at its full size in the base year and at nothing in 2100, which
+pins the start without moving the target. All three SSP curves share a base
+year of 8.15 billion, so inside the span there is nothing to correct and no
+path changes. `tests/kaya.test.ts` checks the base year against both ends and
+the default of all eight sliders, and `tests/population.test.ts` checks that
+the 2100 figure the slider asks for is still the figure it reaches.
 
 ### Land use
 
-Land use CO₂ runs in a straight line from 3.83 GtCO₂ today to whatever the
-reader sets for 2100.
+Land use CO₂ runs in a straight line from 4.59 GtCO₂ today to whatever the
+reader sets for 2100. That figure is the Global Carbon Budget's land-use change
+CO₂ for the base year, the same source and vintage as the fossil and industrial
+CO₂ beside it.
 
 A line is a placeholder. The marker paths carry land use folded into their total
 CO₂ and publish no separate land use series here, so there is no shape to borrow
 from them. If those series become available, the shape should follow them.
+
+### The two technology bounds
+
+Both bound presets hold every technological trajectory at an extreme of the
+record. Two of the three rates come from window scans in `observed.json`, and
+one comes from a published paper.
+
+**Slowest technical progress** takes the weakest 25-year window on energy per
+dollar, −1.36%/yr over 1990 to 2015, and the weakest 30-year window on CO₂ per
+unit of energy. On 2026-09-09 that second rate moved from −0.17%/yr over 1992 to
+2022 to **−0.02%/yr over 1984 to 2014**. The first is the weakest window on the
+combustion series, CO₂ from energy over total energy supply; the second is the
+weakest window on the basis the slider itself moves, cement and industrial CO₂
+included. The bound sets that slider, so it now reads off the quantity it sets.
+The preset's cumulative total went from 5,047 to 5,397 GtCO₂ and its warming
+from 3.47 to 3.53 °C.
+
+**Ausubel methane economy** needs no equivalent correction. Its fuel-mix rate,
+−2.79%/yr, comes from the 1988 paper rather than from a window scan, and its
+energy-per-dollar rate has no CO₂ in it.
+
+`observed.json` carries both scans, `carbon_per_energy_30y` and
+`carbon_per_energy_slider_30y`, so the difference stays visible.
 
 ### Timing and removal
 
@@ -168,7 +219,9 @@ the same tonne out twice.
 **Land use** is net CO₂ from land use, land-use change and forestry, on the
 Global Carbon Budget's definition. That number is already a net: 6.23 GtCO₂ a
 year of gross deforestation and 2.20 of other transitions and peat, less 4.40 of
-regrowth on land already recovering, giving the 3.83 the model starts from. Every
+regrowth on land already recovering. The Global Carbon Budget's own net for the
+base year, 4.59, is what the model starts from; the decomposition above comes
+from the 2024 paper and nets to 4.03, and DATA.md covers the vintages. Every
 conventional removal — planting, restoration, soil carbon, durable wood products
 — lands inside it, which is what lets this one slider reach a sink of 10 GtCO₂ a
 year on its own.
@@ -247,10 +300,10 @@ working.**
 
 | Preset | Population | Income | Energy/$ | CO₂/energy | Land use | Methane | Cumulative | Warming |
 |---|---|---|---|---|---|---|---|---|
-| Kaya at observed rates | 10.2 | +1.91 | −1.43 | −0.15 | 2.0 | 380 | 4,178 | 3.21 |
-| Trend continues | 10.2 | +1.91 | −1.62 | −0.48 | 1.0 | 300 | 3,409 | 2.94 |
-| Slowest technical progress | 11.4 | +2.23 | −1.36 | −0.17 | 2.0 | 450 | 5,047 | 3.47 |
-| Ausubel methane economy | 9.0 | +1.91 | −1.57 | −2.79 | −1.0 | 150 | 1,585 | 2.22 |
+| Kaya at observed rates | 10.2 | +1.91 | −1.43 | −0.15 | 2.0 | 380 | 4,207 | 3.22 |
+| Trend continues | 10.2 | +1.91 | −1.62 | −0.48 | 1.0 | 300 | 3,437 | 2.95 |
+| Slowest technical progress | 11.4 | +2.23 | −1.36 | −0.02 | 2.0 | 450 | 5,397 | 3.53 |
+| Ausubel methane economy | 9.0 | +1.91 | −1.57 | −2.79 | −1.0 | 150 | 1,614 | 2.23 |
 
 **Kaya at observed rates.** The 1990 to 2024 record projected forward unchanged.
 Income +1.91, energy per dollar −1.43 and CO₂ per unit of energy −0.15 all come
@@ -484,10 +537,10 @@ how closely the reconstruction follows, computed rather than asserted
 
 | Preset | 2100 CO₂, this tool | Marker | Cumulative, this tool | Marker | 2050, this tool | Marker |
 |---|---|---|---|---|---|---|
-| CMIP7 HIGH | 54.5 | 55.0 | 3,765 | 3,777 | 48.1 | 47.1 |
-| CMIP7 MEDIUM | 34.1 | 34.4 | 2,767 | 2,770 | 37.0 | 36.1 |
-| CMIP7 MEDIUM-to-LOW | −8.4 | −9.2 | 1,710 | 1,710 | 35.3 | 35.1 |
-| CMIP7 VERY LOW | −11.1 | −5.8 | 323 | 268 | 6.3 | −1.2 |
+| CMIP7 HIGH | 54.5 | 55.0 | 3,781 | 3,777 | 48.3 | 47.1 |
+| CMIP7 MEDIUM | 34.1 | 34.4 | 2,768 | 2,770 | 37.0 | 36.1 |
+| CMIP7 MEDIUM-to-LOW | −7.9 | −9.2 | 1,712 | 1,710 | 35.0 | 35.1 |
+| CMIP7 VERY LOW | −11.1 | −5.8 | 336 | 268 | 6.5 | −1.2 |
 
 Before timing and removal existed the same four presets missed their markers'
 century totals by −12, +325, −480 and +1,031 GtCO₂. Three causes drove that, and

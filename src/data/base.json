@@ -9,7 +9,7 @@
    "gdpPerPersonUsd": "World Bank NY.GDP.MKTP.PP.KD over SP.POP.TOTL, WLD, constant 2021 international $",
    "energyPerDollarMj": "EI Statistical Review 2026 total energy supply over World Bank PPP GDP",
    "co2PerEnergyKgGj": "Global Carbon Budget fossil and industry CO2 (via Our World in Data) over EI total energy supply",
-   "landUseGt": "stated in the brief; the Global Carbon Budget figure for the same year is 4.59 Gt",
+   "landUseGt": "Global Carbon Budget land-use change CO2 (via Our World in Data) for the base year. The brief stated 3.83 Gt, which left the path starting 0.76 Gt below the basis the marker totals are on; see basis.totalCo2Gt and METHODS.md.",
    "methaneMt": "stated in the brief"
   }
  },
@@ -18,7 +18,7 @@
   "gdpPerPersonUsd": 21393.2,
   "energyPerDollarMj": 3.4002,
   "co2PerEnergyKgGj": 65.181,
-  "landUseGt": 3.83,
+  "landUseGt": 4.586,
   "methaneMt": 380.0
  },
  "basis": {

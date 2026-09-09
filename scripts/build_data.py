@@ -190,11 +190,20 @@ def main() -> None:
                  if y in world_gdp and y in world_pop and y in w_tes]
 
     # --- world Kaya factors -------------------------------------------------
+    gcb = fetch_gcb()
     gdppc = {y: world_gdp[y] / world_pop[y] for y in years_gdp}           # $/person
     energy_per_dollar = {y: w_tes[y] * 1e12 / world_gdp[y] for y in years_gdp}  # MJ/$
     carbon_per_energy = {y: w_co2[y] / w_tes[y]                            # kg/GJ
                          for y in range(FIRST_YEAR, LAST_YEAR + 1)
                          if y in w_co2 and y in w_tes}
+    # The same quantity on the basis the CO2-per-energy slider moves: fossil
+    # and industrial CO2, cement included, over total energy supply. The
+    # combustion series above leaves cement out, and a bound read off it
+    # therefore describes a different quantity from the slider it sets. See
+    # METHODS.md, "The two technology bounds".
+    carbon_per_energy_slider = {y: gcb[str(y)]['co2'] / w_tes[y]           # kg/GJ
+                                for y in range(FIRST_YEAR, LAST_YEAR + 1)
+                                if str(y) in gcb and y in w_tes}
 
     observed = {
         'meta': {
@@ -241,6 +250,8 @@ def main() -> None:
             'income_25y': window_extremes(gdppc, 25, GDP_FIRST_YEAR, LAST_YEAR),
             'energy_per_dollar_25y': window_extremes(energy_per_dollar, 25, GDP_FIRST_YEAR, LAST_YEAR),
             'carbon_per_energy_30y': window_extremes(carbon_per_energy, 30, FIRST_YEAR, LAST_YEAR),
+            'carbon_per_energy_slider_30y': window_extremes(
+                carbon_per_energy_slider, 30, FIRST_YEAR, LAST_YEAR),
         },
         'base_year_check': {
             'year': LAST_YEAR,
@@ -259,8 +270,8 @@ def main() -> None:
     # every line it is compared against. CO2 per unit of energy is therefore
     # set from Global Carbon Budget fossil-and-industry CO2 (which includes
     # cement and other process emissions) over EI total energy supply, not
-    # from EI's energy-only CO2. Land use stays at the value the brief gives.
-    gcb = fetch_gcb()
+    # from EI's energy-only CO2. Land use comes from the same source, so the
+    # path starts on the basis the marker totals are on.
     gcb_base = gcb[str(LAST_YEAR)]
     fossil_industry_mt = gcb_base['co2']
     energy_ej = w_tes[LAST_YEAR]
@@ -269,7 +280,7 @@ def main() -> None:
         'gdpPerPersonUsd': round(gdppc[LAST_YEAR], 1),
         'energyPerDollarMj': round(energy_per_dollar[LAST_YEAR], 4),
         'co2PerEnergyKgGj': round(fossil_industry_mt / energy_ej, 3),
-        'landUseGt': 3.83,
+        'landUseGt': round(gcb_base['land_use_change_co2'] / 1000, 3),
         'methaneMt': 380.0,
     }
     base = {
@@ -290,8 +301,10 @@ def main() -> None:
                 'gdpPerPersonUsd': 'World Bank NY.GDP.MKTP.PP.KD over SP.POP.TOTL, WLD, constant 2021 international $',
                 'energyPerDollarMj': 'EI Statistical Review 2026 total energy supply over World Bank PPP GDP',
                 'co2PerEnergyKgGj': 'Global Carbon Budget fossil and industry CO2 (via Our World in Data) over EI total energy supply',
-                'landUseGt': 'stated in the brief; the Global Carbon Budget figure for the same year is '
-                             f'{gcb_base["land_use_change_co2"] / 1000:.2f} Gt',
+                'landUseGt': ('Global Carbon Budget land-use change CO2 (via Our World in '
+                              'Data) for the base year. The brief stated 3.83 Gt, which left '
+                              'the path starting 0.76 Gt below the basis the marker totals '
+                              'are on; see basis.totalCo2Gt and METHODS.md.'),
                 'methaneMt': 'stated in the brief',
             },
         },

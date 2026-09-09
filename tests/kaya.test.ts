@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { BASE, BASE_YEAR, END_YEAR, defaultInputs } from '../src/model/config.js';
+import { BASE, BASE_YEAR, END_YEAR, INPUT_SPECS, SPEC_BY_ID,
+  defaultInputs } from '../src/model/config.js';
 import { computePath } from '../src/model/kaya.js';
 import { MARKERS } from '../src/model/markers.js';
 import { populationAt } from '../src/model/population.js';
@@ -78,6 +79,38 @@ describe('computePath', () => {
       expect(at(p.points, t).removalsGt).toBeCloseTo(-10 * (t / span) ** 2, 9);
       // A straight ramp would put it here; the two must differ.
       expect(at(p.points, t).removalsGt).not.toBeCloseTo(-10 * (t / span), 3);
+    }
+  });
+
+  // 2025 is an observation. Every slider sets something about the years after
+  // it, so no setting of any slider may move the first point. Population broke
+  // this until 2026-09-09: outside the SSP1-SSP3 span it scaled the nearest
+  // curve, and scaling multiplies the base year along with the rest, so at 6
+  // billion the path began from 6.04 and at 14 billion from 8.79 rather than
+  // from 8.15. Every end of every slider, and the defaults, are checked here.
+  it('holds the base year fixed at every setting of every slider', () => {
+    const first = at(computePath(defaultInputs()).points, 0);
+    for (const spec of INPUT_SPECS) {
+      for (const value of [spec.min, spec.max, spec.default]) {
+        const point = at(computePath({ ...defaultInputs(), [spec.id]: value }).points, 0);
+        const where = `${spec.id} at ${value}`;
+        expect(point.year, where).toBe(BASE_YEAR);
+        expect(point.co2Gt, where).toBeCloseTo(first.co2Gt, 9);
+        expect(point.populationBn, where).toBeCloseTo(first.populationBn, 9);
+        expect(point.gdpPerPersonUsd, where).toBeCloseTo(first.gdpPerPersonUsd, 9);
+        expect(point.landUseGt, where).toBeCloseTo(first.landUseGt, 9);
+        expect(point.removalsGt, where).toBeCloseTo(0, 9);
+      }
+    }
+  });
+
+  // The correction that pins the base year decays to nothing by 2100, so the
+  // number the reader set is still the number the path reaches.
+  it('still reaches the 2100 population the slider asks for', () => {
+    const spec = SPEC_BY_ID['population'];
+    for (const target of [spec.min, 7, 8.09, 9.887, 12.977, 13.5, spec.max]) {
+      expect(populationAt(END_YEAR, target), `target ${target}`).toBeCloseTo(target, 6);
+      expect(populationAt(BASE_YEAR, target), `target ${target}`).toBeCloseTo(8.15, 6);
     }
   });
 

@@ -15,16 +15,25 @@
     "removals": 0.0
    },
    "expected": {
-    "cumulative_gt": 4177.7,
-    "warming_c": 3.21,
-    "superseded": {
-     "cumulative_gt": 4083.9,
-     "warming_c": 3.19,
-     "why": "the rate measured combustion CO₂ alone, at -0.21%/yr"
-    },
+    "cumulative_gt": 4206.8,
+    "warming_c": 3.22,
+    "superseded": [
+     {
+      "cumulative_gt": 4177.7,
+      "warming_c": 3.21,
+      "until": "2026-09-09",
+      "why": "land use started from the brief's 3.83 Gt rather than the Global Carbon Budget's 4.586 for the same year"
+     },
+     {
+      "cumulative_gt": 4083.9,
+      "warming_c": 3.19,
+      "until": "2026-09-05",
+      "why": "the CO₂-per-energy rate measured combustion CO₂ alone, at -0.21%/yr"
+     }
+    ],
     "tolerance_gt": 0.5,
     "tolerance_c": 0.01,
-    "source": "frozen from this model after the base-year recalibration"
+    "source": "frozen from this model after the 2026-09-09 recalibration"
    }
   },
   {
@@ -38,7 +47,7 @@
     "co2PerEnergy": -0.08,
     "methane": 533,
     "landUse": 1.9,
-    "improvementTiming": 53,
+    "improvementTiming": 54,
     "removals": 1.5
    }
   },
@@ -53,7 +62,7 @@
     "co2PerEnergy": -0.87,
     "methane": 436,
     "landUse": 1.5,
-    "improvementTiming": 61,
+    "improvementTiming": 62,
     "removals": 0.0
    }
   },
@@ -68,8 +77,8 @@
     "co2PerEnergy": -3.06,
     "methane": 203,
     "landUse": -8.8,
-    "improvementTiming": 31,
-    "removals": 5.5
+    "improvementTiming": 32,
+    "removals": 5.0
    }
   },
   {
@@ -83,7 +92,7 @@
     "co2PerEnergy": -2.6,
     "methane": 94,
     "landUse": -4.7,
-    "improvementTiming": 82,
+    "improvementTiming": 83,
     "removals": 11.0
    }
   },
@@ -102,11 +111,19 @@
     "removals": 0.0
    },
    "expected": {
-    "cumulative_gt": 3408.7,
-    "warming_c": 2.94,
+    "cumulative_gt": 3437.4,
+    "warming_c": 2.95,
+    "superseded": [
+     {
+      "cumulative_gt": 3408.7,
+      "warming_c": 2.94,
+      "until": "2026-09-09",
+      "why": "land use started from the brief's 3.83 Gt rather than the Global Carbon Budget's 4.586 for the same year"
+     }
+    ],
     "tolerance_gt": 0.5,
     "tolerance_c": 0.01,
-    "source": "frozen from this model after the base-year recalibration"
+    "source": "frozen from this model after the 2026-09-09 recalibration"
    }
   },
   {
@@ -117,22 +134,30 @@
     "population": 11.4,
     "income": 2.23,
     "energyPerDollar": -1.36,
-    "co2PerEnergy": -0.17,
+    "co2PerEnergy": -0.02,
     "methane": 450,
     "landUse": 2.0,
     "improvementTiming": 50,
     "removals": 0.0
    },
    "expected": {
-    "cumulative_gt": 5047.2,
-    "warming_c": 3.47,
+    "cumulative_gt": 5397.3,
+    "warming_c": 3.53,
     "brief_stated": {
      "cumulative_gt": 4600,
      "warming_c": 3.4
     },
+    "superseded": [
+     {
+      "cumulative_gt": 5047.2,
+      "warming_c": 3.47,
+      "until": "2026-09-09",
+      "why": "land use started from the brief's 3.83 Gt rather than the Global Carbon Budget's 4.586 for the same year, and the fuel-mix rate came from the weakest 30-year window on the combustion basis rather than the slider's"
+     }
+    ],
     "tolerance_gt": 0.5,
     "tolerance_c": 0.01,
-    "source": "frozen from this model after the base-year recalibration"
+    "source": "frozen from this model after the 2026-09-09 recalibration"
    }
   },
   {
@@ -150,15 +175,23 @@
     "removals": 0.0
    },
    "expected": {
-    "cumulative_gt": 1585.0,
-    "warming_c": 2.22,
+    "cumulative_gt": 1613.7,
+    "warming_c": 2.23,
     "brief_stated": {
      "cumulative_gt": 1400,
      "warming_c": 2.2
     },
+    "superseded": [
+     {
+      "cumulative_gt": 1585.0,
+      "warming_c": 2.22,
+      "until": "2026-09-09",
+      "why": "land use started from the brief's 3.83 Gt rather than the Global Carbon Budget's 4.586 for the same year"
+     }
+    ],
     "tolerance_gt": 0.5,
     "tolerance_c": 0.01,
-    "source": "frozen from this model after the base-year recalibration"
+    "source": "frozen from this model after the 2026-09-09 recalibration"
    }
   }
  ]

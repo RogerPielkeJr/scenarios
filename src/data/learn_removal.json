@@ -23,7 +23,7 @@
    "label": "HIGH",
    "color": "#d1332e",
    "removals": 1.5,
-   "timing": 53,
+   "timing": 54,
    "co2In2100": 55.04
   },
   {
@@ -31,15 +31,15 @@
    "label": "MEDIUM",
    "color": "#e08214",
    "removals": 0.0,
-   "timing": 61,
+   "timing": 62,
    "co2In2100": 34.44
   },
   {
    "id": "ML",
    "label": "MEDIUM-to-LOW",
    "color": "#7b3fa0",
-   "removals": 5.5,
-   "timing": 31,
+   "removals": 5.0,
+   "timing": 32,
    "co2In2100": -9.23
   },
   {
@@ -47,7 +47,7 @@
    "label": "VERY LOW",
    "color": "#1a7f37",
    "removals": 11.0,
-   "timing": 82,
+   "timing": 83,
    "co2In2100": -5.77
   }
  ]

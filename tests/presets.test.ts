@@ -88,7 +88,10 @@ describe('presets', () => {
     { label: 'CMIP7 HIGH', markerId: 'H', toleranceGt: 20 },
     { label: 'CMIP7 MEDIUM', markerId: 'M', toleranceGt: 20 },
     { label: 'CMIP7 MEDIUM-to-LOW', markerId: 'ML', toleranceGt: 20 },
-    { label: 'CMIP7 VERY LOW', markerId: 'VL', toleranceGt: 60 },
+    // VERY LOW is the one marker the 2026-09-09 land-use base made worse,
+    // from 55 to 68 GtCO2: its own land use is a sink of -4.71, so raising the
+    // base raises the whole early ramp against it. The other three improved.
+    { label: 'CMIP7 VERY LOW', markerId: 'VL', toleranceGt: 70 },
   ])('reproduces $label to within $toleranceGt Gt of its marker',
     ({ label, markerId, toleranceGt }) => {
       const preset = PRESETS.find((p) => p.label === label);
@@ -138,8 +141,10 @@ describe('presets', () => {
       const path = computePath(preset.inputs);
       const t = warming(path.cumulativeGt, preset.inputs.methane);
       expect(path.cumulativeGt / stated.cumulative_gt).toBeGreaterThan(1.09);
-      expect(path.cumulativeGt / stated.cumulative_gt).toBeLessThan(1.14);
-      expect(Math.abs(t - stated.warming_c)).toBeLessThan(0.08);
+      // The slow bound is the widest at 1.17, because it took the land-use
+      // base and the fuel-mix basis together; the fast bound sits at 1.15.
+      expect(path.cumulativeGt / stated.cumulative_gt).toBeLessThan(1.18);
+      expect(Math.abs(t - stated.warming_c)).toBeLessThan(0.14);
     }
   });
 });
@@ -157,12 +162,19 @@ describe('the corrected carbon-intensity rate', () => {
       .toBeCloseTo(Number(fuelMix.constants.rates.sliderBasis1990.toFixed(2)), 6);
   });
 
-  // Anything published against the old figure has to stay traceable.
-  it('keeps what the rate and the preset were before the correction', async () => {
+  // Anything published against an older figure has to stay traceable, and each
+  // recalibration has to leave the one before it readable. The 2026-09-09
+  // land-use change briefly wrote over the 2026-09-05 carbon-intensity one,
+  // which is why this is a chain rather than a slot.
+  it('keeps every figure the presets carried before a correction', async () => {
     const config = (await import('../src/data/config.json')).default;
     expect(config.supersededRates.co2PerEnergy).toBeCloseTo(-0.21, 2);
     const observed = PRESETS.find((preset) => preset.id === 'kaya-at-observed-rates');
-    expect(observed?.expected?.superseded?.cumulative_gt).toBeCloseTo(4083.9, 1);
     expect(observed?.inputs.co2PerEnergy).toBeCloseTo(-0.15, 2);
+    const chain = observed?.expected?.superseded ?? [];
+    expect(chain.map((entry) => entry.cumulative_gt)).toEqual([4177.7, 4083.9]);
+    expect(chain.map((entry) => entry.until)).toEqual(['2026-09-09', '2026-09-05']);
+    // Newest first, and every entry says what changed.
+    for (const entry of chain) expect(entry.why.length).toBeGreaterThan(20);
   });
 });

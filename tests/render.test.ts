@@ -276,7 +276,7 @@ describe('a published scenario on screen', () => {
     app.apply(medium.inputs);
     const report = app.lastReport();
     // The reconstruction, which is what the six sliders drive.
-    expect(report?.outputs['tile-cumulative']).toBe('2,767');
+    expect(report?.outputs['tile-cumulative']).toBe('2,768');
     expect(report?.outputs['tile-warming']).toBe('2.94 °C');
     // The published figure stands beside it rather than replacing it.
     expect(report?.outputs['tile-cumulative-note']).toContain('CMIP7 MEDIUM publishes 2,770');
@@ -316,13 +316,13 @@ describe('a published scenario on screen', () => {
     if (ml === undefined) throw new Error('no CMIP7 MEDIUM-to-LOW preset');
     app.apply(ml.inputs);
     const report = app.lastReport();
-    expect(report?.outputs['tile-cumulative']).toBe('1,710');
+    expect(report?.outputs['tile-cumulative']).toBe('1,712');
     expect(report?.outputs['tile-cumulative-note']).toContain('publishes 1,710');
     const notes = report?.outputs['notes'] ?? '';
     expect(notes).toContain('This sits on CMIP7 MEDIUM-to-LOW');
     // Once timing and removal carry this marker's own values, the
     // reconstruction lands on its century total rather than 480 GtCO2 under it.
-    expect(notes).toContain('agree within 0%, 1,710 against 1,710 GtCO₂');
+    expect(notes).toContain('agree within 0%, 1,712 against 1,710 GtCO₂');
   });
 
   // The two technology bounds measure the reconstruction's total, which the

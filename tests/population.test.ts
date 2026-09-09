@@ -22,14 +22,17 @@ describe('populationAt', () => {
     expect(spread).toBeLessThan(1e-9);
   });
 
-  // Outside the SSP1-SSP3 span the nearest curve is scaled, which moves the
-  // 2025 end of it as well as the 2100 end. The slider runs 6 to 14 billion,
-  // so both extremes reach this. Pinned here because it is a real property of
-  // the specified method, not an accident. Raised with the author; see
-  // METHODS.md, "Population outside the SSP span".
-  it('shifts the present-day population when scaling beyond the SSP span', () => {
-    expect(populationAt(BASE_YEAR, 6)).toBeCloseTo(6.04, 2);
-    expect(populationAt(BASE_YEAR, 14)).toBeCloseTo(8.79, 2);
+  // Fixed 2026-09-09. Scaling the nearest curve moved the 2025 end of it along
+  // with the 2100 end, so at 6 billion the path began from 6.04 and at 14
+  // billion from 8.79 rather than from the observed 8.15. The slider runs 6 to
+  // 14 billion, so both extremes reached it. An additive correction that
+  // decays to nothing by 2100 now pins the base year without moving the
+  // target. See METHODS.md, "Population outside the SSP span".
+  it('holds the present-day population beyond the SSP span too', () => {
+    for (const target of [6, 6.5, 7, 13, 13.5, 14]) {
+      expect(populationAt(BASE_YEAR, target), `target ${target}`).toBeCloseTo(8.15, 9);
+      expect(populationAt(END_YEAR, target), `target ${target}`).toBeCloseTo(target, 9);
+    }
   });
 
   it('follows a demographic curve rather than a straight line', () => {
@@ -47,10 +50,18 @@ describe('populationAt', () => {
     }
   });
 
-  it('scales the nearest curve outside the SSP1-SSP3 span', () => {
-    const low = populationAt(2060, 6);
-    const ssp1 = populationAt(2060, ANCHORS_2100.SSP1);
-    expect(low).toBeCloseTo(ssp1 * (6 / ANCHORS_2100.SSP1), 9);
+  // The shape outside the span still comes from scaling the nearest curve;
+  // what changed is that the correction pinning the base year is added on top,
+  // at its full size in 2025 and at nothing in 2100.
+  it('scales the nearest curve outside the SSP1-SSP3 span, then pins the base year', () => {
+    const scaled = (year: number) =>
+      populationAt(year, ANCHORS_2100.SSP1) * (6 / ANCHORS_2100.SSP1);
+    const drift = 8.15 - scaled(BASE_YEAR);
+    for (const year of [BASE_YEAR, 2050, 2075, END_YEAR]) {
+      const remaining = 1 - (year - BASE_YEAR) / (END_YEAR - BASE_YEAR);
+      expect(populationAt(year, 6), String(year))
+        .toBeCloseTo(scaled(year) + drift * remaining, 9);
+    }
   });
 });
 

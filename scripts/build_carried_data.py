@@ -46,23 +46,56 @@ SCENARIOS = [
 # brief_stated so the size of that shift stays visible. Warming moved far
 # less, because the emulator is logarithmic in cumulative CO2: the slow
 # bound went from 3.4 to 3.47 degC and the fast bound from 2.2 to 2.22.
+#
+# Re-frozen 2026-09-09, when two figures moved onto the basis the sliders and
+# the markers already use:
+#   * base land use, from the brief's 3.83 Gt to the Global Carbon Budget's
+#     4.586 for the same year, which is what basis.totalCo2Gt already counted.
+#     Worth about +29 GtCO2 on every path, and it improved three of the four
+#     CMIP7 presets against their published totals: HIGH from -12 to +4 GtCO2,
+#     MEDIUM from -3 to -2, MEDIUM-to-LOW from 0 to +2. VERY LOW went from +55
+#     to +68, which is the cost.
+#   * the slow bound's fuel-mix rate, from the weakest 30-year window on the
+#     combustion basis to the weakest on the slider basis, -0.17 to -0.02%/yr.
+# `superseded` is a list, newest first, because each recalibration has to leave
+# the one before it readable: anything published against an older figure stays
+# traceable to the change that moved it.
+LAND_BASE_WHY = ('land use started from the brief\'s 3.83 Gt rather than the Global '
+                 'Carbon Budget\'s 4.586 for the same year')
+CI_BASIS_WHY = ('the CO2-per-energy rate measured combustion CO2 alone, at -0.21%/yr')
 DOCUMENTED = {
-    # Re-frozen 2026-09-05, when the CO2-per-energy rate moved from -0.21 to
-    # -0.15 to measure the same quantity the slider moves. See METHODS.md.
-    'Kaya at observed rates':     {'cumulative_gt': 4177.7, 'warming_c': 3.21,
-                                   'superseded': {'cumulative_gt': 4083.9, 'warming_c': 3.19,
-                                                  'why': 'the rate measured combustion CO2 '
-                                                         'alone, at -0.21%/yr'}},
-    'Trend continues':            {'cumulative_gt': 3408.7, 'warming_c': 2.94},
-    'Slowest technical progress': {'cumulative_gt': 5047.2, 'warming_c': 3.47,
-                                   'brief_stated': {'cumulative_gt': 4600, 'warming_c': 3.4}},
-    'Ausubel methane economy':    {'cumulative_gt': 1585.0, 'warming_c': 2.22,
-                                   'brief_stated': {'cumulative_gt': 1400, 'warming_c': 2.2}},
+    'Kaya at observed rates':     {'cumulative_gt': 4206.8, 'warming_c': 3.22,
+                                   'superseded': [
+                                       {'cumulative_gt': 4177.7, 'warming_c': 3.21,
+                                        'until': '2026-09-09', 'why': LAND_BASE_WHY},
+                                       {'cumulative_gt': 4083.9, 'warming_c': 3.19,
+                                        'until': '2026-09-05', 'why': CI_BASIS_WHY},
+                                   ]},
+    'Trend continues':            {'cumulative_gt': 3437.4, 'warming_c': 2.95,
+                                   'superseded': [
+                                       {'cumulative_gt': 3408.7, 'warming_c': 2.94,
+                                        'until': '2026-09-09', 'why': LAND_BASE_WHY},
+                                   ]},
+    'Slowest technical progress': {'cumulative_gt': 5397.3, 'warming_c': 3.53,
+                                   'brief_stated': {'cumulative_gt': 4600, 'warming_c': 3.4},
+                                   'superseded': [
+                                       {'cumulative_gt': 5047.2, 'warming_c': 3.47,
+                                        'until': '2026-09-09',
+                                        'why': LAND_BASE_WHY + ', and the fuel-mix rate came '
+                                               'from the weakest 30-year window on the '
+                                               'combustion basis rather than the slider\'s'},
+                                   ]},
+    'Ausubel methane economy':    {'cumulative_gt': 1613.7, 'warming_c': 2.23,
+                                   'brief_stated': {'cumulative_gt': 1400, 'warming_c': 2.2},
+                                   'superseded': [
+                                       {'cumulative_gt': 1585.0, 'warming_c': 2.22,
+                                        'until': '2026-09-09', 'why': LAND_BASE_WHY},
+                                   ]},
 }
 for _entry in DOCUMENTED.values():
     _entry.setdefault('tolerance_gt', 0.5)
     _entry.setdefault('tolerance_c', 0.01)
-    _entry.setdefault('source', 'frozen from this model after the base-year recalibration')
+    _entry.setdefault('source', 'frozen from this model after the 2026-09-09 recalibration')
 
 # Thresholds the conditional notes fire on. Numbers only; the sentences
 # live in src/ui/notes.ts. Lifted from the prototype's notes engine, except
@@ -123,6 +156,10 @@ def main() -> None:
         (OUT / 'learn_fuel_mix.json').read_text())['constants']['rates']
     ci_observed = round(slider_basis['sliderBasis1990'], 2)
     ci_decade = round(slider_basis['sliderBasisDecade'], 2)
+    # The weakest 30-year window on the slider's own basis, for the slow bound.
+    ci_slow_bound = json.loads(
+        (OUT / 'observed.json').read_text())['extremes'][
+            'carbon_per_energy_slider_30y']['max']['value']
 
     inputs = []
     for c in C['CTRL']:
@@ -490,6 +527,15 @@ def main() -> None:
         # carbon-intensity rate rather than the prototype's.
         if label == 'Kaya at observed rates':
             inputs['co2PerEnergy'] = ci_observed
+        # Same correction, applied to the slow bound. The prototype set this
+        # preset's fuel-mix rate to the weakest 30-year window on the
+        # combustion basis, -0.17%/yr over 1992-2022. The slider it sets
+        # measures the wider basis the markers count, where the weakest window
+        # of the same length is -0.02%/yr over 1984-2014. The Ausubel bound
+        # needs no equivalent: its fuel-mix rate comes from the 1988 paper and
+        # its efficiency rate has no CO2 in it. See METHODS.md.
+        if label == 'Slowest technical progress':
+            inputs['co2PerEnergy'] = snap('co2PerEnergy', round(ci_slow_bound, 2))
         entry = {
             'id': label.lower().replace(' ', '-').replace(',', ''),
             'label': label,

@@ -50,28 +50,28 @@
    "id": "H",
    "label": "HIGH",
    "color": "#d1332e",
-   "timing": 53,
+   "timing": 54,
    "removals": 1.5
   },
   {
    "id": "M",
    "label": "MEDIUM",
    "color": "#e08214",
-   "timing": 61,
+   "timing": 62,
    "removals": 0.0
   },
   {
    "id": "ML",
    "label": "MEDIUM-to-LOW",
    "color": "#7b3fa0",
-   "timing": 31,
-   "removals": 5.5
+   "timing": 32,
+   "removals": 5.0
   },
   {
    "id": "VL",
    "label": "VERY LOW",
    "color": "#1a7f37",
-   "timing": 82,
+   "timing": 83,
    "removals": 11.0
   }
  ],

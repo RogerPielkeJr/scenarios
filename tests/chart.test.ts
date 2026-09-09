@@ -215,7 +215,7 @@ describe('the reader’s own label on the chart', () => {
       // A label that has to sit far off draws a hairline back to its line, and
       // then it still reads as that line's name. Those cases are counted
       // separately rather than excused: the tie has to actually be there.
-      if (gap > 60) {
+      if (gap > CHART_GEOMETRY.ACCEPTABLE_DRIFT) {
         const tie = svg.querySelector('[data-user-tie]');
         expect(tie, `no tie drawn at ${JSON.stringify(inputs)}`).not.toBeNull();
         continue;

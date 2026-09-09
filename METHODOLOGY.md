@@ -90,10 +90,10 @@ that publish a carbon-intensity rate.
 
 | Preset | Cumulative CO₂ | Warming in 2100 |
 |---|---|---|
-| Kaya at observed rates | 4,178 Gt | 3.21 °C |
-| Trend continues | 3,409 Gt | 2.94 °C |
-| Slowest technical progress | 5,047 Gt | 3.47 °C |
-| Ausubel methane economy | 1,585 Gt | 2.22 °C |
+| Kaya at observed rates | 4,207 Gt | 3.22 °C |
+| Trend continues | 3,437 Gt | 2.95 °C |
+| Slowest technical progress | 5,397 Gt | 3.53 °C |
+| Ausubel methane economy | 1,614 Gt | 2.23 °C |
 
 Every rate behind those four comes out of `scripts/build_data.py`, recomputed
 from the primary series rather than typed in, and the window that produced each

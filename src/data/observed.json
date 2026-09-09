@@ -511,6 +511,22 @@
     "to": 1995,
     "window": "1965-1995"
    }
+  },
+  "carbon_per_energy_slider_30y": {
+   "span": 30,
+   "count": 30,
+   "max": {
+    "value": -0.0215,
+    "from": 1984,
+    "to": 2014,
+    "window": "1984-2014"
+   },
+   "min": {
+    "value": -0.4193,
+    "from": 1971,
+    "to": 2001,
+    "window": "1971-2001"
+   }
   }
  },
  "base_year_check": {

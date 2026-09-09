@@ -284,6 +284,19 @@ function distanceTo(y: number, band: { top: number; bottom: number }): number {
 /** Drift past which the label stops reading as the line's name, in plot units. */
 const ACCEPTABLE_DRIFT = 60;
 
+/**
+ * How much earlier than that the hairline goes in.
+ *
+ * The placement samples heights every half unit and measures against the band
+ * the line sweeps under the label; a reader, and tests/chart.test.ts, measure
+ * the drawn line every unit across the label's width. The two agree to within
+ * a fraction of a plot unit, which is enough to leave a label 60.03 from its
+ * line with no tie while the placement calls the drift 60. The margin covers
+ * that difference in the direction that costs nothing: an unnecessary hairline
+ * is a hairline, a missing one is a label that names no line.
+ */
+const TIE_MARGIN = 2;
+
 function placeUserLabel(
   path: DrawablePath, yFor: (v: number) => number, scale: Scale, text: string,
 ): { x: number; y: number; connector: number | null } {
@@ -366,7 +379,7 @@ function placeUserLabel(
   // carries a hairline back to it. Every corner of the slider space that needs
   // one is a path that climbs through the markers and then dives, where the
   // only strip clear of all eight lines sits well below the one being named.
-  const connector = best.drift > ACCEPTABLE_DRIFT ? best.reach : null;
+  const connector = best.drift > ACCEPTABLE_DRIFT - TIE_MARGIN ? best.reach : null;
   return { x: best.x, y: best.y + half, connector };
 }
 
@@ -422,4 +435,6 @@ export function renderChart(
     + userPath(path, yFor, scale, name);
 }
 
-export const CHART_GEOMETRY = { VIEW, PLOT, TYPE, CAP_RATIO, labelWidth, shorten };
+export const CHART_GEOMETRY = {
+  VIEW, PLOT, TYPE, CAP_RATIO, labelWidth, shorten, ACCEPTABLE_DRIFT, TIE_MARGIN,
+};
