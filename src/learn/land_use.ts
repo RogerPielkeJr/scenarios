@@ -44,7 +44,7 @@ const PARTS: BuilderPart[] = [
     unitSuffix: '% of today',
     note: `Gross deforestation releases ${gt(D.deforestation)} today, with another `
       + `${gt(D.otherAndPeat)} from other land-use transitions, peat drainage and peat fire. `
-      + 'Zero is a complete halt to forest clearing.',
+      + 'Zero halts forest clearing completely.',
     marks: [
       { value: 0, label: 'halted', kind: 'low' },
       { value: 100, label: 'as today', kind: 'observed' },
@@ -112,9 +112,9 @@ export const LAND_USE_PAGE: LearnPageSpec = {
   accent: '#2f6b3a',
   input: 'landUse',
   title: 'Land use CO₂',
-  standfirst: 'One slider sets net CO₂ from land use in 2100. It is the smallest of the CO₂ '
-    + 'terms, it carries the widest published uncertainty of them, and it is the only one of '
-    + 'the four multiplied factors and two added terms that can take a negative value.',
+  standfirst: 'One slider sets net CO₂ from land use in 2100. It contributes the smallest of '
+    + 'the CO₂ terms, carries the widest published uncertainty of them, and alone among the '
+    + 'four multiplied factors and two added terms takes a negative value.',
 
   definition: {
     quantity: 'Net CO₂ from land use, land-use change and forestry in 2100',
@@ -229,10 +229,10 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     note: 'Clearing, regrowth, and the conditions for a net sink.',
     paragraphs: [
       'Agricultural demand drives the clearing. Cropland and pasture expand where forest '
-      + 'converts most cheaply and where the crops pay: soy and cattle in the Amazon, oil palm '
+      + 'converts most cheaply and crop returns run highest: soy and cattle in the Amazon, oil palm '
       + 'in insular Asia, subsistence and charcoal in the Congo basin. Those three regions '
       + 'account for more than half of global land-use emissions.',
-      'Regrowth runs the other way. Farmland abandoned in one place regrows while forest '
+      'Regrowth moves the net the other way. Farmland abandoned in one place regrows while forest '
       + 'falls in another, and only the net reaches the atmosphere. Regrowth offsets '
       + 'two-thirds of the deforestation flux, so a small change in either flow moves the net '
       + 'by a large fraction.',
@@ -254,14 +254,14 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       `The markers range from ${signedGt(MEDIUM_LOW?.kaya.landUse ?? 0)} in MEDIUM-to-LOW, the `
       + `largest sink of the seven, to ${signedGt(HIGH?.kaya.landUse ?? 0)} in HIGH, which `
       + `stays a source. VERY LOW assumes ${signedGt(VERY_LOW?.kaya.landUse ?? 0)}.`,
-      `A sink of ${signedGt(MEDIUM_LOW?.kaya.landUse ?? 0)} asks this term to move by `
+      `A sink of ${signedGt(MEDIUM_LOW?.kaya.landUse ?? 0)} requires a move of `
       + `${gt(BASE.landUseGt - (MEDIUM_LOW?.kaya.landUse ?? 0))} from where it stands, which `
       + 'exceeds the entire gross deforestation flux. It takes restoration at scale as well '
       + 'as a halt to clearing, and the markers below that figure also use the engineered '
       + 'removal this tool keeps on a separate slider.',
       'The tool draws a straight line from today to whatever you set for 2100, because the '
       + 'markers publish their land-use assumption as a 2100 value rather than a path. The '
-      + 'path in a published scenario is a curve.',
+      + 'published scenario follows a curve.',
     ],
   },
 
@@ -270,17 +270,17 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     note: 'Three flows, netted.',
     paragraphs: [
       'Set what the world clears, what regrows and how much land comes back into forest. The '
-      + 'builder nets the three into a single 2100 flux. Machinery is not among them: capture '
-      + 'and storage has a slider of its own, and setting it here as well would take the same '
-      + 'tonnes out twice.',
+      + 'builder nets the three into a single 2100 flux. The three exclude machinery: capture '
+      + 'and storage has a slider of its own, and setting it here as well would subtract the '
+      + 'same tonnes twice.',
       `The restoration arithmetic multiplies area by rate: a million hectares taking up `
       + `${C.growthRates.matureTropical} tonnes of CO₂ a hectare each year removes `
       + `${(C.growthRates.matureTropical / 1000).toFixed(3)} GtCO₂ a year. Reaching a gigatonne `
       + `at that rate needs ${Math.round(1000 / C.growthRates.matureTropical)} Mha. At the `
       + `young-forest rate of ${C.growthRates.youngTropicalSouthAmerica} it needs `
       + `${Math.round(1000 / C.growthRates.youngTropicalSouthAmerica)} Mha.`,
-      'Every figure here carries the uncertainty on the line above it. The result is an '
-      + 'accounting of what a scenario requires rather than a measurement.',
+      'Every figure here carries the uncertainty on the line above it. The result accounts '
+      + 'for what a scenario requires rather than measuring anything.',
     ],
     action: 'Use this flux in my scenario',
     modes: [{

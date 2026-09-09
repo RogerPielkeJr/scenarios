@@ -108,7 +108,7 @@ export const METHANE_PAGE: LearnPageSpec = {
       + 'still warms the planet in a century; a molecule of methane breaks down within about '
       + 'a decade. The warming from methane in 2100 therefore depends on the emissions rate '
       + 'in 2100 rather than on the cumulative total.',
-      'This slider is therefore a level rather than a rate. The four CO₂ factors set rates '
+      'This slider therefore takes a level rather than a rate. The four CO₂ factors set rates '
       + 'of change and the tool sums their emissions across the century. The methane control '
       + 'sets a single figure for 2100.',
       `The tool converts that answer at ${degrees(METHANE.k * 100)} per 100 Mt a year against `
@@ -224,8 +224,8 @@ export const METHANE_PAGE: LearnPageSpec = {
       + `among the sources on this chart between ${C.firstYear} and ${C.lastYear}, at `
       + `${RICE.growth >= 0 ? '+' : '−'}${Math.abs(RICE.growth).toFixed(2)}% a year, while `
       + `waste methane from landfills and wastewater grew fastest of the five at `
-      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both are `
-      + 'smaller sources than fossil fuels or livestock.',
+      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both emit `
+      + 'less than fossil fuels or livestock.',
       'The Global Methane Budget records that direct anthropogenic methane has tracked the '
       + 'scenarios assuming no or minimal mitigation policy since 2012. That covers the past '
       + 'decade; this slider covers the seven decades after it.',

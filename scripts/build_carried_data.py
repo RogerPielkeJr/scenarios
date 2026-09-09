@@ -170,9 +170,9 @@ def main() -> None:
         'help': ('Bioenergy with capture, direct air capture and the rest: removal '
                  'that stores carbon outside the land account. Forests and soils sit '
                  'on the land use slider, so neither counts the same tonne. A product '
-                 'of four positive factors stays above zero at any rate, and this is '
-                 'the term that takes a path below it. The ramp starts slowly and '
-                 'steepens, as in the scenarios.'),
+                 'of four positive factors stays above zero at any rate, and this term '
+                 'takes a path below it. The ramp starts slowly and steepens, as in '
+                 'the scenarios.'),
         'min': 0, 'max': 25, 'step': 0.5,
         'default': 0, 'decimals': 1,
         'prototypeDefault': 0,
@@ -205,8 +205,8 @@ def main() -> None:
             'scenarios, cement and industrial CO2 included.'),
         'improvementTiming': (
             'The rate sliders set the 2100 level of energy per dollar and CO2 per unit '
-            'of energy. This sets how that change is spread across the years between. '
-            'Half by the midpoint is a constant rate; above half puts more of the '
+            'of energy. This sets how that change spreads across the years between. '
+            'Half by the midpoint gives a constant rate; above half puts more of the '
             'change in the first half of the century.'),
     }
     for spec in inputs:

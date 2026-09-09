@@ -79,7 +79,7 @@ function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): strin
   if (fit.markerGoesNegative) {
     sentences.push(`${fit.label} also removes more CO₂ than it emits before 2100. A product `
       + 'of four positive factors stays above zero, so the fossil term here holds above zero '
-      + 'and the land use and removal sliders are what take a path below it.');
+      + 'and the land use and removal sliders take a path below it.');
   }
   sentences.push(`The chart draws ${fit.label}'s published path behind yours.`);
   return `<p>${sentences.join(' ')}</p>`;
@@ -91,8 +91,8 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
 
   if (flags.populationOutsideUn === 'above') {
     parts.push(`<p>Your population rises above the top of the UN's 95% range of `
-      + `${UN_2024.hi95} billion. SSP3, the population behind CMIP7 HIGH, is the only SSP `
-      + 'above that figure.</p>');
+      + `${UN_2024.hi95} billion. Of the SSPs, only SSP3, the population behind CMIP7 HIGH, `
+      + 'goes above that figure.</p>');
   }
   if (flags.populationOutsideUn === 'below') {
     parts.push(`<p>Your population falls below the bottom of the UN's 95% range of `

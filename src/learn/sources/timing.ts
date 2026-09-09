@@ -16,7 +16,7 @@ export const TIMING_SOURCES: readonly Source[] = [
     publisher: 'World Bank',
     vintage: 'accessed 2026',
     url: 'https://data.worldbank.org/indicator/NY.GDP.MKTP.PP.KD',
-    used: 'The denominator in energy per dollar, so the improvement being timed is the one '
+    used: 'The denominator in energy per dollar, so this control times the same improvement '
       + 'the slider above sets.',
   },
   {

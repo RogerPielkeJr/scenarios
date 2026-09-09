@@ -292,11 +292,11 @@ export const INCOME_PAGE: LearnPageSpec = {
     heading: 'What moves it',
     note: 'Convergence between the income groups, and its limits.',
     paragraphs: [
-      `Convergence explains most of the world average's movement. Middle-income countries, `
+      `Convergence accounts for most of the movement in the world average. Middle-income countries, `
       + `${MIDDLE_INCOME.populationShare.toFixed(0)}% of the world's people, grew `
       + `${rate(MIDDLE_INCOME.growth)} a year since 1990 against `
       + `${rate(HIGH_INCOME.growth)} in high-income countries. The ratio between the two `
-      + `averages is ${times(C.ratios.highOverMiddle)} today.`,
+      + `averages differ by a factor of ${times(C.ratios.highOverMiddle)} today.`,
       `Low-income countries did not converge. They grew ${rate(LOW_INCOME.growth)} a year `
       + `since 1990 and ${rate(LOW_INCOME.growthRecentDecade)} over the past decade, while `
       + `holding ${LOW_INCOME.populationShare.toFixed(1)}% of the world's people and `
@@ -313,12 +313,12 @@ export const INCOME_PAGE: LearnPageSpec = {
       + `${Math.round(BASE_YEAR + Math.log(HIGH_INCOME.gdpPerPerson / MIDDLE_INCOME.gdpPerPerson)
         / Math.log((1 + MIDDLE_INCOME.growth / 100) / (1 + HIGH_INCOME.growth / 100)))}, `
       + 'converge, and the middle-income average passes the high-income one after that date. '
-      + 'The second figure shows the crossing. It is the arithmetic of a steady rate held for '
-      + '75 years rather than a forecast.',
+      + 'The second figure shows the crossing. It follows from holding a steady rate for 75 '
+      + 'years rather than from any forecast.',
       'Saturation ties income to energy intensity. A scenario can pair fast income growth '
       + 'with fast intensity decline and reach the same energy demand as one pairing slow '
-      + 'growth with slow decline. The four factors multiply, so the product is what fixes '
-      + 'the emissions.',
+      + 'growth with slow decline. The four factors multiply, so their product fixes the '
+      + 'emissions.',
     ],
   },
 
@@ -330,8 +330,8 @@ export const INCOME_PAGE: LearnPageSpec = {
       + `${rate(OBSERVED)} recorded since 1990. HIGH-to-LOW assumes `
       + `${rate(2.63)}, the fastest of the seven.`,
       `CMIP7 HIGH sits at ${rate(HIGH_RATE)}, a third of the observed rate, with the largest `
-      + 'population of the seven. Its emissions are the highest of the seven and its income '
-      + 'per person the lowest. A high-emissions scenario built here can take that form or '
+      + 'population of the seven. It has the highest emissions of the seven and the lowest '
+      + 'income per person. A high-emissions scenario built here can take that form or '
       + 'the opposite one, high income with slow decarbonisation, and the two set different '
       + 'values on the other five sliders.',
     ],

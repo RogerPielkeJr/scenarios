@@ -198,7 +198,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + `${factorFor('coal').toFixed(1)} kgCO₂ per gigajoule, oil `
       + `${factorFor('oil').toFixed(1)} and natural gas ${factorFor('gas').toFixed(1)}. `
       + 'Nuclear, hydro, wind and solar release none at the point of use. Shifting energy '
-      + 'between those columns is the whole of this factor.',
+      + 'between those columns moves this factor, and nothing else does.',
       `This page counts carbon two ways. Burning fuel released `
       + `${kg(C.levels.energyBasis2024)} in ${C.lastYear}. The slider measures `
       + `${kg(C.levels.sliderBasis2024)}, because it also carries the cement, flaring and `
@@ -325,10 +325,10 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + 'times as much energy as it consumed in 1965, and fossil fuels supplied most of that '
       + 'addition, so a large absolute build-out of nuclear, hydro, wind and solar still left '
       + `the fossil share at ${pc(FOSSIL_2024)}.`,
-      'The arithmetic is strict. Cutting this term by half while total energy doubles takes '
+      'Cutting this term by half while total energy doubles takes '
       + 'more than a quadrupling of zero-carbon supply, because that supply has to cover both '
       + 'the share it takes from fossil fuels and the growth in the total. The rate of '
-      + 'decarbonisation in any scenario is a statement about the build-out of clean supply.',
+      + 'decarbonisation in any scenario therefore states a rate of clean-supply build-out.',
       `Fuel switching inside the fossil block has a limit. Replacing every remaining `
       + `tonne of coal with gas would cut about `
       + `${((factorFor('coal') - factorFor('gas')) * (FACTORS.find((f) => f.id === 'coal')?.share2024 ?? 0) / 100).toFixed(1)} `
@@ -359,8 +359,8 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + 'arithmetic above. LOW, LOW-to-NEGATIVE and VERY LOW all reach 2100 with fossil and '
       + 'industrial CO₂ below zero: −3.7, −23.2 and −1.1 GtCO₂ a year once their land-use '
       + 'term comes out. A rate applied to a positive quantity gives a positive quantity, so '
-      + 'those three scenarios publish no rate. Their route below zero is carbon removal, on '
-      + 'the land use and removal sliders.',
+      + 'those three scenarios publish no rate. They reach a negative figure through carbon '
+      + 'removal, on the land use and removal sliders.',
     ],
   },
 
@@ -372,7 +372,7 @@ export const CARBON_INTENSITY_PAGE: LearnPageSpec = {
       + 'normalises them; only their proportions enter the answer. Published emission factors turn '
       + 'the mix into kilograms of CO₂ per gigajoule, and the distance from today’s '
       + `${kg(C.levels.sliderBasis2024)} across 75 years gives the rate for the slider.`,
-      `Two adjustments separate the mix from the answer, and the result shows you both. The `
+      `Two adjustments sit between the mix and the answer, and the readout gives both. The `
       + `page scales the emission factors by ${C.calibration.factor.toFixed(3)}, because applied `
       + `raw to the ${C.lastYear} mix they give ${kg(C.calibration.modelled2024)} against the `
       + `${kg(C.calibration.observed2024)} the world emitted from energy, the `

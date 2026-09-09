@@ -113,9 +113,9 @@ function markerTable(root: Document, spec: LearnPageSpec): HTMLTableElement {
   // value for. A column of dashes reads as a fault rather than as a fact, so
   // the table says which it is; the page's own prose gives the derived figures.
   const caption = values.every((value) => value === null)
-    ? '<caption>No marker publishes a value for this control. What each CMIP7 preset '
-      + 'puts on the slider is derived from that marker’s CO₂ path, and the reading '
-      + 'above gives the figures.</caption>'
+    ? '<caption>No marker publishes a value for this control. This tool derives what each '
+      + 'CMIP7 preset puts on the slider from that marker’s CO₂ path, and the reading above '
+      + 'gives the figures.</caption>'
     : '';
   table.innerHTML = caption
     + '<thead><tr><th scope="col">Scenario</th>'

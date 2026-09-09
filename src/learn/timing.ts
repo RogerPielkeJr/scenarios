@@ -53,7 +53,7 @@ const PARTS: BuilderPart[] = [
     default: SPEC.default,
     decimals: 0,
     unitSuffix: '%',
-    note: `Half by the midpoint is a constant rate. The record gives `
+    note: `Half by the midpoint gives a constant rate. The record shows `
       + `${pc(EI.sharePercent)} for energy per dollar over ${EI.firstYear} to ${EI.lastYear} `
       + `and ${pc(CI.sharePercent)} for the fuel mix over the same years.`,
     marks: [
@@ -70,8 +70,8 @@ export const TIMING_PAGE: LearnPageSpec = {
   input: 'improvementTiming',
   title: 'When the improvement arrives',
   standfirst: 'The two technology sliders set the 2100 level of energy per dollar and CO₂ '
-    + 'per unit of energy. This one sets how that change is spread across the years between. '
-    + 'The 2100 level is the same at every setting; the cumulative total is not.',
+    + 'per unit of energy. This one sets how that change spreads across the years between. '
+    + 'Every setting gives the same 2100 level and a different cumulative total.',
 
   definition: {
     quantity: `Share of the century's technology improvement delivered by ${MID_YEAR}`,
@@ -86,9 +86,9 @@ export const TIMING_PAGE: LearnPageSpec = {
       + 'figure.',
       `This control sets that difference as one number: the share of the century's `
       + `improvement in energy per dollar and CO₂ per unit of energy that lands by `
-      + `${MID_YEAR}. At 50 the annual rate is constant. Above 50 the rate is faster in the `
-      + 'first half of the century and slower in the second; below 50 the order reverses.',
-      'The 2100 level is the same at every setting. The rate sliders fix that level and this '
+      + `${MID_YEAR}. At 50 the annual rate holds constant. Above 50 the rate runs faster in `
+      + 'the first half of the century and slower in the second; below 50 the order reverses.',
+      'Every setting gives the same 2100 level. The rate sliders fix that level and this '
       + 'control changes only the shape of the path to it, so moving it changes the '
       + 'cumulative total and the warming at a fixed endpoint.',
     ],
@@ -98,22 +98,22 @@ export const TIMING_PAGE: LearnPageSpec = {
     heading: 'What the world has done',
     note: 'The record, timed.',
     paragraphs: [
-      `The record answers this question differently for the two factors. Energy per dollar `
+      `The two factors differ in the record. Energy per dollar `
       + `improved ${rate(EI.firstHalf.rate)} over `
       + `${EI.firstHalf.from} to ${EI.firstHalf.to} and ${rate(EI.secondHalf.rate)} over `
-      + `${EI.secondHalf.from} to ${EI.secondHalf.to}, so ${pc(EI.sharePercent)} of its `
-      + 'improvement was banked by the midpoint.',
+      + `${EI.secondHalf.from} to ${EI.secondHalf.to}, so it banked ${pc(EI.sharePercent)} of `
+      + 'its improvement by the midpoint.',
       `The fuel mix did the reverse. It improved ${rate(CI.firstHalf.rate)} over `
       + `${CI.firstHalf.from} to ${CI.firstHalf.to} and ${rate(CI.secondHalf.rate)} over `
       + `${CI.secondHalf.from} to ${CI.secondHalf.to}, banking ${pc(CI.sharePercent)} of it by `
       + `the midpoint. Coal's share of a growing energy system accounts for the slowdown `
       + 'after that.',
       'One factor therefore ran late and the other early, and neither at a constant rate. A '
-      + 'constant rate is an assumption rather than an observation.',
+      + 'constant rate rests on assumption; nothing in the record shows one.',
     ],
     caption: `Each factor as a share of its ${EI.firstYear}-to-${EI.lastYear} improvement, `
       + 'banked year by year, against the straight line of a constant rate. A curve above the '
-      + 'line is an early path, one below it a late path.',
+      + 'line marks an early path, one below it a late path.',
     dataSource: 'Energy Institute Statistical Review and World Bank GDP, 1965 to 2024',
     key: [
       { label: 'Energy per dollar', color: '#b8860b' },
@@ -160,8 +160,8 @@ export const TIMING_PAGE: LearnPageSpec = {
     heading: 'What moves it',
     note: 'Capital stock, and the order of replacement.',
     paragraphs: [
-      'Energy systems change when their equipment is replaced, and equipment lasts decades. A '
-      + 'power station built this year is still running in the 2060s, a building shell for '
+      'Energy systems change when operators replace their equipment, and equipment lasts '
+      + 'decades. A power station built this year still runs in the 2060s, a building shell for '
       + 'longer than that. Timing therefore carries a cost either way: an early improvement '
       + 'takes the retirement of capital before the end of its life, and a late one takes the '
       + 'continued operation of the existing stock.',
@@ -174,8 +174,8 @@ export const TIMING_PAGE: LearnPageSpec = {
       + 'turnover of capital than one weighted toward the second, at the same 2100 level. The '
       + 'timing and the rate together give the requirement decade by decade.',
       'A late improvement arrives at the same 2100 level with a larger cumulative total. '
-      + 'That is the arithmetic of the overshoot-and-remove scenarios: they are late paths, '
-      + 'and the removal offsets the extra accumulation.',
+      + 'The overshoot-and-remove scenarios follow that arithmetic: they take late paths, and '
+      + 'the removal offsets the extra accumulation.',
     ],
   },
 
@@ -187,13 +187,12 @@ export const TIMING_PAGE: LearnPageSpec = {
       + `so this tool derives one: the value that makes this model's reconstruction follow `
       + `that marker year by year, at the marker's published rates. `
       + data.markers.map((m) => `${m.label} ${pc(m.timing)}`).join(', ') + '.',
-      'MEDIUM is an early path. Its emissions fall 0.77% a year to 2050 and are close to '
-      + 'flat after that. MEDIUM-to-LOW is a late path, and its large removal in the second '
+      'MEDIUM takes an early path. Its emissions fall 0.77% a year to 2050 and hold nearly '
+      + 'flat after that. MEDIUM-to-LOW takes a late path, and its large removal in the second '
       + 'half of the century offsets the earlier emissions.',
       'Before this control existed, every preset compounded at a constant rate. CMIP7 MEDIUM '
       + 'then came within 1% of its 2100 emissions and 12% above its cumulative total: the '
-      + 'same endpoint on a different path, and the cumulative total is what sets the '
-      + 'warming.',
+      + 'same endpoint on a different path, and the cumulative total sets the warming.',
     ],
   },
 
@@ -205,7 +204,7 @@ export const TIMING_PAGE: LearnPageSpec = {
       + 'beneath the slider gives the annual rate at each end of the century, and the chart '
       + 'below gives the recorded share for each factor.',
       'This control leaves the 2100 level of the technology sliders unchanged. The endpoint '
-      + 'is exact at every setting, so what moves is the cumulative total.',
+      + 'holds exact at every setting, and the cumulative total moves.',
     ],
     action: 'Use this timing in my scenario',
     modes: [{

@@ -191,8 +191,8 @@ export const POPULATION_PAGE: LearnPageSpec = {
       + `IHME therefore finishes ${bn(C.world2100.medium - IHME.end2100Bn)} below the UN medium, inside `
       + `SSP1. The gap turns on fertility: IHME forecasts a world total of `
       + `${IHME.fertility2100} births per woman in 2100 against the UN's `
-      + `${FERTILITY.world['2100']}. IHME's account of that difference is female education `
-      + 'and access to contraception, on a faster decline than the UN projection. This chart '
+      + `${FERTILITY.world['2100']}. IHME attributes that difference to female education and `
+      + 'access to contraception, and projects a faster decline than the UN. This chart '
       + 'draws the '
       + 'two points that paper states, joined by a straight line, because the trajectory '
       + 'between them needs an account at the Global Health Data Exchange.',
@@ -262,7 +262,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
     heading: 'What moves it',
     note: 'Births, the age structure already alive, and the size of each effect.',
     paragraphs: [
-      `Fertility sets the projection. The world averaged ${FERTILITY.world['1950']} births `
+      `The projection follows fertility. The world averaged ${FERTILITY.world['1950']} births `
       + `per woman in 1950, ${FERTILITY.world['1990']} in 1990 and ${FERTILITY.world['2024']} `
       + `in 2024, and the UN's medium projection takes it to ${FERTILITY.world['2100']} by 2100. `
       + `Holding the 2024 rate instead gives ${bn(C.heldStill2100.constantFertility)} people `
@@ -275,14 +275,14 @@ export const POPULATION_PAGE: LearnPageSpec = {
       + `${C.today.year} and ${bn(SSA.default)} in the medium projection, an increase of `
       + `${bn(SSA_GROWTH)} against a world increase of ${bn(WORLD_GROWTH)}. Asia shrinks by `
       + `${bn(ASIA.today - ASIA.default)} over the same span and Europe by `
-      + `${bn(EUROPE.today - EUROPE.default)}. Fertility explains the split: `
+      + `${bn(EUROPE.today - EUROPE.default)}. The fertility rates account for the split: `
       + `${FERTILITY.byRegion2024['sub-saharan-africa']} births per woman in sub-Saharan Africa `
       + `in 2024, against ${FERTILITY.byRegion2024['asia']} in Asia and `
       + `${FERTILITY.byRegion2024['europe']} in Europe.`,
       'The projections disagree about the pace of fertility decline in the countries with the '
-      + 'highest rates today. That one question moves the 2100 world total by billions. The '
-      + 'inputs to it are schooling, contraceptive access, child mortality and the age at '
-      + 'marriage, all of them subject to national policy.',
+      + 'highest rates today. That one question moves the 2100 world total by billions. '
+      + 'Schooling, contraceptive access, child mortality and the age at marriage feed into '
+      + 'it, and national policy reaches all four.',
     ],
   },
 
@@ -290,7 +290,7 @@ export const POPULATION_PAGE: LearnPageSpec = {
     heading: 'What the CMIP7 markers assume',
     note: 'Seven scenarios, three population trajectories.',
     paragraphs: [
-      `The markers borrow their populations from the SSPs. HIGH takes SSP3 at ${bn(12.977)}, `
+      `The markers take their populations from the SSPs. HIGH uses SSP3 at ${bn(12.977)}, `
       + `which exceeds the top of the UN's 95% interval of ${bn(C.world2100.hi95)}. Four markers `
       + `take SSP2 at ${bn(9.887)}, close to the UN medium. HIGH-to-LOW and VERY LOW take SSP1 at `
       + `about ${bn(8.092)}, below the bottom of that interval.`,

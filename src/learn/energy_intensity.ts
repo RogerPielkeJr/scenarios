@@ -254,7 +254,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       caption: `Every ${WINDOWS.span}-year window in the record, one tick each, from `
         + `${rate(WINDOWS.fastest.value)} in ${WINDOWS.fastest.from}-${WINDOWS.fastest.to} to `
         + `${rate(WINDOWS.slowest.value)} in ${WINDOWS.slowest.from}-${WINDOWS.slowest.to}. `
-        + 'Faster improvement is to the left.',
+        + 'Ticks further left mark faster improvement.',
       dataSource: 'Energy Institute Statistical Review 2026 over World Bank and Maddison output',
       spec(outcome: BuilderOutcome, scenario): StripSpec {
         const chosen = outcome.value;
@@ -299,13 +299,13 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       + 'steel, road freight shifting to rail, an economy making more pharmaceuticals and '
       + 'less fertiliser. Decomposition studies separate the three and attribute most of the '
       + 'recorded fall to efficiency, with structural change second.',
-      `The record bounds the answer. Across ${WINDOW_RATES.length} `
+      `The record gives a range. Across ${WINDOW_RATES.length} `
       + `${WINDOWS.span}-year windows since ${C.firstYear}, the fastest improved `
       + `${rate(WINDOWS.fastest.value)} (${WINDOWS.fastest.from} to ${WINDOWS.fastest.to}) and `
       + `the slowest ${rate(WINDOWS.slowest.value)} (${WINDOWS.slowest.from} to `
       + `${WINDOWS.slowest.to}). Every window falls inside that range of `
       + `${Math.abs(WINDOWS.slowest.value - WINDOWS.fastest.value).toFixed(2)} percentage `
-      + 'points. That is the narrowest range of the four Kaya factors.',
+      + 'points. No other Kaya factor varies across a narrower range.',
     ],
   },
 
@@ -325,7 +325,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
 
   builder: {
     heading: 'Build your value',
-    note: 'Borrow a stretch of the record, or scale the observed rate.',
+    note: 'Take a window from the record, or scale the observed rate.',
     paragraphs: [
       'Two ways in. Pick a window from the record and take the rate across it, or set a '
       + 'multiple of the rate observed since 1990. Either way the page '

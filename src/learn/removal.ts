@@ -105,7 +105,7 @@ const PARTS: BuilderPart[] = [
     note: `Bioenergy with carbon capture, direct air capture, biochar and enhanced `
       + `weathering: the removal that stores carbon outside the land-use account. These run `
       + `at ${mt(TODAY.novelGt)} today, ${TODAY.novelSharePercent}% of all removal, growing `
-      + `${TODAY.novelGrowthPercent}% a year. Planting and soil carbon are the other `
+      + `${TODAY.novelGrowthPercent}% a year. Planting and soil carbon supply the other `
       + `${gt(TODAY.conventionalGt)}, on the land use slider.`,
     marks: [
       { value: 0, label: 'today 0.0', kind: 'observed' },
@@ -119,9 +119,9 @@ export const REMOVAL_PAGE: LearnPageSpec = {
   accent: '#1f6f3f',
   input: 'removals',
   title: 'Engineered CO₂ removal',
-  standfirst: 'A product of four positive factors is positive at any rate of change, so the '
-    + 'Kaya identity alone has no route below zero. This slider is the term that takes a path '
-    + 'negative, and two of the seven CMIP7 markers end the century below zero.',
+  standfirst: 'A product of four positive factors stays positive at any rate of change, so '
+    + 'the Kaya identity alone has no route below zero. This slider supplies the term that '
+    + 'takes a path negative, and two of the seven CMIP7 markers end the century below zero.',
 
   definition: {
     quantity: 'Carbon dioxide captured and stored, outside the land account, in 2100',
@@ -133,18 +133,18 @@ export const REMOVAL_PAGE: LearnPageSpec = {
       'The identity multiplies four positive quantities: people, income each, energy per '
       + 'dollar, carbon per unit of energy. At any rate of change the product stays above '
       + 'zero. Net negative emissions therefore fall outside the four factors, and two CMIP7 '
-      + 'markers are net negative in 2100.',
-      'Removal therefore enters as a separate term, added rather than multiplied. It is the '
-      + 'one control that takes the path below zero. The deep-mitigation scenarios use it to '
+      + 'markers end 2100 net negative.',
+      'Removal therefore enters as a separate term, added rather than multiplied. It alone '
+      + 'takes the path below zero. The deep-mitigation scenarios use it to '
       + 'offset the emissions they accumulate earlier in the century.',
       'This term covers capture and storage. Planting, restoration, soil carbon and wood '
       + 'products belong to the land, and the land-use term nets them against clearing: '
-      + `today’s land-use flux of ${gt(BASE.landUseGt)} is the figure after existing regrowth `
+      + `today’s land-use flux of ${gt(BASE.landUseGt)} remains after existing regrowth `
       + `absorbs ${gt(LAND.regrowth)}. Forests go on the land use slider and capture and `
       + 'storage on this one, so no tonne enters the total twice.',
-      'The ramp is the square of elapsed time rather than a straight line: near zero before '
-      + 'the 2040s, then steeper. That shape follows the deployment in the scenarios, and it '
-      + 'is also what separates this control from the land use slider. A straight ramp to a '
+      'The ramp follows the square of elapsed time rather than a straight line: near zero '
+      + 'before the 2040s, then steeper. That shape matches the deployment in the scenarios, '
+      + 'and it also separates this control from the land use slider. A straight ramp to a '
       + '2100 level gives the same path as moving land use by the same amount, so the two '
       + 'controls would cover one set of paths between them.',
     ],
@@ -152,13 +152,14 @@ export const REMOVAL_PAGE: LearnPageSpec = {
 
   chart: {
     heading: 'What the world has done',
-    note: 'Almost all of it is forests.',
+    note: 'Forests account for almost all of it.',
     paragraphs: [
       `The world removes ${gt(TODAY.totalGt)} today, about ${TODAY.shareOfGrossPercent}% of `
-      + `gross CO₂ emissions. Nearly all of it is conventional: planting, restoration and soil `
-      + `carbon, the things countries already report under land use. Capture and storage `
+      + `gross CO₂ emissions. Conventional methods account for nearly all of it: planting, `
+      + `restoration and soil carbon, the things countries already report under land use. `
+      + `Capture and storage `
       + `accounts for ${mt(TODAY.novelGt)}, ${TODAY.novelSharePercent}% of the total.`,
-      `That small number is growing ${TODAY.novelGrowthPercent}% a year, and everything built `
+      `That small number grows ${TODAY.novelGrowthPercent}% a year, and everything built `
       + `or under construction would reach ${mt(AHEAD.pipeline2030Gt)} by 2030. Country `
       + `pledges add to ${gt(AHEAD.pledges2030Gt)} of removal in 2030, still almost entirely `
       + 'conventional.',
@@ -210,21 +211,21 @@ export const REMOVAL_PAGE: LearnPageSpec = {
     note: 'Land, energy, storage and who pays.',
     paragraphs: [
       'Conventional removal competes for land. Planting forests and building soil carbon uses '
-      + 'the same hectares as food, and it releases what it stored if the forest burns or is '
-      + 'cleared, which makes permanence a policy question rather than a technical one. That '
-      + 'family sits on the land use slider, so this page leaves it out.',
+      + 'the same hectares as food, and a fire or a clearance releases what those hectares '
+      + 'stored, which makes permanence a policy question rather than a technical one. That '
+      + 'family belongs to the land use slider, so this page leaves it out.',
       'Capture and storage trades the land constraint for an energy constraint. Direct air '
-      + 'capture works against a dilute gas and takes energy that has to be low-carbon, or '
-      + 'part of the removal cancels itself. Bioenergy with capture takes biomass grown '
-      + 'first, which returns the question to land. That is competition for hectares rather '
-      + 'than a double count of carbon: those tonnes go into geological storage rather than '
-      + 'into the standing biomass the land-use flux measures.',
+      + 'capture works against a dilute gas and takes low-carbon energy, or part of the '
+      + 'removal cancels itself. Bioenergy with capture takes biomass grown first, which '
+      + 'returns the question to land. That competition falls on hectares rather than on '
+      + 'carbon: those tonnes go into geological storage rather than into the standing '
+      + 'biomass the land-use flux measures.',
       'Storage has to hold for centuries to count, which means geology rather than '
       + 'vegetation, and geology means surveys, permits and monitoring in a host '
       + `jurisdiction. The voluntary market signed contracts for ${mt(0.04)} of removal last `
       + 'year, against pledges measured in gigatonnes.',
       'Removal at the scale the scenarios assume has no precedent and no market at present. '
-      + 'A scenario that uses it is making a claim about the second half of the century that '
+      + 'A scenario that uses it claims something about the second half of the century that '
       + 'the record does not yet cover, and this slider sets the size of that claim.',
     ],
   },
@@ -237,7 +238,7 @@ export const REMOVAL_PAGE: LearnPageSpec = {
       + `value that makes the reconstruction follow that marker's published path, fitted with `
       + `the marker's land use already in place. `
       + data.markers.map((m) => `${m.label} ${m.removals.toFixed(1)}`).join(', ')
-      + ' GtCO₂ a year by 2100. Each figure is what the path needs beyond the land rather '
+      + ' GtCO₂ a year by 2100. Each figure gives what the path needs beyond the land rather '
       + 'than the marker’s whole removal.',
       `The distinction changes the arithmetic. MEDIUM-to-LOW assumes a land sink of `
       + `${gt(Math.abs(ML_LAND))} in 2100, the largest of the seven, and the fit needs `
@@ -245,8 +246,9 @@ export const REMOVAL_PAGE: LearnPageSpec = {
       + `${gt(Math.abs(VL_LAND))} of land sink and needs ${gt(marker('VL').removals)} beyond `
       + 'that. Read either figure as that scenario’s total removal and its forests enter the '
       + 'total twice.',
-      `MEDIUM needs nothing here at all, and HIGH’s ${gt(marker('H').removals)} is not an `
-      + 'assumption of the scenario. A constant rate overshoots HIGH’s published path, '
+      `MEDIUM needs nothing here at all, and HIGH’s ${gt(marker('H').removals)} comes from `
+      + 'the fit rather than from the scenario. A constant rate overshoots HIGH’s published '
+      + 'path, '
       + `ending 2100 at ${HIGH_OVERSHOOT.without.toFixed(1)} against the marker’s `
       + `${HIGH_OVERSHOOT.marker.toFixed(1)} GtCO₂ a year, and the fit subtracts the `
       + 'difference on this slider. Only the two deep markers carry a figure here that comes '
@@ -254,16 +256,16 @@ export const REMOVAL_PAGE: LearnPageSpec = {
       `MEDIUM-to-LOW and VERY LOW end the century at ${marker('ML').co2In2100.toFixed(1)} and `
       + `${marker('VL').co2In2100.toFixed(1)} GtCO₂ a year, below zero and outside the range `
       + `of any arrangement of the four Kaya factors. VERY LOW’s `
-      + `${gt(marker('VL').removals)} is roughly `
+      + `${gt(marker('VL').removals)} comes to roughly `
       + `${Math.round(marker('VL').removals / TODAY.novelGt).toLocaleString('en-US')} times `
-      + 'the capture and storage running today, and it sits alongside the fastest emissions '
-      + 'cuts in the set. The scenario requires both.',
+      + 'the capture and storage running today, alongside the fastest emissions cuts in the '
+      + 'set. The scenario requires both.',
     ],
   },
 
   builder: {
     heading: 'Build your value',
-    note: 'One family. Forests are on the land use page.',
+    note: 'One family. Forests belong to the land use page.',
     paragraphs: [
       'Set the 2100 figure for capture and storage. Forests, soils and wood products stay on '
       + 'the land use page, because the land-use term nets them against clearing already, and '
