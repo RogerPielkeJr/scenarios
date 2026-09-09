@@ -24,7 +24,7 @@ export const TIMING_SOURCES: readonly Source[] = [
     publisher: 'Van Vuuren and colleagues, Geoscientific Model Development 19',
     vintage: '2026',
     url: 'https://doi.org/10.5194/gmd-19-2627-2026',
-    used: 'The marker scenarios whose published CO₂ paths give each preset its own timing '
+    used: 'The marker scenarios whose published CO₂ paths give each preset its timing '
       + 'value, fitted in scripts/build_carried_data.py.',
   },
   {
@@ -32,7 +32,7 @@ export const TIMING_SOURCES: readonly Source[] = [
     publisher: 'Pielke Jr., Wigley and Green, Nature 452',
     vintage: '2008',
     url: 'https://doi.org/10.1038/452531a',
-    used: 'The argument that a scenario’s assumed rate of technological change is a '
-      + 'quantity worth reading directly rather than leaving implicit.',
+    used: 'The argument for reading a scenario’s assumed rate of technological change as an '
+      + 'explicit quantity rather than an implicit one.',
   },
 ];

@@ -44,7 +44,7 @@ const PARTS: BuilderPart[] = [
     unitSuffix: '% of today',
     note: `Gross deforestation releases ${gt(D.deforestation)} today, with another `
       + `${gt(D.otherAndPeat)} from other land-use transitions, peat drainage and peat fire. `
-      + 'Zero means the world stops clearing forest altogether.',
+      + 'Zero is a complete halt to forest clearing.',
     marks: [
       { value: 0, label: 'halted', kind: 'low' },
       { value: 100, label: 'as today', kind: 'observed' },
@@ -95,7 +95,7 @@ const PARTS: BuilderPart[] = [
       + `carbon fraction: ${C.growthRates.matureTropical} tCO₂ a hectare for a tropical stand `
       + `over 20 years old, ${C.growthRates.youngTropicalSouthAmerica} for young South `
       + `American regrowth, ${C.growthRates.youngTropicalAsiaInsular} for young insular Asian `
-      + 'regrowth. Below-ground carbon and soil add more.',
+      + 'regrowth. Below-ground carbon and soil add to these figures.',
     marks: [
       { value: C.growthRates.matureTropical, label: 'mature', kind: 'observed' },
       { value: C.growthRates.youngTropicalSouthAmerica, label: 'young', kind: 'high' },
@@ -112,15 +112,15 @@ export const LAND_USE_PAGE: LearnPageSpec = {
   accent: '#2f6b3a',
   input: 'landUse',
   title: 'Land use CO₂',
-  standfirst: 'One slider sets what forests and farming do to the atmosphere in 2100. This '
-    + 'term stays the smallest of the six, nobody knows it as precisely as the others, and '
-    + 'alone among them it turns negative on its own.',
+  standfirst: 'One slider sets net CO₂ from land use in 2100. It is the smallest of the CO₂ '
+    + 'terms, it carries the widest published uncertainty of them, and it is the only one of '
+    + 'the four multiplied factors and two added terms that can take a negative value.',
 
   definition: {
     quantity: 'Net CO₂ from land use, land-use change and forestry in 2100',
     units: 'GtCO₂ a year; a negative value removes carbon from the air',
     place: 'Added on top of the four factors that multiply, with land removal already netted '
-      + 'in and engineered removal on its own slider',
+      + 'in and engineered removal on a separate slider',
     today: `${gt(BASE.landUseGt)} in the tool’s base year`,
     paragraphs: [
       'This term nets two large flows against each other. Clearing forest for cropland and '
@@ -128,8 +128,8 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + `land and in shifting cultivation cycles take up about ${gt(D.regrowth)}. Other `
       + `land-use transitions, peat drainage and peat fire add ${gt(D.otherAndPeat)}.`,
       `The net comes to roughly ${gt(D.net)}, about a tenth of the ${gt(38.6)} from fossil `
-      + 'fuels and industry. Its share of the total has fallen for thirty years while fossil '
-      + 'emissions grew.',
+      + 'fuels and industry. Its share of the total fell over the past thirty years against '
+      + 'rising fossil emissions.',
       `Two large flows netted against each other produce a small number with a large `
       + `uncertainty. The Global Carbon Budget reports ±${C.uncertaintyGtCo2} GtCO₂ at one `
       + `standard deviation, ${(C.uncertaintyGtCo2 / D.net * 100).toFixed(0)}% of the net `
@@ -141,19 +141,19 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     heading: 'What the world has done',
     note: 'The band shows the published uncertainty rather than a spread of scenarios.',
     paragraphs: [
-      `Land-use CO₂ reached ${gt(C.levels.first)} in ${C.firstYear}, peaked at `
-      + `${gt(C.levels.peak)} in ${C.levels.peakYear}, and reached ${gt(C.levels.last)} in `
+      `Land-use CO₂ stood at ${gt(C.levels.first)} in ${C.firstYear}, peaked at `
+      + `${gt(C.levels.peak)} in ${C.levels.peakYear} and stood at ${gt(C.levels.last)} in `
       + `${C.lastYear}. The Global Carbon Budget records a statistically significant decline `
       + 'of about 0.7 GtCO₂ per decade since the late 1990s.',
-      `The uncertainty swamps the trend in any single year. At ±${C.uncertaintyGtCo2} GtCO₂ `
-      + 'the band spans both a substantial source and something close to neutral, which '
-      + 'explains why the scenarios disagree about this term more than about any other.',
+      `The uncertainty exceeds the trend in any single year. At ±${C.uncertaintyGtCo2} GtCO₂ `
+      + 'the band covers both a substantial source and a value near zero. The scenarios '
+      + 'disagree about this term by more than about any other.',
       `Two figures from the same project show what that means. The series drawn here averages `
       + `${gt(C.vintageGap.seriesDecadeMean)} over 2014 to 2023, while the Global Carbon `
       + `Budget's 2024 paper reports ${gt(C.vintageGap.paperDecadeMean)} for that decade. `
       + `The ${(C.vintageGap.seriesDecadeMean - C.vintageGap.paperDecadeMean).toFixed(2)} `
-      + 'GtCO₂ between them falls short of the uncertainty on either, and exceeds most of '
-      + 'what the sliders on this page argue about.',
+      + 'GtCO₂ between them falls inside the uncertainty on either, and exceeds most of the '
+      + 'range the controls on this page cover.',
     ],
     caption: `World land-use CO₂, ${C.firstYear} to ${C.lastYear}, with the Global Carbon `
       + `Budget's one-sigma uncertainty of ±${C.uncertaintyGtCo2} GtCO₂, then a straight line `
@@ -226,24 +226,24 @@ export const LAND_USE_PAGE: LearnPageSpec = {
 
   drivers: {
     heading: 'What moves it',
-    note: 'Clearing, regrowth, and what turns the term negative.',
+    note: 'Clearing, regrowth, and the conditions for a net sink.',
     paragraphs: [
       'Agricultural demand drives the clearing. Cropland and pasture expand where forest '
       + 'converts most cheaply and where the crops pay: soy and cattle in the Amazon, oil palm '
-      + 'in insular Asia, subsistence and charcoal in the Congo basin. Those three countries '
+      + 'in insular Asia, subsistence and charcoal in the Congo basin. Those three regions '
       + 'account for more than half of global land-use emissions.',
-      'Regrowth pushes the other way, and far fewer people talk about it. Farmland abandoned '
-      + 'in one place regrows while forest falls in another, and only the net reaches the '
-      + `atmosphere. Regrowth currently offsets two-thirds of the deforestation flux, so the `
-      + 'balance can shift without either flow changing much.',
+      'Regrowth runs the other way. Farmland abandoned in one place regrows while forest '
+      + 'falls in another, and only the net reaches the atmosphere. Regrowth offsets '
+      + 'two-thirds of the deforestation flux, so a small change in either flow moves the net '
+      + 'by a large fraction.',
       'For the term to turn negative, three things have to happen together: clearing has to '
       + 'stop almost entirely, regrowth has to continue or expand on the land already '
       + 'recovering, and new land has to come into forest at scale. The controls at the top '
-      + 'of this page make the size of that requirement explicit.',
-      `Engineered removal used to sit on this slider too, for want of anywhere else: a `
-      + 'product of four positive factors cannot go below zero however fast the fuel mix '
-      + 'changes. It now has a control of its own, so this one covers the land alone and the '
-      + 'two no longer overlap. See the removal page.',
+      + 'of this page put a number on each of the three.',
+      'Engineered removal sat on this slider until it had a control of its own, because a '
+      + 'product of four positive factors cannot go below zero at any rate of change. This '
+      + 'slider now covers the land and the removal slider covers the machinery, so the two '
+      + 'do not overlap. See the removal page.',
     ],
   },
 
@@ -256,12 +256,12 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + `stays a source. VERY LOW assumes ${signedGt(VERY_LOW?.kaya.landUse ?? 0)}.`,
       `A sink of ${signedGt(MEDIUM_LOW?.kaya.landUse ?? 0)} asks this term to move by `
       + `${gt(BASE.landUseGt - (MEDIUM_LOW?.kaya.landUse ?? 0))} from where it stands, which `
-      + 'exceeds the entire gross deforestation flux. Reaching it takes restoration at scale '
-      + 'as well as the halt, and the markers that go further still lean on the engineered '
+      + 'exceeds the entire gross deforestation flux. It takes restoration at scale as well '
+      + 'as a halt to clearing, and the markers below that figure also use the engineered '
       + 'removal this tool keeps on a separate slider.',
       'The tool draws a straight line from today to whatever you set for 2100, because the '
-      + 'markers publish their land-use assumption as a 2100 value rather than a path. A real '
-      + 'scenario would bend.',
+      + 'markers publish their land-use assumption as a 2100 value rather than a path. The '
+      + 'path in a published scenario is a curve.',
     ],
   },
 
@@ -279,8 +279,8 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + `at that rate needs ${Math.round(1000 / C.growthRates.matureTropical)} Mha. At the `
       + `young-forest rate of ${C.growthRates.youngTropicalSouthAmerica} it needs `
       + `${Math.round(1000 / C.growthRates.youngTropicalSouthAmerica)} Mha.`,
-      'Every figure here carries the uncertainty on the line above it. Treat the result as an '
-      + 'accounting of what a scenario requires rather than as a measurement.',
+      'Every figure here carries the uncertainty on the line above it. The result is an '
+      + 'accounting of what a scenario requires rather than a measurement.',
     ],
     action: 'Use this flux in my scenario',
     modes: [{

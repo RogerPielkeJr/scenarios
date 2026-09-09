@@ -65,7 +65,7 @@ export function renderStats(
   const summary = scenarioSummary(inputs, path);
   tiles.cumulative.textContent = thousands(summary.cumulativeGt);
   const highNote = HIGH === undefined ? 'GtCO₂'
-    : `GtCO₂ · CMIP7 HIGH reaches ${thousands(HIGH.cumulativeGt)}`;
+    : `GtCO₂ · CMIP7 HIGH totals ${thousands(HIGH.cumulativeGt)}`;
   // With a preset on screen the note carries what that scenario publishes, so
   // the reader reads the reconstruction and the published figure together.
   tiles.cumulativeNote.textContent = published === null
@@ -108,14 +108,14 @@ export function analogueTile(intensity: number): { value: string; note: string }
   }
   if (verdict.kind === 'cleaner') {
     return {
-      value: 'no economy this clean',
-      note: `${per} · the cleanest today is ${verdict.nearest.name} at `
+      value: 'below every economy today',
+      note: `${per} · the lowest today is ${verdict.nearest.name} at `
         + `${perDollar(verdict.nearest.kg_co2_per_usd)}`,
     };
   }
   if (verdict.kind === 'dirtier') {
     return {
-      value: 'no economy this carbon-intensive',
+      value: 'above every economy today',
       note: `${per} · the highest today is ${verdict.nearest.name} at `
         + `${perDollar(verdict.nearest.kg_co2_per_usd)}`,
     };

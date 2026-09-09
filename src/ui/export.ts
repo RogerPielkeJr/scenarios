@@ -11,7 +11,8 @@
 import { INPUT_SPECS } from '../model/config.js';
 import { ANCHORS } from '../model/emulator.js';
 
-import { MARKER_BY_ID, placeAmongMarkers, type PublishedPath } from '../model/markers.js';
+import { MARKER_BY_ID, placeAmongMarkers, reconstructionLabel,
+  type PublishedPath } from '../model/markers.js';
 import type { ScenarioInputs, ScenarioPath } from '../model/types.js';
 import { displayName, type Scenario } from '../state.js';
 import { degrees, formatInput, signedDegrees, thousands } from '../format.js';
@@ -93,7 +94,7 @@ async function drawSheet(
 ): Promise<HTMLCanvasElement> {
   const { inputs } = scenario;
   const title = published === null ? displayName(scenario.name)
-    : `${published.label} as published`;
+    : reconstructionLabel(published);
   const styles = window.getComputedStyle(document.documentElement);
   const paper = styles.getPropertyValue('--panel').trim() || '#ffffff';
   const ink = styles.getPropertyValue('--ink').trim() || '#16243a';

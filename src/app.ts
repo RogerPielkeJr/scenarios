@@ -1,7 +1,7 @@
 import { PRESETS } from './model/bounds.js';
 import { computeFlags, markerIdForPreset } from './model/flags.js';
 import { computePath } from './model/kaya.js';
-import { MARKERS, MARKER_BY_ID, publishedPath } from './model/markers.js';
+import { MARKERS, MARKER_BY_ID, publishedPath, reconstructionLabel } from './model/markers.js';
 import { INPUT_SPECS, SCENARIO_FACTORS, approximateScenarioCount, defaultInputs } from './model/config.js';
 import type { ScenarioInputs } from './model/types.js';
 import {
@@ -168,7 +168,7 @@ export function mountApp(root: Document = document): App {
     // A preset still names the scenario, and says which of the two curves the
     // ink is: the marker itself sits highlighted behind it under the same name,
     // so calling the ink "CMIP7 MEDIUM" alone left two lines sharing one label.
-    const label = published === null ? name : `${published.label} reconstructed`;
+    const label = published === null ? name : reconstructionLabel(published);
     const results: PanelResult[] = [];
 
     // Computed once and shared, so a slow panel cannot disagree with a fast one.
@@ -196,15 +196,16 @@ export function mountApp(root: Document = document): App {
       chartCaption.textContent = '';
       if (published === null) {
         chartCaption.append(
-          'Annual CO₂ emissions including land use, 2025 to 2100. ', bold(name),
+          'Annual CO₂ emissions including land use and removal, 2025 to 2100. ', bold(name),
           ' in black along with the seven CMIP7 markers.',
         );
       } else {
         chartCaption.append(
-          'Annual CO₂ emissions including land use, 2025 to 2100. This reconstruction of ',
-          bold(published.label), ' in black along with the seven CMIP7 markers, with ',
+          'Annual CO₂ emissions including land use and removal, 2025 to 2100. This ',
+          'reconstruction of ', bold(published.label),
+          ' in black along with the seven CMIP7 markers, with ',
           `${published.label} itself picked out among them. The two differ, and the `,
-          'tiles below report both.',
+          'tiles below give both.',
         );
       }
     });

@@ -168,11 +168,11 @@ def main() -> None:
         'id': 'removals', 'legacyId': 'cdr', 'kind': 'level',
         'label': 'Engineered CO2 removal in 2100',
         'help': ('Bioenergy with capture, direct air capture and the rest: removal '
-                 'that stores carbon outside the land account. Forests and soils '
-                 'belong to the land use slider instead, so no tonne is set twice. '
-                 'The four Kaya factors multiply, so on their own they approach zero '
-                 'without ever crossing it; this is what carries a path below zero. '
-                 'It ramps in slowly and accelerates, as the scenarios deploy it.'),
+                 'that stores carbon outside the land account. Forests and soils sit '
+                 'on the land use slider, so neither counts the same tonne. A product '
+                 'of four positive factors stays above zero at any rate, and this is '
+                 'the term that takes a path below it. The ramp starts slowly and '
+                 'steepens, as in the scenarios.'),
         'min': 0, 'max': 25, 'step': 0.5,
         'default': 0, 'decimals': 1,
         'prototypeDefault': 0,
@@ -181,20 +181,37 @@ def main() -> None:
         'reference': {'value': 0, 'label': 'None today'},
     })
 
-    # The land use help carried over from the prototype, which had no removal
-    # slider to be confused with. The two terms are additive and must not
-    # overlap, so each help now says which removal it counts. See METHODS.md.
+    # Help text the prototype's own wording no longer covers.
+    #
+    # The land use help predates the removal slider, so it did not say which
+    # removal it counts; the two terms are additive and must not overlap. The
+    # rest are rewritten to report the record rather than characterise it: the
+    # prototype wrote "the world managed", "has done nearly all the
+    # decarbonising" and "improved only", which are readings of the numbers
+    # rather than the numbers. See METHODS.md.
+    HELP = {
+        'landUse': (
+            'Forests and farming release about 3.8 Gt a year now. CMIP7 spans a sink '
+            'of 8.8 Gt to a source of 1.9. Regrowth and restoration net into this '
+            'figure; engineered removal has a slider of its own.'),
+        'income': (
+            f'The world averaged 1.91% a year from 1990 to 2024.'),
+        'energyPerDollar': (
+            'Energy per dollar improved 1.43% a year since 1990, the largest of the '
+            'four factors over that period.'),
+        'co2PerEnergy': (
+            f'The fuel mix improved {abs(ci_observed):.2f}% a year since 1990 and '
+            f'{abs(ci_decade):.2f}% over the past decade, on the same basis as the '
+            'scenarios, cement and industrial CO2 included.'),
+        'improvementTiming': (
+            'The rate sliders set the 2100 level of energy per dollar and CO2 per unit '
+            'of energy. This sets how that change is spread across the years between. '
+            'Half by the midpoint is a constant rate; above half puts more of the '
+            'change in the first half of the century.'),
+    }
     for spec in inputs:
-        if spec['id'] == 'landUse':
-            spec['help'] = (
-                spec['help'].rstrip('.') + '. Regrowth and restoration net into this '
-                'figure; engineered removal has its own slider.')
-    for spec in inputs:
-        if spec['id'] == 'co2PerEnergy':
-            spec['help'] = (
-                f'The fuel mix improved only {abs(ci_observed):.2f}% a year since 1990, and '
-                f'{abs(ci_decade):.2f}% over the past decade, counting the cement and '
-                'industrial CO2 the scenarios count.')
+        if spec['id'] in HELP:
+            spec['help'] = HELP[spec['id']]
     # --- how many scenarios the sliders actually reach -----------------------
     # Multiplying the slider stops counts settings, not outcomes. Energy per
     # dollar and CO2 per unit of energy enter the identity only through their

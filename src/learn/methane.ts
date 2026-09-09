@@ -94,23 +94,23 @@ export const METHANE_PAGE: LearnPageSpec = {
   input: 'methane',
   title: 'Methane',
   standfirst: 'One slider sets how much methane the world emits in 2100. Methane leaves the '
-    + 'atmosphere within a couple of decades, which makes its 2100 level a question about '
-    + 'what the world emits that year rather than about everything emitted before it.',
+    + 'atmosphere within a couple of decades, so its 2100 level depends on emissions in that '
+    + 'year rather than on the total emitted before it.',
 
   definition: {
     quantity: 'Anthropogenic methane emissions in 2100',
     units: 'million tonnes of CH4 a year',
-    place: 'Alongside the four CO₂ factors, reaching the warming figure through its own '
+    place: 'Alongside the four CO₂ factors, entering the warming figure through a separate '
       + 'coefficient',
     today: `${mt(BASE.methaneMt)} (base year ${BASE_YEAR})`,
     paragraphs: [
-      'Methane differs from CO₂ in the one way that matters most here. A molecule of CO₂ '
-      + 'emitted today still warms the planet in a century; a molecule of methane breaks down '
-      + 'within about a decade. Cumulative methane emissions therefore do little work, and '
-      + 'the flow in a given year does almost all of it.',
-      'That turns this slider into a level rather than a rate. The four CO₂ factors set rates '
-      + 'of change and the tool adds up everything they emit. Methane asks one question: how '
-      + 'much does the world still emit in 2100?',
+      'Methane differs from CO₂ in atmospheric lifetime. A molecule of CO₂ emitted today '
+      + 'still warms the planet in a century; a molecule of methane breaks down within about '
+      + 'a decade. The warming from methane in 2100 therefore depends on the emissions rate '
+      + 'in 2100 rather than on the cumulative total.',
+      'This slider is therefore a level rather than a rate. The four CO₂ factors set rates '
+      + 'of change and the tool sums their emissions across the century. The methane control '
+      + 'sets a single figure for 2100.',
       `The tool converts that answer at ${degrees(METHANE.k * 100)} per 100 Mt a year against `
       + `today's ${mt(METHANE.refMt)}. Moving the slider across its whole range, ${SPEC.min} `
       + `to ${SPEC.max} Mt, changes the 2100 warming figure by `
@@ -130,15 +130,15 @@ export const METHANE_PAGE: LearnPageSpec = {
       + `${RICE.growth >= 0 ? '+' : '−'}${Math.abs(RICE.growth).toFixed(2)}%.`,
       `Livestock supplies the largest share at ${pc(LIVESTOCK.share)}, fossil fuel production `
       + `and distribution ${pc(FOSSIL.share)}, waste ${pc(WASTE.share)} and rice `
-      + `${pc(RICE.share)}. The first two carry most of the reductions the scenarios assume.`,
+      + `${pc(RICE.share)}. The first two account for most of the reductions in the scenarios.`,
       'Natural wetlands emit more than all of these together, and fall outside both the chart '
       + 'and the slider. The Global Methane Budget puts wetlands and inland fresh water at '
-      + '248 Tg a year against 369 Tg from direct anthropogenic sources, which lets a '
-      + 'scenario cut human methane hard and still leave a large natural flux in place.',
+      + '248 Tg a year against 369 Tg from direct anthropogenic sources. A deep cut in '
+      + 'anthropogenic methane therefore leaves a large natural flux in place.',
     ],
     caption: `Anthropogenic methane by source, ${C.firstYear} to ${C.lastYear}, in million `
-      + 'tonnes a year, then a straight line to the 2100 total you set above. The seven '
-      + 'Dots at 2100 mark the seven CMIP7 scenarios.',
+      + 'tonnes a year, then a straight line to the 2100 total you set above. Dots at 2100 '
+      + 'mark the seven CMIP7 scenarios.',
     dataSource: 'EDGAR 2024 release, anthropogenic CH4 by sector; ScenarioMIP CMIP7 markers',
     key: [
       ...SOURCES.map((entry) => ({
@@ -208,28 +208,27 @@ export const METHANE_PAGE: LearnPageSpec = {
     heading: 'What moves it',
     note: 'A short life, and five sources with different politics.',
     paragraphs: [
-      'A short atmospheric life cuts both ways. Methane emitted in the 2030s has stopped '
-      + 'warming the planet by 2100, so a scenario can emit a great deal along the way and '
-      + 'still reach a low 2100 level. A cut also delivers its cooling within two decades '
-      + 'rather than over centuries, which draws attention to methane out of proportion to '
-      + 'its share of emissions.',
+      'A short atmospheric life has two consequences. Methane emitted in the 2030s no longer '
+      + 'warms the planet in 2100, so a scenario can emit a large amount along the way and '
+      + 'still arrive at a low 2100 level. A cut also takes effect within two decades rather '
+      + 'than over centuries.',
       'Fossil methane leaks from wells, pipelines, compressors and mines, and stopping it '
       + 'often pays for itself in recovered gas. Satellites now find individual leaks, which '
-      + 'has moved this source from an estimate to an observation and revised inventories '
-      + 'upward in the process.',
+      + 'turned this source from an estimate into a measurement and revised the inventories '
+      + 'upward.',
       'Livestock methane comes out of rumen fermentation and manure. It scales with herd '
       + 'size, herd size scales with meat and dairy demand, and that demand rises with income '
       + 'in exactly the countries whose income the projections raise. Feed additives, breeding '
-      + 'and manure management each shave a few percent off it; none of them halves it.',
+      + 'and manure management each cut it by a few percent, and none of the three by half.',
       `Rice paddies emit while flooded, and drainage regimes change that. Rice alone fell `
       + `among the sources on this chart between ${C.firstYear} and ${C.lastYear}, at `
       + `${RICE.growth >= 0 ? '+' : '−'}${Math.abs(RICE.growth).toFixed(2)}% a year, while `
       + `waste methane from landfills and wastewater grew fastest of the five at `
-      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both stay `
-      + 'smaller than fossil fuels or livestock, and both yield more readily.',
+      + `${WASTE.growth >= 0 ? '+' : '−'}${Math.abs(WASTE.growth).toFixed(2)}%. Both are `
+      + 'smaller sources than fossil fuels or livestock.',
       'The Global Methane Budget records that direct anthropogenic methane has tracked the '
-      + 'scenarios assuming no or minimal mitigation policy since 2012. That describes the '
-      + 'past decade; the slider asks about the seven that follow.',
+      + 'scenarios assuming no or minimal mitigation policy since 2012. That covers the past '
+      + 'decade; this slider covers the seven decades after it.',
     ],
   },
 
@@ -239,13 +238,12 @@ export const METHANE_PAGE: LearnPageSpec = {
     paragraphs: [
       `The markers range from ${mt(VERY_LOW_CH4)} in VERY LOW to ${mt(HIGH_CH4)} in HIGH, a `
       + `spread of ${(HIGH_CH4 / VERY_LOW_CH4).toFixed(1)} times. HIGH assumes `
-      + `${((HIGH_CH4 / BASE.methaneMt - 1) * 100).toFixed(0)}% more than today; VERY LOW `
-      + `assumes ${((1 - VERY_LOW_CH4 / BASE.methaneMt) * 100).toFixed(0)}% less.`,
+      + `${((HIGH_CH4 / BASE.methaneMt - 1) * 100).toFixed(0)}% above today's level, VERY `
+      + `LOW ${((1 - VERY_LOW_CH4 / BASE.methaneMt) * 100).toFixed(0)}% below it.`,
       `That whole spread moves this tool's warming figure by `
       + `${degrees(METHANE.k * (HIGH_CH4 - VERY_LOW_CH4))}, against the 1.65 °C separating `
-      + 'those two scenarios overall. Methane '
-      + 'matters here, and the CO₂ factors decide the century.',
-      'Treat the coefficient with care. It comes from fitting a straight line to seven FaIR '
+      + 'those two scenarios overall, a share of about a third.',
+      'The coefficient has limits. It comes from fitting a straight line to seven FaIR '
       + 'runs, so it reproduces those seven and carries no information about a methane path '
       + 'outside their range. It also ignores when the methane leaves the ground, a real '
       + 'simplification for a gas that clears the atmosphere within a decade.',

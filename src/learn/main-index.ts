@@ -11,9 +11,9 @@ import { buildIdentity } from '../ui/learn/identity.js';
 import { installThemeToggle } from '../ui/theme.js';
 import { linkToolbar } from '../ui/toolbar.js';
 
-const STANDFIRST = 'Six assumptions decide any emissions future. Each page below explains one '
-  + 'of them: what it measures, what the world has done with it, what the CMIP7 scenarios '
-  + 'assume, and how to build a value of your own and carry it back into your scenario.';
+const STANDFIRST = 'Each page below covers one of the eight assumptions in the tool: what it '
+  + 'measures, the record for it, what the CMIP7 scenarios assume, and a builder that hands a '
+  + 'value back to the slider.';
 
 function element<K extends keyof HTMLElementTagNameMap>(
   tag: K, className?: string, text?: string,

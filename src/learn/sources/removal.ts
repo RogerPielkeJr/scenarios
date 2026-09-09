@@ -18,22 +18,22 @@ export const REMOVAL_SOURCES: readonly Source[] = [
     vintage: '2026',
     url: 'https://doi.org/10.5194/gmd-19-2627-2026',
     used: 'The marker scenarios, two of which end the century below zero, and whose published '
-      + 'CO₂ paths give each preset its own 2100 removal level.',
+      + 'CO₂ paths give each preset its 2100 removal level.',
   },
   {
     title: 'Global Carbon Budget 2024',
     publisher: 'Friedlingstein and colleagues, Earth System Science Data 17',
     vintage: '2025',
     url: 'https://doi.org/10.5194/essd-17-965-2025',
-    used: 'Gross fossil and land-use CO₂, for the comparison between what removal takes back '
-      + 'and what the world emits.',
+    used: 'Gross fossil and land-use CO₂, for the ratio of removal today to emissions '
+      + 'today.',
   },
   {
     title: 'Carbon Dioxide Removal (Chapter 12, IPCC AR6 Working Group III)',
     publisher: 'Intergovernmental Panel on Climate Change',
     vintage: '2022',
     url: 'https://doi.org/10.1017/9781009157926.014',
-    used: 'The assessment of removal methods, their limits, and why scenarios reaching net '
-      + 'zero and beyond rely on them.',
+    used: 'The assessment of removal methods, their limits, and their role in scenarios at '
+      + 'net zero and below.',
   },
 ];

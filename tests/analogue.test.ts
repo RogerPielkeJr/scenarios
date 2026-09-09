@@ -62,8 +62,8 @@ describe('the country the 2100 world resembles', () => {
     const verdict = analogueFor(0.011);
     expect(verdict?.kind).toBe('cleaner');
     if (verdict?.kind === 'cleaner') expect(verdict.nearest.name).toBe('Switzerland');
-    expect(analogueTile(0.011).value).toBe('no economy this clean');
-    expect(analogueTile(0.011).note).toContain('the cleanest today is Switzerland');
+    expect(analogueTile(0.011).value).toBe('below every economy today');
+    expect(analogueTile(0.011).note).toContain('the lowest today is Switzerland');
   });
 
   it('says so when the world sits in a gap inside the table', () => {
@@ -79,7 +79,7 @@ describe('the country the 2100 world resembles', () => {
     const verdict = analogueFor(0.9);
     expect(verdict?.kind).toBe('dirtier');
     if (verdict?.kind === 'dirtier') expect(verdict.nearest.name).toBe('Turkmenistan');
-    expect(analogueTile(0.9).value).toBe('no economy this carbon-intensive');
+    expect(analogueTile(0.9).value).toBe('above every economy today');
   });
 
   // Whatever the verdict, both lines have to say something, and the note has

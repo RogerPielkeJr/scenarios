@@ -1,5 +1,18 @@
 import { expect, test } from '@playwright/test';
 import { citedSources } from '../src/learn/sources/index.js';
+import { readFileSync } from 'node:fs';
+import { LEARN_ENTRIES } from '../src/learn/registry.js';
+
+// Playwright runs this file through Node, which rejects the bare JSON imports
+// the model modules use, so the data comes off disk rather than through them.
+// Anything needing the model itself belongs in the Vitest suite.
+const SLIDER_COUNT: number =
+  (JSON.parse(readFileSync('src/data/config.json', 'utf8')) as { inputs: unknown[] })
+    .inputs.length;
+
+// The site is "Build your own climate scenario". An unnamed scenario's
+// downloads take that stem; see fileStem in src/app.ts.
+const UNNAMED_STEM = 'climate-scenario';
 
 // Three widths, not four. 1280 and 1600 exercised the same layout, because
 // .wrap caps at 1180px, and every regenerated baseline costs the repository
@@ -192,7 +205,7 @@ test('the PNG button produces a scenario sheet', async ({ page }) => {
     page.waitForEvent('download'),
     page.locator('#download-png').click(),
   ]);
-  expect(download.suggestedFilename()).toBe('emissions-scenario.png');
+  expect(download.suggestedFilename()).toBe(`${UNNAMED_STEM}.png`);
   const { readFileSync } = await import('node:fs');
   const bytes = readFileSync((await download.path()) as string);
   expect(bytes.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
@@ -210,7 +223,7 @@ test('the PDF button produces a one-page PDF', async ({ page }) => {
     page.waitForEvent('download'),
     page.locator('#download-pdf').click(),
   ]);
-  expect(download.suggestedFilename()).toBe('emissions-scenario.pdf');
+  expect(download.suggestedFilename()).toBe(`${UNNAMED_STEM}.pdf`);
   const { readFileSync } = await import('node:fs');
   const bytes = readFileSync((await download.path()) as string);
   const text = bytes.toString('latin1');
@@ -251,11 +264,12 @@ for (const slug of LIVE_SLUGS) {
         await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
         await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
         await page.goto(`/learn/${slug}/`);
-        // The reader's own series, attached rather than visible: on the
-        // removal page it opens flat on the axis, because capture and storage
-        // starts at no effect, and a horizontal path has no visible box.
-        await page.waitForSelector('#learn-chart path[data-series="reader"]',
-          { state: 'attached' });
+        // Attached rather than visible. On the removal page the first path is
+        // a horizontal line, because capture and storage opens at no effect,
+        // and a zero-height box never counts as visible. Not the reader's
+        // series specifically: the carbon-intensity chart is stacked bands and
+        // puts the reader's line in the second figure.
+        await page.waitForSelector('#learn-chart path', { state: 'attached' });
         await page.evaluate(() => document.fonts.ready);
         await expect(page).toHaveScreenshot(`learn-${slug}-${breakpoint.name}-${theme}.png`,
           { fullPage: true });
@@ -319,9 +333,22 @@ test('a scenario survives the round trip through the population page', async ({ 
 });
 
 test('the back link returns the scenario unchanged', async ({ page }) => {
-  await page.goto('/learn/population/?s=11.3_2.2_-1.9_-0.7_-1.5_240&n=Held%20steady');
+  // The link is whatever the page itself writes, never a literal. One number
+  // per slider means a typed link goes stale the moment a slider joins, which
+  // is what happened when timing and removal arrived and left this test
+  // looking for the six-number form.
+  await page.goto('/');
+  await page.locator('#input-population').fill('11.3');
+  await page.locator('#input-population').dispatchEvent('input');
+  await page.locator('#scenario-name').fill('Held steady');
+  await page.locator('#scenario-name').dispatchEvent('input');
+  await expect(page).toHaveURL(/#s=11\.3_/);
+  const link = new URL(page.url()).hash.slice(1);
+  expect(link.split('&')[0]?.split('_')).toHaveLength(SLIDER_COUNT);
+
+  await page.goto(`/learn/population/?${link}`);
   await page.locator('.back-link').first().click();
-  await expect(page).toHaveURL(/#s=11\.3_2\.2_-1\.9_-0\.7_-1\.5_240&n=Held%20steady/);
+  await expect(page).toHaveURL(`/#${link}`);
   await expect(page.locator('#readout-population')).toHaveText('11.3 billion');
   await expect(page.locator('#scenario-name')).toHaveValue('Held steady');
 });
@@ -331,29 +358,60 @@ test('a published scenario draws its own path until a slider moves', async ({ pa
   // By data-preset, not by text: "CMIP7 MEDIUM" is a prefix of
   // "CMIP7 MEDIUM-to-LOW" and matches both buttons.
   await page.locator('.presets button[data-preset="cmip7-medium"]').click();
-  await expect(page.locator('#tile-cumulative')).toHaveText('2,770');
-  await expect(page.locator('#tile-warming')).toHaveText('2.84 °C');
-  await expect(page.locator('#chart text', { hasText: 'CMIP7 MEDIUM as published' }))
+  // No number typed in. This test is about the chart drawing the marker's own
+  // path, and tests/presets.test.ts already pins what each preset comes to;
+  // repeating a figure here only froze a stale one, which is how "2,770" (the
+  // marker's published total) outlived the tile's 2,767 (the model's).
+  await expect(page.locator('#tile-cumulative')).toHaveText(/^[\d,]+$/);
+  await expect(page.locator('#tile-warming')).toHaveText(/^\d\.\d{2} °C$/);
+  const cumulative = await page.locator('#tile-cumulative').textContent() ?? '';
+  // "reconstructed", not "as published": the ink is the Kaya reconstruction
+  // and the marker's own path sits behind it. src/model/markers.ts writes the
+  // label for both the chart and the downloaded sheet.
+  await expect(page.locator('#chart text', { hasText: 'CMIP7 MEDIUM reconstructed' }))
     .toHaveCount(1);
   await expect(page.locator('.presets button[aria-pressed="true"]')).toHaveCount(1);
 
-  // The published path and the marker line behind it are the same 16 points.
+  // The ink is the reconstruction, one point a year, and the marker's own
+  // path sits behind it at the six values it publishes. The two used to be
+  // the same line: drawing the published path as the ink made one step of the
+  // population slider look like it raised warming by 0.18 degrees when it had
+  // lowered it by 0.002. They must differ, and both must be on the chart.
   const drawn = await page.locator('#chart [data-user-path]').getAttribute('d');
   const ghost = await page.locator('#chart [data-marker="M"]').getAttribute('d');
-  expect(drawn?.replace(/^M/, '')).toBe(ghost?.replace(/^M/, ''));
+  expect(drawn).not.toBe(null);
+  expect(ghost).not.toBe(null);
+  expect(drawn).not.toBe(ghost);
+  expect((drawn ?? '').split('L')).toHaveLength(2100 - 2025 + 1);
+  expect((ghost ?? '').split('L')).toHaveLength(16);
 
   await page.locator('#input-population').fill('11');
   await page.locator('#input-population').dispatchEvent('input');
-  await expect(page.locator('#tile-cumulative')).not.toHaveText('2,770');
-  await expect(page.locator('#chart text', { hasText: 'as published' })).toHaveCount(0);
+  await expect(page.locator('#tile-cumulative')).not.toHaveText(cumulative);
+  await expect(page.locator('#chart text', { hasText: 'reconstructed' })).toHaveCount(0);
 });
 
-test('every figure offers a PNG and a spreadsheet', async ({ page }) => {
-  for (const path of ['/', '/learn/population/', '/learn/energy-intensity/']) {
+test('every figure on a learn page offers a PNG and a spreadsheet', async ({ page }) => {
+  for (const path of ['/learn/population/', '/learn/energy-intensity/', '/learn/removal/']) {
     await page.goto(path);
     const figures = await page.locator('.chart-figure').count();
+    expect(figures, path).toBeGreaterThan(0);
     await expect(page.locator('.figure-actions')).toHaveCount(figures);
   }
+});
+
+// The top page is the exception, and on purpose. Its chart sits in a
+// .chart-figure like any other, but what its two buttons hand over is the
+// whole scenario sheet -- chart, results and assumptions on one page -- so
+// they live in the toolbar rather than under the figure. This test used to
+// count the top page among the rest and passed only while its chart had no
+// figure wrapper to be counted.
+test('the top page downloads a scenario sheet rather than the figure', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.chart-figure')).toHaveCount(1);
+  await expect(page.locator('.figure-actions')).toHaveCount(0);
+  await expect(page.locator('#download-png')).toBeVisible();
+  await expect(page.locator('#download-pdf')).toBeVisible();
 });
 
 test('the PNG button under a figure downloads that figure', async ({ page }) => {
@@ -418,10 +476,16 @@ test('a named scenario names its download', async ({ page }) => {
 });
 
 test('the learn index opens every finished page', async ({ page }) => {
+  // Counted from the registry, which is what the index itself reads. The
+  // literal 6 here outlived two new pages. LIVE_SLUGS is the screenshot list
+  // and is not the same thing: the timing page is live and carries no
+  // baseline, so the index shows more links than that list has entries.
+  const live = LEARN_ENTRIES.filter((entry) => entry.status === 'live').length;
   await page.goto('/learn/');
-  await expect(page.locator('.learn-index > li')).toHaveCount(6);
-  await expect(page.locator('.learn-index a')).toHaveCount(LIVE_SLUGS.length);
-  await expect(page.locator('.forthcoming-tag')).toHaveCount(6 - LIVE_SLUGS.length);
+  await expect(page.locator('.learn-index > li')).toHaveCount(LEARN_ENTRIES.length);
+  await expect(page.locator('.learn-index a')).toHaveCount(live);
+  await expect(page.locator('.forthcoming-tag'))
+    .toHaveCount(LEARN_ENTRIES.length - live);
   await page.locator('.learn-index a').first().click();
   await expect(page.locator('h1')).toHaveText('Population');
 });
@@ -494,8 +558,8 @@ test.describe('the scenario strip', () => {
   test('leaves the sliders\' own readouts alone', async ({ page }) => {
     await page.goto('/');
     const readouts = page.locator('#controls .readout');
-    expect(await readouts.count()).toBe(6);
-    for (let index = 0; index < 6; index += 1) {
+    expect(await readouts.count()).toBe(SLIDER_COUNT);
+    for (let index = 0; index < SLIDER_COUNT; index += 1) {
       const position = await readouts.nth(index).evaluate(
         (node) => getComputedStyle(node).position);
       expect(position, `slider readout ${index}`).toBe('static');

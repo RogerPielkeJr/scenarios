@@ -64,10 +64,11 @@ export interface PublishedPath {
 /**
  * A marker's published emissions path, five-yearly to 2100.
  *
- * Loading a CMIP7 preset shows this rather than the reconstruction, so
- * "start from a published scenario" draws the scenario that was published.
- * Moving any slider takes the reader off those six values and back to the
- * Kaya reconstruction.
+ * Loading a CMIP7 preset highlights this behind the ink, which stays the Kaya
+ * reconstruction the sliders drive. Drawing the published path as the ink
+ * instead made one step of the population slider look like it raised warming
+ * by 0.18 degrees when it had lowered it by 0.002. Moving any slider drops
+ * the highlight and leaves the reconstruction alone.
  */
 export function publishedPath(marker: Marker): PublishedPath {
   return {
@@ -79,6 +80,18 @@ export function publishedPath(marker: Marker): PublishedPath {
     warmingC: marker.warmingC,
     label: `CMIP7 ${marker.label}`,
   };
+}
+
+/**
+ * What to call the ink line while a CMIP7 preset is loaded.
+ *
+ * The ink is the Kaya reconstruction of that marker, and the marker's own
+ * path sits highlighted behind it under the same name, so the label has to
+ * separate the two. The chart and the downloaded sheet both read this, after
+ * the sheet spent a while calling the reconstruction "as published".
+ */
+export function reconstructionLabel(published: PublishedPath): string {
+  return `${published.label} reconstructed`;
 }
 
 /**

@@ -52,7 +52,7 @@ export const POPULATION_SOURCES: readonly Source[] = [
     publisher: 'Gerland and colleagues, Science 346(6206)',
     vintage: '2014',
     url: 'https://doi.org/10.1126/science.1257469',
-    used: 'The probabilistic result that reset expectations of an early plateau.',
+    used: 'The probabilistic projection of a later peak than earlier estimates gave.',
   },
   {
     title: 'The human core of the shared socioeconomic pathways: Population scenarios by age, '

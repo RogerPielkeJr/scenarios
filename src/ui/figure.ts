@@ -288,7 +288,7 @@ function drawTable(
     ctx.fillStyle = palette.dim;
     ctx.font = `10px ${SANS}`;
     ctx.fillText(`${rows.length} of ${totalRows} rows, evenly spaced. `
-      + 'The spreadsheet beside the image carries every one of them.',
+      + 'The spreadsheet beside the image has all of them.',
     margin, y, available);
   }
 }

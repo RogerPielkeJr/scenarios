@@ -24,13 +24,13 @@ function comparisonSentence(flags: ScenarioFlags): string {
 
 const COHERENCE_PHRASES: Record<keyof ScenarioFlags['coherence'], string> = {
   fastFuelMixSlowEfficiency:
-    'a fuel mix changing faster than any scenario while the energy each dollar needs barely moves',
+    'a fuel mix changing faster than any scenario alongside little change in energy per dollar',
   fastEfficiencyStaticFuelMix:
-    'energy use improving faster than any scenario while the fuel mix stands still',
+    'energy per dollar improving faster than any scenario alongside an unchanged fuel mix',
   stagnantEconomyFastEfficiency:
-    'a stagnant economy that still modernises its energy use faster than any scenario',
+    'flat income per person alongside energy per dollar improving faster than any scenario',
   largeSinkUnchangedFuelMix:
-    'a large land sink alongside an unchanged fuel mix, which no marker pairs together',
+    'a large land sink alongside an unchanged fuel mix, a pair no marker assumes',
 };
 
 /**
@@ -59,7 +59,7 @@ function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): strin
   const closeEnd = !fit.markerGoesNegative && Math.abs(fit.endPercent) < 5;
   sentences.push(closeEnd
     ? `${lead} reaches ${gt(fit.ourEndGt)} in 2100, within `
-      + `${Math.abs(fit.endPercent).toFixed(0)}% of ${fit.label}'s own ${gt(fit.markerEndGt)}.`
+      + `${Math.abs(fit.endPercent).toFixed(0)}% of ${fit.label}'s published ${gt(fit.markerEndGt)}.`
     : `${lead} reaches ${gt(fit.ourEndGt)} in 2100 against `
       + `${fit.label}'s ${gt(fit.markerEndGt)}.`);
 
@@ -77,9 +77,9 @@ function fidelitySentence(fit: MarkerFidelity, showingPublished: boolean): strin
       + `${fit.label} emits ${gt(fit.markerMidGt)}.`);
   }
   if (fit.markerGoesNegative) {
-    sentences.push(`${fit.label} also removes more CO₂ than it emits before 2100. Four `
-      + 'factors multiplied together stay positive, so the fossil term here cannot turn '
-      + 'negative and only the land use slider can pull a path below zero.');
+    sentences.push(`${fit.label} also removes more CO₂ than it emits before 2100. A product `
+      + 'of four positive factors stays above zero, so the fossil term here holds above zero '
+      + 'and the land use and removal sliders are what take a path below it.');
   }
   sentences.push(`The chart draws ${fit.label}'s published path behind yours.`);
   return `<p>${sentences.join(' ')}</p>`;
@@ -91,7 +91,8 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
 
   if (flags.populationOutsideUn === 'above') {
     parts.push(`<p>Your population rises above the top of the UN's 95% range of `
-      + `${UN_2024.hi95} billion. Only SSP3, which carries CMIP7 HIGH, goes there.</p>`);
+      + `${UN_2024.hi95} billion. SSP3, the population behind CMIP7 HIGH, is the only SSP `
+      + 'above that figure.</p>');
   }
   if (flags.populationOutsideUn === 'below') {
     parts.push(`<p>Your population falls below the bottom of the UN's 95% range of `
@@ -103,19 +104,19 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
       + 'the observed rate.</p>');
   }
   if (flags.fuelMixFasterThanAnyScenario) {
-    parts.push('<p>The fuel mix has never changed this fast. CMIP7 MEDIUM assumes about '
-      + 'four times the observed rate and the low scenarios assume more.</p>');
+    parts.push('<p>No period on record shows the fuel mix changing at this rate. CMIP7 '
+      + 'MEDIUM assumes about four times the observed rate and the low scenarios more.</p>');
   }
   // Both bounds judge the reconstruction's own total, which the tiles now
   // report whether or not a preset stands, so the bounds apply throughout.
   {
     if (flags.aboveSlowBound) {
-      parts.push(`<p>Above ${thousands(BOUNDS.slow)} GtCO₂ you have passed the highest total `
-        + 'reachable with every technological trajectory held at the slowest rate the world '
-        + 'has recorded.</p>');
+      parts.push(`<p>Above ${thousands(BOUNDS.slow)} GtCO₂ this total exceeds the highest `
+        + 'reachable with every technological trajectory held at the slowest rate in the '
+        + 'record.</p>');
     }
     if (flags.belowFastBound) {
-      parts.push(`<p>Below ${thousands(BOUNDS.fast)} GtCO₂ you have passed the lowest total `
+      parts.push(`<p>Below ${thousands(BOUNDS.fast)} GtCO₂ this total falls under the lowest `
         + 'reachable with every technological trajectory at its fastest recorded rate.</p>');
     }
   }
@@ -127,43 +128,43 @@ export function renderNotes(container: HTMLElement, flags: ScenarioFlags): void 
     .filter((key) => flags.coherence[key])
     .map((key) => COHERENCE_PHRASES[key]);
   if (incoherent.length > 0) {
-    parts.push(`<p>Worth a second look: you have set ${incoherent.join(', and ')}. `
-      + 'No CMIP7 marker combines these, which does not make it impossible, only '
-      + 'unexamined.</p>');
+    parts.push(`<p>This scenario sets ${incoherent.join(', and ')}. `
+      + 'No CMIP7 marker combines those settings.</p>');
   }
 
   parts.push('<p><b>How the tool works this out.</b> Emissions come from four factors '
     + 'multiplied '
     + 'together: how many people, how much each of them earns, how much energy each dollar of '
-    + 'that income needs, and how much carbon each unit of energy carries. Economists call the '
-    + 'middle two energy intensity and carbon intensity. Land use CO₂ joins them from its '
-    + 'own slider. The four cover fossil and industrial CO₂, cement included, so they count '
-    + 'the same emissions the CMIP7 scenarios count.</p>');
+    + 'that income takes, and how much carbon each unit of energy emits. Economists call the '
+    + 'middle two energy intensity and carbon intensity. Land use CO₂ and engineered removal '
+    + 'are added terms with sliders of their own. The four factors cover fossil and '
+    + 'industrial CO₂, cement included, so they count the same emissions the CMIP7 scenarios '
+    + 'count.</p>');
 
   parts.push('<p><b>Where the warming figure comes from.</b> A curve fitted to FaIR runs of '
-    + 'the seven CMIP7 markers, so treat it as indicative rather than as a model result. It reads the total '
-    + 'CO₂ you emit and your methane, and nothing else, which means two paths reaching the same '
-    + 'total give the same answer however differently they got there. Methane adds about '
+    + 'the seven CMIP7 markers, which makes it indicative rather than a model result. It '
+    + 'takes the cumulative CO₂ and the methane, and nothing else, so two paths with the same '
+    + 'cumulative total give the same answer. Methane adds about '
     + `${(METHANE.k * 100).toFixed(2)} °C per 100 Mt a year. It takes the form `
     + `${EMULATOR_FORM}.</p>`);
 
   parts.push(`<p><b>The two technology bounds.</b> Jesse Ausubel argued in 1995 that `
     + 'technological trajectories move at rates steady enough to bound the future, and that a '
     + 'scenario halting them describes technical regression rather than business as usual. '
-    + 'These two presets take him at his word. <b>Slowest technical progress</b> holds every '
+    + 'These two presets apply that argument. <b>Slowest technical progress</b> holds every '
     + 'trajectory at the slowest sustained rate on record: the energy each dollar needs '
     + `improving ${Math.abs(BOUND_RATES.slowestEfficiency.value).toFixed(2)}% a year, the `
     + `weakest ${BOUND_RATES.slowestEfficiency.window} window, and the fuel mix `
     + `${Math.abs(BOUND_RATES.slowestFuelMix.value).toFixed(2)}% a year, the weakest `
-    + `${BOUND_RATES.slowestFuelMix.window} window. Income grows at the fastest observed rate and `
-    + 'population reaches the top of the UN range, so emissions climb as high as slow technology '
-    + `permits, about ${thousands(BOUNDS.slow)} GtCO₂. <b>Ausubel methane economy</b> uses his `
-    + 'own 1988 published trajectory, which squeezes carbon out of primary energy to 0.06 tonnes '
+    + `${BOUND_RATES.slowestFuelMix.window} window. Income grows at the fastest observed rate `
+    + 'and population sits at the top of the UN range, which gives a cumulative total of '
+    + `about ${thousands(BOUNDS.slow)} GtCO₂. <b>Ausubel methane economy</b> uses his `
+    + '1988 published trajectory, which takes carbon in primary energy to 0.06 tonnes '
     + 'of carbon per kilowatt-year by 2100, implying the fuel mix improving 2.79% a year, with '
     + `the energy each dollar needs at its fastest observed rate of `
     + `${Math.abs(BOUND_RATES.fastestEfficiency.value).toFixed(2)}% a year and income still growing at the `
-    + `historical pace, about ${thousands(BOUNDS.fast)} GtCO₂. Neither bound assumes poverty, `
-    + 'and neither assumes a technology stops working.</p>');
+    + `historical pace, a cumulative total of about ${thousands(BOUNDS.fast)} GtCO₂. Neither `
+    + 'bound assumes poverty, and neither assumes a halt to any technology.</p>');
 
   parts.push(`<p><b>Sources.</b> Observed rates come from the Energy Institute Statistical `
     + 'Review and the World Bank. Fossil and industrial CO₂ for the base year comes from the '

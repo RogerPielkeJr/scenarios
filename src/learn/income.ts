@@ -92,7 +92,7 @@ const RATE_PART: BuilderPart = {
   default: Number(OBSERVED.toFixed(2)),
   decimals: 2,
   unitSuffix: '%/yr',
-  note: `The world managed ${rate(OBSERVED)} from 1990 to ${C.lastYear}, `
+  note: `The world averaged ${rate(OBSERVED)} from 1990 to ${C.lastYear}, `
     + `${rate(C.rates.recentDecade)} over the past decade, and `
     + `${rate(C.rates.wholeRecord)} across the whole record since ${C.firstYear}.`,
   marks: [
@@ -153,9 +153,9 @@ export const INCOME_PAGE: LearnPageSpec = {
   accent: '#8a5a00',
   input: 'income',
   title: 'Income per person',
-  standfirst: 'One slider sets how fast the average person gets richer. Seventy-five years '
-    + 'of compounding turns a small difference in that rate into a large difference in the '
-    + 'world of 2100, and every scenario’s energy demand rests on it.',
+  standfirst: 'One slider sets the growth rate of income per person. Over seventy-five years '
+    + 'of compounding, a difference of a few tenths of a point in that rate changes the 2100 '
+    + 'level by a factor of two or more, and energy demand follows the level.',
 
   definition: {
     quantity: 'World GDP per person, at purchasing power parity',
@@ -163,16 +163,16 @@ export const INCOME_PAGE: LearnPageSpec = {
     place: 'The second of the four factors that multiply',
     today: `${dollars(BASE.gdpPerPersonUsd)} (${C.lastYear})`,
     paragraphs: [
-      'Income per person carries two jobs in the identity. It measures how much output each '
-      + 'person commands, and it sets the demand for the energy services that output '
-      + 'requires: heating, cooling, travel, materials and machines.',
-      `Compounding does the work. The world grew ${rate(OBSERVED)} a year from 1990 to `
-      + `${C.lastYear}, which sounds modest and turns ${dollars(BASE.gdpPerPersonUsd)} into `
-      + `${dollars(OBSERVED_2100)} across 75 years. A rate one percentage point lower, `
-      + `${rate(OBSERVED - 1)}, reaches ${dollars(compound(BASE.gdpPerPersonUsd, OBSERVED - 1, SPAN))} `
-      + `instead, ${times(OBSERVED_2100 / compound(BASE.gdpPerPersonUsd, OBSERVED - 1, SPAN))} `
-      + 'less. The slider spans a wider range than that.',
-      `The world average hides most of what matters. High-income countries average `
+      'Income per person does two things in the identity. It measures output per person, and '
+      + 'it sets demand for the energy services that output takes: heating, cooling, travel, '
+      + 'materials and machines.',
+      `The world grew ${rate(OBSERVED)} a year from 1990 to ${C.lastYear}. Compounded over 75 `
+      + `years, that rate takes ${dollars(BASE.gdpPerPersonUsd)} to `
+      + `${dollars(OBSERVED_2100)}. One percentage point lower, ${rate(OBSERVED - 1)}, gives `
+      + `${dollars(compound(BASE.gdpPerPersonUsd, OBSERVED - 1, SPAN))}, a factor of `
+      + `${times(OBSERVED_2100 / compound(BASE.gdpPerPersonUsd, OBSERVED - 1, SPAN))} between `
+      + 'the two. The slider covers a wider range of rates.',
+      `The world average covers a wide spread. High-income countries average `
       + `${dollars(HIGH_INCOME.gdpPerPerson)} today and low-income countries `
       + `${dollars(LOW_INCOME.gdpPerPerson)}, a ratio of ${times(C.ratios.highOverLow)}.`,
     ],
@@ -180,22 +180,21 @@ export const INCOME_PAGE: LearnPageSpec = {
 
   chart: {
     heading: 'What the world has done',
-    note: 'The record, then each scenario’s rate compounding forward.',
+    note: 'The record, then each scenario’s rate from 2025 on.',
     paragraphs: [
       `World output per person rose from ${dollars(C.levels.first)} in ${C.firstYear} to `
       + `${dollars(C.levels.last)} in ${C.lastYear}, at ${rate(C.rates.wholeRecord)} across `
-      + `the whole record. The past decade grew slightly faster, at ${rate(C.rates.recentDecade)}.`,
+      + `the whole record. The past decade averaged ${rate(C.rates.recentDecade)}.`,
       `The seven markers spread from ${rate(HIGH_RATE)} to `
       + `${rate(Math.max(...MARKERS.map((m) => markerValueFor(m, 'income') ?? 0)))}. `
-      + `CMIP7 HIGH takes the low end, reaching ${dollars(HIGH_2100)} per person in 2100 `
-      + `against ${dollars(OBSERVED_2100)} if the observed rate simply continued. The scenario `
-      + 'that emits the most describes a world where people end the century '
-      + `${times(OBSERVED_2100 / HIGH_2100)} poorer than continuing the recorded rate implies, `
-      + `and where ${MARKER_BY_ID['H']?.kaya.populationBn.toFixed(2) ?? ''} billion of them `
-      + 'share it.',
-      `Before 1990 the level rests on Maddison Project growth rates rather than the World `
-      + 'Bank, as it does on the energy per dollar page; every figure from 1990 onward comes '
-      + 'from the World Bank alone.',
+      + `CMIP7 HIGH sits at the low end. Its rate gives ${dollars(HIGH_2100)} per person in `
+      + `2100, against ${dollars(OBSERVED_2100)} at the observed rate: a factor of `
+      + `${times(OBSERVED_2100 / HIGH_2100)}. The scenario with the highest emissions of the `
+      + `seven also has the largest population, at `
+      + `${MARKER_BY_ID['H']?.kaya.populationBn.toFixed(2) ?? ''} billion people.`,
+      `Before 1990 the level comes from Maddison Project growth rates rather than the World `
+      + 'Bank, as on the energy per dollar page. Every figure from 1990 on comes from the '
+      + 'World Bank.',
     ],
     caption: `World GDP per person, ${C.firstYear} to ${C.lastYear}, then your rate and the `
       + 'seven CMIP7 markers compounding forward from 2025. Constant 2021 international '
@@ -247,8 +246,8 @@ export const INCOME_PAGE: LearnPageSpec = {
     },
     extra: {
       kind: 'plot',
-      caption: 'The same question inside the three World Bank income groups: what each '
-        + 'averages now, and what the growth you set takes it to by 2100.',
+      caption: 'The same question inside the three World Bank income groups: the average '
+        + 'today, and the 2100 average at the growth rate you set.',
       dataSource: 'World Bank purchasing-power GDP and population, by income group',
       key: GROUPS.map((entry, index) => ({
         label: entry.label,
@@ -291,53 +290,50 @@ export const INCOME_PAGE: LearnPageSpec = {
 
   drivers: {
     heading: 'What moves it',
-    note: 'Convergence, and what it has and has not done.',
+    note: 'Convergence between the income groups, and its limits.',
     paragraphs: [
       `Convergence explains most of the world average's movement. Middle-income countries, `
       + `${MIDDLE_INCOME.populationShare.toFixed(0)}% of the world's people, grew `
       + `${rate(MIDDLE_INCOME.growth)} a year since 1990 against `
-      + `${rate(HIGH_INCOME.growth)} in high-income countries. That gap closed part of the `
-      + `distance between them: the ratio between the two averages stands at `
-      + `${times(C.ratios.highOverMiddle)} today.`,
+      + `${rate(HIGH_INCOME.growth)} in high-income countries. The ratio between the two `
+      + `averages is ${times(C.ratios.highOverMiddle)} today.`,
       `Low-income countries did not converge. They grew ${rate(LOW_INCOME.growth)} a year `
       + `since 1990 and ${rate(LOW_INCOME.growthRecentDecade)} over the past decade, while `
       + `holding ${LOW_INCOME.populationShare.toFixed(1)}% of the world's people and `
-      + `${LOW_INCOME.gdpShare.toFixed(1)}% of its output. Whether that changes decides more `
-      + 'of any 2100 income figure than anything else on this page, and those same countries '
-      + 'carry most of the remaining population growth.',
-      'Energy demand follows income through the services people buy with it. A household that '
-      + 'reaches middle income buys a refrigerator, then air conditioning, then a vehicle, '
-      + 'and each purchase raises the energy behind that household for decades. The models '
-      + 'represent this as a demand relationship that saturates: the first thousand dollars '
-      + 'of extra income adds more energy demand than the twentieth thousand.',
-      `Extrapolating those rates has consequences worth seeing. Middle-income countries `
-      + `growing ${rate(MIDDLE_INCOME.growth)} and high-income countries `
+      + `${LOW_INCOME.gdpShare.toFixed(1)}% of its output. The same countries account for `
+      + 'most of the remaining population growth.',
+      'Energy demand follows income through the services people buy. A household at middle '
+      + 'income buys a refrigerator, then air conditioning, then a vehicle, and each purchase '
+      + 'raises that household’s energy use for decades. The models represent this as a '
+      + 'demand relationship that saturates: the first thousand dollars of extra income adds '
+      + 'more energy demand than the twentieth thousand.',
+      `Extrapolate those two rates and they cross. Middle-income countries at `
+      + `${rate(MIDDLE_INCOME.growth)} and high-income countries at `
       + `${rate(HIGH_INCOME.growth)} converge completely around `
       + `${Math.round(BASE_YEAR + Math.log(HIGH_INCOME.gdpPerPerson / MIDDLE_INCOME.gdpPerPerson)
         / Math.log((1 + MIDDLE_INCOME.growth / 100) / (1 + HIGH_INCOME.growth / 100)))}, `
-      + 'after which the middle-income average passes the high-income one. The second figure '
-      + 'above shows it. Treat that as a demonstration of what steady extrapolation does '
-      + 'across 75 years rather than as a forecast.',
-      'That saturation ties income to energy intensity, so read the two together. A '
-      + 'scenario can pair fast income growth with fast intensity decline and end at modest '
-      + 'energy demand, or pair slow growth with slow decline and end in the same place. The '
-      + 'four factors multiply, so only their product settles anything.',
+      + 'converge, and the middle-income average passes the high-income one after that date. '
+      + 'The second figure shows the crossing. It is the arithmetic of a steady rate held for '
+      + '75 years rather than a forecast.',
+      'Saturation ties income to energy intensity. A scenario can pair fast income growth '
+      + 'with fast intensity decline and reach the same energy demand as one pairing slow '
+      + 'growth with slow decline. The four factors multiply, so the product is what fixes '
+      + 'the emissions.',
     ],
   },
 
   markers: {
     heading: 'What the CMIP7 markers assume',
-    note: 'Seven scenarios, none above the recorded rate by much.',
+    note: 'Seven scenarios, six of them near the recorded rate.',
     paragraphs: [
       `Six of the seven markers assume between ${rate(1.24)} and ${rate(1.97)}, straddling the `
-      + `${rate(OBSERVED)} the world has managed since 1990. HIGH-to-LOW assumes `
+      + `${rate(OBSERVED)} recorded since 1990. HIGH-to-LOW assumes `
       + `${rate(2.63)}, the fastest of the seven.`,
-      `CMIP7 HIGH stands apart at ${rate(HIGH_RATE)}, a third of the observed rate. Combined `
-      + 'with the largest population of the seven, it describes the century’s highest '
-      + 'emissions arising in a world whose people stay comparatively poor. A reader building '
-      + 'their own high-emissions scenario has to decide whether they mean that world, or a '
-      + 'rich one that fails to decarbonise, and the two make very different demands on the '
-      + 'other five sliders.',
+      `CMIP7 HIGH sits at ${rate(HIGH_RATE)}, a third of the observed rate, with the largest `
+      + 'population of the seven. Its emissions are the highest of the seven and its income '
+      + 'per person the lowest. A high-emissions scenario built here can take that form or '
+      + 'the opposite one, high income with slow decarbonisation, and the two set different '
+      + 'values on the other five sliders.',
     ],
   },
 
@@ -345,20 +341,19 @@ export const INCOME_PAGE: LearnPageSpec = {
     heading: 'Build your value',
     note: 'Three ways in: from the rate, from the level, or from the groups.',
     paragraphs: [
-      'Set the rate and read what it reaches, set the 2100 level and read the rate it '
-      + 'requires, or set growth for each income group and let the builder weight them by '
-      + 'population.',
+      'Set a rate and the builder gives the 2100 level, set a 2100 level and it gives the '
+      + 'rate, or set growth for each income group and it weights them by population.',
       `The third mode holds each group's share of world population where it stands today, so `
       + 'the answer isolates the effect of growth rates. The UN projects the low-income share '
-      + 'rising through the century, which means this mode understates the weight of the '
-      + 'slowest-growing group and so overstates the world average a little.',
+      + 'rising through the century, so this mode gives the slowest-growing group less '
+      + 'weight than the UN projects and puts the world average slightly above it.',
     ],
     action: 'Use this rate in my scenario',
     modes: [
       {
         id: 'rate',
         label: 'Set a rate',
-        note: 'Read off what it reaches by 2100.',
+        note: 'The 2100 level follows from the rate.',
         parts: [RATE_PART],
         combine(values) {
           const value = values['rate'] ?? OBSERVED;
@@ -383,7 +378,7 @@ export const INCOME_PAGE: LearnPageSpec = {
       {
         id: 'level',
         label: 'Set a 2100 level',
-        note: 'Read off the rate it takes to get there.',
+        note: 'The rate follows from the 2100 level.',
         parts: [LEVEL_PART],
         combine(values) {
           const level = values['level'] ?? OBSERVED_2100;
@@ -404,7 +399,7 @@ export const INCOME_PAGE: LearnPageSpec = {
       {
         id: 'groups',
         label: 'By income group',
-        note: 'Growth for each group, weighted by the people in it.',
+        note: 'Growth for each group, weighted by population.',
         parts: GROUP_PARTS,
         combine(values) {
           const level = weightedWorld(values);

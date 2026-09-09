@@ -50,6 +50,6 @@ export const METHANE_SOURCES: readonly Source[] = [
     vintage: 'launched 2021',
     url: 'https://www.globalmethanepledge.org/',
     used: 'The 30% reduction by 2030 against 2020 that participants have signed, for '
-      + 'comparison with what these controls imply.',
+      + 'comparison with the values on these controls.',
   },
 ];

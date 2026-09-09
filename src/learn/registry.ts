@@ -32,7 +32,7 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     input: 'income',
     title: 'Income per person',
     linkText: 'Learn more about income per person',
-    summary: 'What 75 years of compounding does, and how the models tie income '
+    summary: 'The effect of 75 years of compounding, and how the models tie income '
       + 'to energy demand.',
     status: 'live',
   },
@@ -41,8 +41,8 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     input: 'energyPerDollar',
     title: 'Energy per dollar',
     linkText: 'Learn more about energy per dollar',
-    summary: 'Efficiency, structural change and sectoral mix, and the term that '
-      + 'has carried most of the decarbonisation on record.',
+    summary: 'Efficiency, structural change and sectoral mix, and this term’s share of '
+      + 'the decarbonisation on record.',
     status: 'live',
   },
   {
@@ -50,8 +50,8 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     input: 'co2PerEnergy',
     title: 'CO₂ per unit of energy',
     linkText: 'Learn more about CO₂ per unit of energy',
-    summary: 'The fuel mix, and the arithmetic of adding zero-carbon supply '
-      + 'while total energy grows.',
+    summary: 'The fuel mix, and the arithmetic of adding zero-carbon supply against a '
+      + 'growing total.',
     status: 'live',
   },
   {
@@ -59,8 +59,8 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     input: 'landUse',
     title: 'Land use CO₂',
     linkText: 'Learn more about land use CO₂',
-    summary: 'Deforestation minus regrowth, why nobody knows the number precisely, '
-      + 'and what turns the term negative.',
+    summary: 'Deforestation minus regrowth, the uncertainty on the difference, and the '
+      + 'three conditions for a net sink.',
     status: 'live',
   },
   {
@@ -77,8 +77,8 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     input: 'improvementTiming',
     title: 'When the improvement arrives',
     linkText: 'Learn more about when the improvement arrives',
-    summary: 'Why the route matters as much as the destination, and how the world '
-      + 'has actually timed its two technology factors.',
+    summary: 'The effect of an early or late path at a fixed 2100 level, and the timing '
+      + 'in the record for the two technology factors.',
     status: 'live',
   },
   {
@@ -86,8 +86,8 @@ export const LEARN_ENTRIES: readonly LearnEntry[] = [
     input: 'removals',
     title: 'Engineered CO₂ removal',
     linkText: 'Learn more about engineered removal',
-    summary: 'The one term that can take a path below zero, what runs today, and how '
-      + 'far the deep scenarios scale it.',
+    summary: 'The one term that takes a path below zero, the level today, and the scale '
+      + 'in the deep-mitigation scenarios.',
     status: 'live',
   },
 ];

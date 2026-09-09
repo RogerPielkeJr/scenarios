@@ -34,8 +34,8 @@ export const CARBON_INTENSITY_SOURCES: readonly Source[] = [
     publisher: 'Intergovernmental Panel on Climate Change',
     vintage: '2022',
     url: 'https://doi.org/10.1017/9781009157926.004',
-    used: 'The Kaya decomposition of recorded emissions, and how little of it carbon '
-      + 'intensity has supplied.',
+    used: 'The Kaya decomposition of recorded emissions, and carbon intensity’s share of '
+      + 'the total.',
   },
   {
     title: 'The Shared Socioeconomic Pathways and their energy, land use, and greenhouse '

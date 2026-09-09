@@ -102,7 +102,7 @@ const WINDOW_PARTS: BuilderPart[] = [
     default: 1990,
     decimals: 0,
     unitSuffix: '',
-    note: 'The first year of the stretch of record you want to borrow.',
+    note: 'The first year of the window.',
     marks: [
       { value: C.firstYear, label: String(C.firstYear), kind: 'low' },
       { value: 1990, label: '1990', kind: 'observed' },
@@ -117,7 +117,7 @@ const WINDOW_PARTS: BuilderPart[] = [
     default: C.lastYear,
     decimals: 0,
     unitSuffix: '',
-    note: 'At least ten years after it opens, so a rate means something.',
+    note: 'At least ten years after the first, so the rate covers a trend.',
     marks: [
       { value: 2000, label: '2000', kind: 'low' },
       { value: C.lastYear, label: String(C.lastYear), kind: 'observed' },
@@ -135,7 +135,7 @@ const MULTIPLE_PARTS: BuilderPart[] = [{
   decimals: 2,
   unitSuffix: '×',
   note: `The world improved ${rate(OBSERVED)} from 1990 to ${C.lastYear}. `
-    + 'One times that rate continues it; two doubles it; zero halts it.',
+    + 'A multiple of one holds that rate, two doubles it, zero gives no change.',
   marks: [
     { value: 0, label: 'halted', kind: 'low' },
     { value: 1, label: 'observed', kind: 'observed' },
@@ -157,10 +157,9 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
   accent: '#1f5fa8',
   input: 'energyPerDollar',
   title: 'Energy per dollar',
-  standfirst: 'One slider sets how fast the world squeezes energy out of each dollar of '
-    + 'output. This page shows what that term has done since 1965, why it has carried most '
-    + 'of the decarbonisation on record, and where any candidate rate falls among the rates '
-    + 'the world has actually managed.',
+  standfirst: 'One slider sets the rate of change in energy used per dollar of output. This '
+    + 'page gives the record since 1965, this term’s share of the fall in CO₂ per dollar, '
+    + 'and where a candidate rate falls among the rates on record.',
 
   definition: {
     quantity: 'Primary energy per dollar of world output',
@@ -168,15 +167,15 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
     place: 'The third of the four factors that multiply',
     today: `${mj(BASE.energyPerDollarMj)} (${C.lastYear})`,
     paragraphs: [
-      'Energy intensity counts the primary energy the world burns to produce a dollar of '
-      + 'output. Three separate movements push it down. Devices convert fuel into useful '
-      + 'work more completely; output shifts from steel, cement and freight toward services '
-      + 'and software; and within each sector the product mix moves toward lighter goods.',
+      'Energy intensity counts the primary energy used to produce a dollar of output. Three '
+      + 'separate movements push it down: higher conversion efficiency in devices, a shift in '
+      + 'output from steel, cement and freight toward services and software, and a shift '
+      + 'inside each sector toward lighter goods.',
       `The slider sets how fast the term falls each year, compounding from `
       + `${mj(BASE.energyPerDollarMj)} in ${BASE_YEAR}. Continuing the observed `
-      + `${rate(OBSERVED)} for 75 years reaches `
-      + `${mj(compound(BASE.energyPerDollarMj, OBSERVED, END_YEAR - BASE_YEAR))} by 2100. `
-      + `CMIP7 HIGH's ${rate(HIGH_RATE)} reaches `
+      + `${rate(OBSERVED)} for 75 years gives `
+      + `${mj(compound(BASE.energyPerDollarMj, OBSERVED, END_YEAR - BASE_YEAR))} in 2100. `
+      + `CMIP7 HIGH's ${rate(HIGH_RATE)} gives `
       + `${mj(compound(BASE.energyPerDollarMj, HIGH_RATE, END_YEAR - BASE_YEAR))}.`,
       `Between 1990 and ${C.lastYear} this term improved ${rate(OBSERVED)} while the fuel `
       + `mix improved ${rate(OBSERVED_RATES.co2PerEnergy)}. Of the fall in CO₂ per dollar of `
@@ -187,25 +186,25 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
 
   chart: {
     heading: 'What the world has done',
-    note: 'History to 2024, then the rates each scenario assumes, compounding forward.',
+    note: 'The record to 2024, then each scenario’s assumed rate.',
     paragraphs: [
       `World energy intensity fell from ${mj(C.levels.first)} in ${C.firstYear} to `
       + `${mj(C.levels.last)} in ${C.lastYear}, a fall of `
       + `${(100 * (1 - C.levels.last / C.levels.first)).toFixed(0)}% across 59 years. `
       + `Primary energy grew ${rate(C.energy.growth)} over that span and world output `
       + `${rate(C.gdp.growth)}; the gap between those two rates gives this term.`,
-      `The whole record improves at ${rate(C.rates.wholeRecord)}. The 34 years the World `
-      + `Bank covers on its own improve faster, at ${rate(C.rates.longRecord)}, and the past `
-      + `decade faster still, at ${rate(C.rates.recentDecade)}.`,
+      `The whole record improves at ${rate(C.rates.wholeRecord)}, the 34 years the World `
+      + `Bank covers at ${rate(C.rates.longRecord)}, and the past decade at `
+      + `${rate(C.rates.recentDecade)}.`,
       `Before 1990 no purchasing-power GDP series exists, so the build carries the level `
       + 'back on Maddison Project growth rates. That choice moves the '
       + `whole-record rate: adjusting Maddison's growth to match the World Bank over the 32 `
       + `years they share gives ${rate(C.spliceSensitivity.wholeRecordRate)} instead of `
-      + `${rate(C.rates.wholeRecord)}. Everything from 1990 onward rests on the World Bank alone.`,
+      + `${rate(C.rates.wholeRecord)}. Every figure from 1990 on comes from the World Bank.`,
     ],
     caption: `World energy intensity, ${C.firstYear} to ${C.lastYear}, then each rate `
-      + 'compounding forward from 2025: your own, the observed rate, and the four CMIP7 '
-      + 'markers that publish one.',
+      + 'from 2025 on: your rate, the observed rate, and the four CMIP7 markers that publish '
+      + 'a rate for this term.',
     dataSource: 'Energy Institute Statistical Review 2026; World Bank purchasing-power GDP; Maddison Project Database 2023 before 1990',
     key: [
       { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },
@@ -255,7 +254,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       caption: `Every ${WINDOWS.span}-year window in the record, one tick each, from `
         + `${rate(WINDOWS.fastest.value)} in ${WINDOWS.fastest.from}-${WINDOWS.fastest.to} to `
         + `${rate(WINDOWS.slowest.value)} in ${WINDOWS.slowest.from}-${WINDOWS.slowest.to}. `
-        + 'Faster improvement lies to the left.',
+        + 'Faster improvement is to the left.',
       dataSource: 'Energy Institute Statistical Review 2026 over World Bank and Maddison output',
       spec(outcome: BuilderOutcome, scenario): StripSpec {
         const chosen = outcome.value;
@@ -286,29 +285,27 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
 
   drivers: {
     heading: 'What moves it',
-    note: 'Efficiency, structural change, and what the record permits.',
+    note: 'Efficiency, structural change, and the range in the record.',
     paragraphs: [
-      'Efficiency does the visible work. A combined-cycle gas turbine converts more of its '
-      + 'fuel into electricity than the plant it replaces, an electric motor converts more '
-      + 'of its electricity into motion than an engine converts fuel, and insulation cuts '
-      + 'the heat a building needs. Each improvement lowers the energy behind a given amount '
-      + 'of output.',
-      'Structural change does as much and attracts less notice. When a country builds out '
-      + 'its steel, cement and chemical capacity, its energy intensity rises for a decade or '
-      + 'two; when growth moves toward services, it falls. China went through the first of those '
-      + 'movements in the 2000s, and the world average followed.',
+      'Efficiency accounts for part of it. A combined-cycle gas turbine converts more of its '
+      + 'fuel into electricity than the plant it replaces, an electric motor converts more of '
+      + 'its electricity into motion than an engine converts fuel, and insulation cuts a '
+      + 'building’s heat demand. Each of those lowers the energy per unit of output.',
+      'Structural change accounts for a comparable share. A country building out its steel, '
+      + 'cement and chemical capacity raises its energy intensity for a decade or two, and a '
+      + 'country whose growth moves toward services lowers it. China did the first in the '
+      + '2000s, and the world average moved with it.',
       'Sectoral mix moves the term inside each of those sectors: aluminium substituting for '
       + 'steel, road freight shifting to rail, an economy making more pharmaceuticals and '
-      + 'less fertiliser. Decomposition studies separate the three, and they attribute the '
-      + 'bulk of the recorded fall to efficiency with structural change second.',
+      + 'less fertiliser. Decomposition studies separate the three and attribute most of the '
+      + 'recorded fall to efficiency, with structural change second.',
       `The record bounds the answer. Across ${WINDOW_RATES.length} `
       + `${WINDOWS.span}-year windows since ${C.firstYear}, the fastest improved `
       + `${rate(WINDOWS.fastest.value)} (${WINDOWS.fastest.from} to ${WINDOWS.fastest.to}) and `
       + `the slowest ${rate(WINDOWS.slowest.value)} (${WINDOWS.slowest.from} to `
       + `${WINDOWS.slowest.to}). Every window falls inside that range of `
       + `${Math.abs(WINDOWS.slowest.value - WINDOWS.fastest.value).toFixed(2)} percentage `
-      + 'points, which makes this the best-behaved of the four Kaya factors and the one a '
-      + 'reader can most fairly extrapolate.',
+      + 'points. That is the narrowest range of the four Kaya factors.',
     ],
   },
 
@@ -318,13 +315,11 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
     paragraphs: [
       `CMIP7 HIGH assumes ${rate(HIGH_RATE)}, `
       + `${(HIGH_RATE / OBSERVED * 100).toFixed(0)}% of the observed rate and `
-      + `${placeAmongWindows(HIGH_RATE)}. A scenario that emits a great `
-      + 'deal reaches that total partly by assuming the world stops improving the term that '
-      + 'has improved most reliably.',
-      'The low markers push the other way. HIGH-to-LOW assumes 2.29% a year and VERY LOW '
-      + '2.11%, both faster than any 25-year window the world has ever managed. Those two '
-      + 'scenarios ask for sustained improvement beyond the record in exactly the term the '
-      + 'high scenario asks the world to abandon.',
+      + `${placeAmongWindows(HIGH_RATE)}. Its emissions total therefore rests in part on a `
+      + 'near-halt in the term with the narrowest range in the record.',
+      'The low markers assume the opposite. HIGH-to-LOW takes 2.29% a year and VERY LOW '
+      + '2.11%, both faster than any 25-year window on record. The same term therefore runs '
+      + 'above the record in those two scenarios and below it in HIGH.',
     ],
   },
 
@@ -332,8 +327,8 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
     heading: 'Build your value',
     note: 'Borrow a stretch of the record, or scale the observed rate.',
     paragraphs: [
-      'Two ways in. Pick a window from the record and take the rate the world actually achieved '
-      + 'across it, or set a multiple of the rate observed since 1990. Either way the page '
+      'Two ways in. Pick a window from the record and take the rate across it, or set a '
+      + 'multiple of the rate observed since 1990. Either way the page '
       + 'reports where the answer falls among the '
       + `${WINDOW_RATES.length} ${WINDOWS.span}-year windows on record.`,
       'A window shorter than ten years measures a business cycle rather than a trend, so the '
@@ -367,7 +362,7 @@ export const ENERGY_INTENSITY_PAGE: LearnPageSpec = {
       {
         id: 'multiple',
         label: 'A multiple of the observed rate',
-        note: `Scaled from the ${rate(OBSERVED)} the world managed from 1990 to ${C.lastYear}.`,
+        note: `Scaled from the ${rate(OBSERVED)} recorded from 1990 to ${C.lastYear}.`,
         parts: MULTIPLE_PARTS,
         combine(values) {
           const multiple = values['multiple'] ?? 1;

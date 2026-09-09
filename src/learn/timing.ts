@@ -53,9 +53,9 @@ const PARTS: BuilderPart[] = [
     default: SPEC.default,
     decimals: 0,
     unitSuffix: '%',
-    note: `Half by the midpoint is a steady rate. The world managed `
-      + `${pc(EI.sharePercent)} on energy per dollar over ${EI.firstYear} to ${EI.lastYear} `
-      + `and ${pc(CI.sharePercent)} on the fuel mix over the same years.`,
+    note: `Half by the midpoint is a constant rate. The record gives `
+      + `${pc(EI.sharePercent)} for energy per dollar over ${EI.firstYear} to ${EI.lastYear} `
+      + `and ${pc(CI.sharePercent)} for the fuel mix over the same years.`,
     marks: [
       { value: 50, label: 'steady', kind: 'observed' },
       { value: Math.round(EI.sharePercent), label: 'energy', kind: 'low' },
@@ -69,29 +69,28 @@ export const TIMING_PAGE: LearnPageSpec = {
   accent: '#0f6f74',
   input: 'improvementTiming',
   title: 'When the improvement arrives',
-  standfirst: 'The two technology sliders set where energy per dollar and CO₂ per unit of '
-    + 'energy end up in 2100. This one sets when they get there. It never moves the '
-    + 'destination, only the route, and the route is what decides the century total.',
+  standfirst: 'The two technology sliders set the 2100 level of energy per dollar and CO₂ '
+    + 'per unit of energy. This one sets how that change is spread across the years between. '
+    + 'The 2100 level is the same at every setting; the cumulative total is not.',
 
   definition: {
     quantity: `Share of the century's technology improvement delivered by ${MID_YEAR}`,
     units: 'per cent',
-    place: 'On the two technology factors, redistributing their rates through time while '
-      + 'holding their 2100 levels exactly',
-    today: `50% is a constant rate, which is what this model assumed before this control `
-      + 'existed',
+    place: 'On the two technology factors, redistributing their rates across the century at '
+      + 'a fixed 2100 level',
+    today: '50%, a constant annual rate, and the model’s behaviour before this control',
     paragraphs: [
-      'Two scenarios can end the century at the same emissions and reach it along very '
-      + 'different routes, and the route is what the atmosphere responds to. Warming follows '
-      + 'the total CO₂ emitted, so a path that cuts early and levels off accumulates far less '
-      + 'than one that drifts and then falls, even where both arrive at the same 2100 figure.',
-      `This control names that difference in one number: of the whole century's improvement `
-      + `in energy per dollar and CO₂ per unit of energy, how much lands by ${MID_YEAR}. At 50 `
-      + 'the annual rate never changes. Above 50 the improvement front-loads and then eases; '
-      + 'below 50 it builds slowly and arrives late.',
-      'The 2100 level stays put whatever you choose. The rate sliders own the destination and '
-      + 'this one owns nothing but the shape, so moving it changes the century total and the '
-      + 'warming that follows without touching where the path ends.',
+      'Two scenarios can end the century at the same annual emissions after very different '
+      + 'paths. Warming follows the cumulative CO₂, so a path that cuts early and then '
+      + 'flattens accumulates less than one that stays high and then falls, at the same 2100 '
+      + 'figure.',
+      `This control sets that difference as one number: the share of the century's `
+      + `improvement in energy per dollar and CO₂ per unit of energy that lands by `
+      + `${MID_YEAR}. At 50 the annual rate is constant. Above 50 the rate is faster in the `
+      + 'first half of the century and slower in the second; below 50 the order reverses.',
+      'The 2100 level is the same at every setting. The rate sliders fix that level and this '
+      + 'control changes only the shape of the path to it, so moving it changes the '
+      + 'cumulative total and the warming at a fixed endpoint.',
     ],
   },
 
@@ -99,23 +98,22 @@ export const TIMING_PAGE: LearnPageSpec = {
     heading: 'What the world has done',
     note: 'The record, timed.',
     paragraphs: [
-      `Ask the record the question this slider asks and the two technology factors answer it `
-      + `in opposite directions. Energy per dollar improved ${rate(EI.firstHalf.rate)} over `
+      `The record answers this question differently for the two factors. Energy per dollar `
+      + `improved ${rate(EI.firstHalf.rate)} over `
       + `${EI.firstHalf.from} to ${EI.firstHalf.to} and ${rate(EI.secondHalf.rate)} over `
-      + `${EI.secondHalf.from} to ${EI.secondHalf.to}: it accelerated, banking only `
-      + `${pc(EI.sharePercent)} of its improvement by the midpoint.`,
+      + `${EI.secondHalf.from} to ${EI.secondHalf.to}, so ${pc(EI.sharePercent)} of its `
+      + 'improvement was banked by the midpoint.',
       `The fuel mix did the reverse. It improved ${rate(CI.firstHalf.rate)} over `
       + `${CI.firstHalf.from} to ${CI.firstHalf.to} and ${rate(CI.secondHalf.rate)} over `
       + `${CI.secondHalf.from} to ${CI.secondHalf.to}, banking ${pc(CI.sharePercent)} of it by `
-      + `the midpoint and slowing to almost nothing since. Coal's share of a growing energy `
-      + 'system is what stalled it.',
-      'So the world has run one factor late and the other early, and neither at a steady rate. '
-      + 'That is the honest reason this control exists: a constant rate is a convenient '
-      + 'assumption rather than an observed one.',
+      + `the midpoint. Coal's share of a growing energy system accounts for the slowdown `
+      + 'after that.',
+      'One factor therefore ran late and the other early, and neither at a constant rate. A '
+      + 'constant rate is an assumption rather than an observation.',
     ],
-    caption: `Each factor as a share of its own ${EI.firstYear}-to-${EI.lastYear} improvement, `
-      + 'banked year by year, against the straight line a constant rate would have drawn. '
-      + 'A curve above the line ran early; one below it ran late.',
+    caption: `Each factor as a share of its ${EI.firstYear}-to-${EI.lastYear} improvement, `
+      + 'banked year by year, against the straight line of a constant rate. A curve above the '
+      + 'line is an early path, one below it a late path.',
     dataSource: 'Energy Institute Statistical Review and World Bank GDP, 1965 to 2024',
     key: [
       { label: 'Energy per dollar', color: '#b8860b' },
@@ -160,26 +158,24 @@ export const TIMING_PAGE: LearnPageSpec = {
 
   drivers: {
     heading: 'What moves it',
-    note: 'Capital stock, and the order things get replaced in.',
+    note: 'Capital stock, and the order of replacement.',
     paragraphs: [
       'Energy systems change when their equipment is replaced, and equipment lasts decades. A '
       + 'power station built this year is still running in the 2060s, a building shell for '
-      + 'longer than that. Timing is therefore not a free choice: front-loading an improvement '
-      + 'means retiring capital before it wears out, and deferring one means living with what '
-      + 'is already built.',
-      'That asymmetry is why the two observed factors diverged. Energy per dollar improves '
-      + 'through a thousand small substitutions across the whole economy, and it accelerated '
-      + 'as services grew relative to heavy industry. The fuel mix improves by replacing '
-      + 'primary energy plant, which is slower, lumpier and more capital-intensive, and it '
-      + 'stalled while coal capacity grew.',
-      'A scenario that front-loads its improvement therefore assumes a faster turnover of '
-      + 'capital than a scenario that defers it, whatever both say about 2100. Reading the '
-      + 'timing alongside the rate says what a trajectory asks of the world in the decades a '
-      + 'reader will actually live through.',
-      'It cuts the other way too. Deferring an improvement puts the same 2100 level in reach '
-      + 'while emitting far more along the way, which is the arithmetic behind the '
-      + 'overshoot-and-remove scenarios: they are late paths, and they need removal to pay '
-      + 'back what the delay accumulated.',
+      + 'longer than that. Timing therefore carries a cost either way: an early improvement '
+      + 'takes the retirement of capital before the end of its life, and a late one takes the '
+      + 'continued operation of the existing stock.',
+      'That difference in capital accounts for the divergence between the two factors. '
+      + 'Energy per dollar improves through many small substitutions across the economy, and '
+      + 'its rate rose as services grew relative to heavy industry. The fuel mix improves by '
+      + 'replacing primary energy plant, which takes longer and more capital per unit, and '
+      + 'its rate fell through the build-out of coal capacity.',
+      'A scenario weighted toward the first half of the century therefore assumes a faster '
+      + 'turnover of capital than one weighted toward the second, at the same 2100 level. The '
+      + 'timing and the rate together give the requirement decade by decade.',
+      'A late improvement arrives at the same 2100 level with a larger cumulative total. '
+      + 'That is the arithmetic of the overshoot-and-remove scenarios: they are late paths, '
+      + 'and the removal offsets the extra accumulation.',
     ],
   },
 
@@ -188,29 +184,28 @@ export const TIMING_PAGE: LearnPageSpec = {
     note: 'Fitted from their published paths, not stated by them.',
     paragraphs: [
       `The markers publish a CO₂ path and six Kaya rates. They do not publish a timing figure, `
-      + `so this tool derives one: the value that makes this model's own reconstruction follow `
-      + `that marker year by year, at the marker's own rates. `
+      + `so this tool derives one: the value that makes this model's reconstruction follow `
+      + `that marker year by year, at the marker's published rates. `
       + data.markers.map((m) => `${m.label} ${pc(m.timing)}`).join(', ') + '.',
-      'MEDIUM front-loads. Its own emissions fall 0.77% a year to 2050 and then almost stop '
-      + 'falling, which is a scenario that does its work early and coasts. MEDIUM-to-LOW runs '
-      + 'the other way and defers, which is what its large late removal pays for.',
-      'Before this control existed, every preset compounded at a constant rate, and the '
-      + 'mismatch showed: CMIP7 MEDIUM landed within 1% of its own 2100 emissions and 12% '
-      + 'above its century total. Same destination, wrong route, and the total is what warms '
-      + 'the planet.',
+      'MEDIUM is an early path. Its emissions fall 0.77% a year to 2050 and are close to '
+      + 'flat after that. MEDIUM-to-LOW is a late path, and its large removal in the second '
+      + 'half of the century offsets the earlier emissions.',
+      'Before this control existed, every preset compounded at a constant rate. CMIP7 MEDIUM '
+      + 'then came within 1% of its 2100 emissions and 12% above its cumulative total: the '
+      + 'same endpoint on a different path, and the cumulative total is what sets the '
+      + 'warming.',
     ],
   },
 
   builder: {
     heading: 'Build your value',
-    note: 'One control, and the curve it draws.',
+    note: 'One control, and the resulting path.',
     paragraphs: [
-      `Set how much of the century's improvement lands by ${MID_YEAR}. The readout beneath `
-      + 'the slider says what your choice does to the annual rate at each end of the century, '
-      + 'and the chart further down shows what the world managed on each factor.',
-      'Nothing here changes where the technology sliders end up in 2100. The endpoint is '
-      + 'exact for every setting, which is what makes this a question about route rather than '
-      + 'about ambition.',
+      `Set the share of the century's improvement that lands by ${MID_YEAR}. The readout `
+      + 'beneath the slider gives the annual rate at each end of the century, and the chart '
+      + 'below gives the recorded share for each factor.',
+      'This control leaves the 2100 level of the technology sliders unchanged. The endpoint '
+      + 'is exact at every setting, so what moves is the cumulative total.',
     ],
     action: 'Use this timing in my scenario',
     modes: [{
