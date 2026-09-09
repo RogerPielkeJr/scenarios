@@ -44,11 +44,23 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # Not --with-deps. That runs apt-get against the Chrome repo the runner
+      # preconfigures, and on 2026-09-09 that index served a bad hash for over
+      # ten minutes, which failed this job twice for a reason with nothing to
+      # do with the code. The runner image already carries the shared
+      # libraries Chromium needs; the fallback covers an image that does not.
+      - run: npx playwright install chromium || npx playwright install --with-deps chromium
       - run: npm run test:browser
 
   build:
-    needs: [test, browser]
+    # Deliberately not waiting on `browser`. It gated the deploy for one
+    # afternoon and the first thing that happened was a broken apt mirror
+    # blocking a copy fix on a live site. The deterministic suite gates: 365
+    # vitest tests and typecheck, which need no network beyond npm. The browser
+    # job still runs on every push and still marks the commit red when it
+    # fails, which is the signal it is good for; screenshots are a local check
+    # either way, and this is a static site.
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
