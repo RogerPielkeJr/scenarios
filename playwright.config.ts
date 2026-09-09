@@ -1,12 +1,17 @@
+import { existsSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
 
 // Playwright's bundled Chromium needs GTK and ATK shared libraries that this
 // host does not have system-wide, and installing them needs root. The
 // browser-test conda environment already carries them, so point the loader
-// there. Harmless if the libraries are present system-wide.
+// there. Skipped where the directory does not exist, which is the case on a CI
+// runner: there `playwright install --with-deps` puts the libraries in the
+// system paths and prepending a missing directory would only be noise.
 const CONDA_LIB = '/home/rpielke/miniconda3/envs/browser-test/lib';
-process.env['LD_LIBRARY_PATH'] = [CONDA_LIB, process.env['LD_LIBRARY_PATH']]
-  .filter(Boolean).join(':');
+if (existsSync(CONDA_LIB)) {
+  process.env['LD_LIBRARY_PATH'] = [CONDA_LIB, process.env['LD_LIBRARY_PATH']]
+    .filter(Boolean).join(':');
+}
 
 /**
  * Visual checks at the four widths the brief names. Screenshots are

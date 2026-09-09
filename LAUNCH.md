@@ -19,7 +19,7 @@ anything except the step before it.
   `randomtest-1788894681.thehonestbroker.org`, which is how we know it is a
   wildcard rather than a record for this subdomain. Decarbonization has a real
   CNAME to `rogerpielkejr.github.io`; this should match it.
-- The audit is clean: 325 tests, typecheck, eleven pages with no console errors,
+- The audit is clean: 349 vitest tests and 92 Playwright tests, typecheck, twelve pages with no console errors,
   no 4xx, no overflow from 360 to 1440 pixels, dark mode at 15.3:1, every
   internal link resolving, every external link either resolving or blocked to
   robots but live in a browser.
@@ -94,7 +94,9 @@ scenario builder from all four pages' nav. Those links already point at
 18. Check the social card: paste the URL into a Slack or Substack draft and
     confirm the card renders rather than a grey box.
 19. `curl -s https://scenarios.thehonestbroker.org/sitemap.xml` and confirm all
-    ten URLs answer 200 on the live domain.
+    twelve URLs answer 200 on the live domain. `scripts/build_sitemap.py`
+    derives the list from vite's entry points and `tests/sitemap.test.ts` holds
+    the two together, so the count follows the pages rather than a hand edit.
 
 ## Decisions, and where they landed
 

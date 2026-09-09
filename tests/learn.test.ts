@@ -46,18 +46,17 @@ function loadPage(search: string): void {
 
 const LIVE_PAGES = [
   POPULATION_PAGE, ENERGY_INTENSITY_PAGE, CARBON_INTENSITY_PAGE, INCOME_PAGE,
-  METHANE_PAGE, LAND_USE_PAGE, REMOVAL_PAGE,
+  METHANE_PAGE, LAND_USE_PAGE, TIMING_PAGE, REMOVAL_PAGE,
 ];
 
-// The timing page is not in that list, and the two invariants it misses say
-// why: its figures draw the record alone, so moving the builder redraws
-// nothing and the reader's scenario name appears on no series. Every other
-// page puts the reader's own value on its chart. Left as found rather than
-// fixed here, because deciding what curve the reader's midpoint share draws on
-// a 1965-2024 axis is a question about that page rather than about this one.
-it('leaves the timing page out of the live set, and says what it misses', () => {
-  expect(LIVE_PAGES).not.toContain(TIMING_PAGE);
-  expect(TIMING_PAGE.builder.modes[0]?.parts).toHaveLength(1);
+// Every page in that list is every page in the registry. The timing page sat
+// outside it until its figures drew the reader's own setting: the record runs
+// on a 1965-to-2024 axis and the reader's timing on a 2025-to-2100 one, so it
+// took a second figure rather than a second series.
+it('holds every live page in the registry to these invariants', () => {
+  expect(LIVE_PAGES.map((page) => page.slug).sort())
+    .toEqual(LEARN_ENTRIES.filter((entry) => entry.status === 'live')
+      .map((entry) => entry.slug).sort());
 });
 
 /** Every live page has to render, draw and hand back a value. */
@@ -363,6 +362,41 @@ describe('land use and removal do not count the same carbon twice', () => {
     expect(preset?.inputs.landUse).toBeCloseTo(MARKER_BY_ID['VL']?.kaya.landUse ?? 0, 1);
     expect(preset?.inputs.removals)
       .toBeCloseTo(removalData.markers.find((m) => m.id === 'VL')?.removals ?? 0, 6);
+  });
+});
+
+// Two pages feed a slider no marker publishes a value for. Their tables used
+// to render seven dashes under a column headed "Assumes", which reads as a
+// fault rather than as a fact.
+describe('the marker table on a page with no published value', () => {
+  it('shows the fitted figure under a Derived column, not a column of dashes', () => {
+    for (const page of [TIMING_PAGE, REMOVAL_PAGE]) {
+      const html = readFileSync(resolve(process.cwd(), `learn/${page.slug}/index.html`), 'utf8');
+      const body = html.slice(html.indexOf('<body>') + '<body>'.length, html.indexOf('</body>'));
+      document.body.innerHTML = body.replace(/<script[\s\S]*?<\/script>/g, '');
+      window.history.replaceState(null, '', `/learn/${page.slug}/?${encodeScenario(SCENARIO)}`);
+      mountLearnPage(page);
+      const table = document.getElementById('markers-table');
+      expect(table?.querySelector('thead th:nth-child(2)')?.textContent, page.slug)
+        .toBe('Derived');
+      const cells = [...(table?.querySelectorAll('tbody td:first-of-type') ?? [])]
+        .map((cell) => cell.textContent);
+      // Four presets carry a fitted value; the other three markers keep a dash.
+      expect(cells.filter((text) => text !== '—').length, page.slug).toBe(4);
+      expect(table?.querySelector('caption')?.textContent, page.slug)
+        .toContain('No marker publishes a value');
+    }
+  });
+
+  it('leaves the published pages alone', () => {
+    const html = readFileSync(resolve(process.cwd(), 'learn/land-use/index.html'), 'utf8');
+    const body = html.slice(html.indexOf('<body>') + '<body>'.length, html.indexOf('</body>'));
+    document.body.innerHTML = body.replace(/<script[\s\S]*?<\/script>/g, '');
+    window.history.replaceState(null, '', `/learn/land-use/?${encodeScenario(SCENARIO)}`);
+    mountLearnPage(LAND_USE_PAGE);
+    const table = document.getElementById('markers-table');
+    expect(table?.querySelector('thead th:nth-child(2)')?.textContent).toBe('Assumes');
+    expect(table?.querySelector('caption')).toBeNull();
   });
 });
 

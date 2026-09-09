@@ -121,7 +121,8 @@ export const LAND_USE_PAGE: LearnPageSpec = {
     units: 'GtCO₂ a year; a negative value removes carbon from the air',
     place: 'Added on top of the four factors that multiply, with land removal already netted '
       + 'in and engineered removal on a separate slider',
-    today: `${gt(BASE.landUseGt)} in the tool’s base year`,
+    today: `${gt(BASE.landUseGt)} in the tool’s base year; the Global Carbon Budget series `
+      + `puts ${C.lastYear} at ${gt(C.levels.last)}`,
     paragraphs: [
       'This term nets two large flows against each other. Clearing forest for cropland and '
       + `pasture releases about ${gt(D.deforestation)}, while forests regrowing on abandoned `
@@ -154,10 +155,19 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + `The ${(C.vintageGap.seriesDecadeMean - C.vintageGap.paperDecadeMean).toFixed(2)} `
       + 'GtCO₂ between them falls inside the uncertainty on either, and exceeds most of the '
       + 'range the controls on this page cover.',
+      `The same gap opens where the record meets your path, and the chart shows it as a step. `
+      + `The series ends at ${gt(C.levels.last)} in ${C.lastYear}; the model starts from `
+      + `${gt(BASE.landUseGt)}, the figure the brief states, so the path begins `
+      + `${(C.levels.last - BASE.landUseGt).toFixed(2)} GtCO₂ below the last observation. `
+      + `That difference sits well inside the ±${C.uncertaintyGtCo2} GtCO₂ on the series, and `
+      + 'every cumulative total on this site runs on the lower figure. Read the step as two '
+      + 'vintages of one uncertain quantity rather than as a fall between 2024 and 2025.',
     ],
     caption: `World land-use CO₂, ${C.firstYear} to ${C.lastYear}, with the Global Carbon `
       + `Budget's one-sigma uncertainty of ±${C.uncertaintyGtCo2} GtCO₂, then a straight line `
-      + 'to the 2100 flux you set above. Dots at 2100 mark the seven CMIP7 scenarios.',
+      + `to the 2100 flux you set above. The path starts from the model's base of `
+      + `${gt(BASE.landUseGt)} rather than from the ${gt(C.levels.last)} the series ends at, `
+      + 'which is the step at the divider. Dots at 2100 mark the seven CMIP7 scenarios.',
     dataSource: 'Global Carbon Budget 2024, land-use change CO₂, via Our World in Data; ScenarioMIP CMIP7 markers',
     key: [
       { label: `Record, ${C.firstYear} to ${C.lastYear}`, color: 'var(--ink)' },

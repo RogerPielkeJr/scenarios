@@ -255,7 +255,7 @@ test('the theme toggle overrides the system setting', async ({ page }) => {
 });
 
 const LIVE_SLUGS = ['population', 'energy-intensity', 'carbon-intensity',
-  'income', 'methane', 'land-use', 'removal'];
+  'income', 'methane', 'land-use', 'timing', 'removal'];
 
 for (const slug of LIVE_SLUGS) {
   for (const breakpoint of BREAKPOINTS) {

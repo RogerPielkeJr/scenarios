@@ -154,4 +154,14 @@ export interface LearnPageSpec {
   markers: ProseBlock;
   builder: BuilderBlock;
   sources: readonly Source[];
+  /**
+   * A value for the marker table where no marker publishes one.
+   *
+   * Timing and engineered removal have no published figure, so
+   * `markerValueFor` returns null for both and their tables came out as seven
+   * dashes. This tool fits a value for each from that marker's CO2 path, and a
+   * page that has one supplies it here; the table then says "Derived" in place
+   * of "Assumes", so the column cannot be read as something a marker states.
+   */
+  derivedMarkerValue?(markerId: string): number | null;
 }

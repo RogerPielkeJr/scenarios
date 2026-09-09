@@ -17,6 +17,7 @@
     "build:card": "python3 scripts/build_social_card.py",
     "typecheck": "tsc --noEmit",
     "test:visual": "playwright test",
+    "test:browser": "playwright test --grep-invert \"at [0-9]+px|looks right at\"",
     "test:visual:update": "rm -rf tests/screenshots && playwright test --update-snapshots",
     "test:all": "vitest run && playwright test"
   },

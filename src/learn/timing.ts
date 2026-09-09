@@ -9,6 +9,7 @@
 import data from '../data/learn_timing.json';
 import { BASE_YEAR, END_YEAR, SPEC_BY_ID } from '../model/config.js';
 import { accumulatedYears } from '../model/rates.js';
+import { readerLabel } from '../state.js';
 import type { PlotSpec } from '../ui/plot.js';
 import type { BuilderPart, LearnPageSpec } from './types.js';
 import { TIMING_SOURCES } from './sources/timing.js';
@@ -154,6 +155,52 @@ export const TIMING_PAGE: LearnPageSpec = {
         rightGutter: 96,
       };
     },
+
+    // The record answers this question on a 1965-to-2024 axis and the reader
+    // answers it on a 2025-to-2100 one, so the two do not share a figure. The
+    // second one puts the reader's setting on the same vertical scale as the
+    // first, which is what lets the two be compared by eye.
+    extra: {
+      kind: 'plot',
+      caption: `The share of the century's improvement banked year by year at your setting, `
+        + 'against the straight line of a constant rate. The same vertical scale as the '
+        + 'figure above, over 2025 to 2100 rather than over the record.',
+      dataSource: 'Derived from the timing control; no external data',
+      key: [
+        { label: 'Your timing', color: 'var(--you)' },
+        { label: 'A constant rate', color: 'var(--dim)', dash: true },
+      ],
+      spec(outcome, scenario): PlotSpec {
+        const share = outcome.value;
+        const points = [];
+        for (let year = BASE_YEAR; year <= END_YEAR; year += 1) {
+          points.push({
+            year,
+            value: (accumulatedYears(year - BASE_YEAR, SPAN, share) / SPAN) * 100,
+          });
+        }
+        return {
+          xMin: BASE_YEAR,
+          xMax: END_YEAR,
+          xTicks: [BASE_YEAR, 2050, MID_YEAR, 2075, END_YEAR],
+          yLabel: '% of the improvement banked',
+          yDecimals: 0,
+          yMin: 0,
+          yMax: 100,
+          series: [
+            { id: 'steady',
+              label: 'A constant rate',
+              points: [{ year: BASE_YEAR, value: 0 }, { year: END_YEAR, value: 100 }],
+              color: 'var(--dim)', width: 1.4, dash: '4 4' },
+            { id: 'reader',
+              label: readerLabel(scenario, 'Your timing'),
+              points,
+              color: 'var(--you)', width: 2.6, labelAtEnd: true },
+          ],
+          rightGutter: 96,
+        };
+      },
+    },
   },
 
   drivers: {
@@ -243,4 +290,10 @@ export const TIMING_PAGE: LearnPageSpec = {
   },
 
   sources: TIMING_SOURCES,
+
+  // The four markers this tool carries a preset for. The other three have no
+  // fitted timing, so the table shows a dash for them.
+  derivedMarkerValue(markerId) {
+    return data.markers.find((m) => m.id === markerId)?.timing ?? null;
+  },
 };

@@ -5,7 +5,7 @@
   "observedYear": 2024,
   "note": "The base-year state is the observed 2024 world, applied at 2025. 2025 is not complete in every source, so the first year of the path carries the last full year forward rather than projecting it.",
   "sources": {
-   "populationBn": "World Bank SP.POP.TOTL, WLD",
+   "populationBn": "World Bank SP.POP.TOTL, WLD. Recorded for the base year and not used by the model: the path takes its 2025 population from the SSP curves, which give 8.15 bn, so this number documents the base year rather than setting it. tests/kaya.test.ts pins that behaviour.",
    "gdpPerPersonUsd": "World Bank NY.GDP.MKTP.PP.KD over SP.POP.TOTL, WLD, constant 2021 international $",
    "energyPerDollarMj": "EI Statistical Review 2026 total energy supply over World Bank PPP GDP",
    "co2PerEnergyKgGj": "Global Carbon Budget fossil and industry CO2 (via Our World in Data) over EI total energy supply",

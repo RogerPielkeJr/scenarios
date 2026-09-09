@@ -27,8 +27,28 @@ jobs:
       - run: npm run typecheck
       - run: npm test
 
+  # The browser tests, minus the screenshots.
+  #
+  # The committed baselines come from this machine's font rendering, so a
+  # runner would fail every one of them for reasons that say nothing about the
+  # code. The rest of the suite carries the checks that do travel: the share
+  # link surviving every route, the downloads, the strip at sixteen widths, the
+  # 404 page, and one figure toolbar per figure. Screenshots stay a local
+  # check, run with npm run test:visual:update before a push that moves layout.
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+
   build:
-    needs: test
+    needs: [test, browser]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

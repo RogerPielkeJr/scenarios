@@ -312,4 +312,10 @@ export const REMOVAL_PAGE: LearnPageSpec = {
   },
 
   sources: REMOVAL_SOURCES,
+
+  // The four markers this tool carries a preset for. The other three have no
+  // fitted removal, so the table shows a dash for them.
+  derivedMarkerValue(markerId) {
+    return data.markers.find((m) => m.id === markerId)?.removals ?? null;
+  },
 };

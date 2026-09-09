@@ -96,12 +96,23 @@ const NUMBER_WORDS: Readonly<Record<number, string>> = Object.freeze({
   2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine',
 });
 
-/** The seven markers' own value for this page's factor. */
+/**
+ * The seven markers' value for this page's factor.
+ *
+ * Two pages have no published value for any marker. Rather than seven dashes,
+ * those show what this tool fits from each marker's CO2 path, under a column
+ * headed "Derived" and a caption saying where the figures come from.
+ */
 function markerTable(root: Document, spec: LearnPageSpec): HTMLTableElement {
   const table = element(root, 'table', 'kaya markers-table');
   table.id = 'markers-table';
   const input = SPEC_BY_ID[spec.input];
-  const values = MARKERS.map((marker) => markerValueFor(marker, spec.input));
+  const published = MARKERS.map((marker) => markerValueFor(marker, spec.input));
+  const derived = published.every((value) => value === null)
+    && spec.derivedMarkerValue !== undefined;
+  const values = derived
+    ? MARKERS.map((marker) => spec.derivedMarkerValue?.(marker.id) ?? null)
+    : published;
   const rows = MARKERS.map((marker, index) => {
     const value = values[index] ?? null;
     return `<tr><th scope="row"><span class="swatch" style="background:${marker.color}"></span>`
@@ -109,17 +120,17 @@ function markerTable(root: Document, spec: LearnPageSpec): HTMLTableElement {
       + `<td>${value === null ? '—' : formatInput(spec.input, value)}</td>`
       + `<td class="units">${input.units}</td></tr>`;
   }).join('');
-  // Timing and engineered removal are the two controls no marker publishes a
-  // value for. A column of dashes reads as a fault rather than as a fact, so
-  // the table says which it is; the page's own prose gives the derived figures.
-  const caption = values.every((value) => value === null)
-    ? '<caption>No marker publishes a value for this control. This tool derives what each '
-      + 'CMIP7 preset puts on the slider from that marker’s CO₂ path, and the reading above '
-      + 'gives the figures.</caption>'
-    : '';
+  const caption = derived
+    ? '<caption>No marker publishes a value for this control. These figures come from '
+      + 'fitting each marker’s published CO₂ path, and a dash marks a marker this tool '
+      + 'carries no preset for.</caption>'
+    : published.every((value) => value === null)
+      ? '<caption>No marker publishes a value for this control.</caption>'
+      : '';
   table.innerHTML = caption
     + '<thead><tr><th scope="col">Scenario</th>'
-    + '<th scope="col">Assumes</th><th scope="col">Units</th></tr></thead>'
+    + `<th scope="col">${derived ? 'Derived' : 'Assumes'}</th>`
+    + '<th scope="col">Units</th></tr></thead>'
     + `<tbody>${rows}</tbody>`;
   return table;
 }
