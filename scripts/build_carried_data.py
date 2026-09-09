@@ -167,11 +167,12 @@ def main() -> None:
     inputs.append({
         'id': 'removals', 'legacyId': 'cdr', 'kind': 'level',
         'label': 'Engineered CO2 removal in 2100',
-        'help': ('Carbon captured and stored on purpose, counted apart from the land '
-                 'use sink. The four Kaya factors multiply, so on their own they '
-                 'approach zero without ever crossing it; this is what carries a path '
-                 'below zero. It ramps in slowly and accelerates, as the scenarios '
-                 'deploy it.'),
+        'help': ('Bioenergy with capture, direct air capture and the rest: removal '
+                 'that stores carbon outside the land account. Forests and soils '
+                 'belong to the land use slider instead, so no tonne is set twice. '
+                 'The four Kaya factors multiply, so on their own they approach zero '
+                 'without ever crossing it; this is what carries a path below zero. '
+                 'It ramps in slowly and accelerates, as the scenarios deploy it.'),
         'min': 0, 'max': 25, 'step': 0.5,
         'default': 0, 'decimals': 1,
         'prototypeDefault': 0,
@@ -180,6 +181,14 @@ def main() -> None:
         'reference': {'value': 0, 'label': 'None today'},
     })
 
+    # The land use help carried over from the prototype, which had no removal
+    # slider to be confused with. The two terms are additive and must not
+    # overlap, so each help now says which removal it counts. See METHODS.md.
+    for spec in inputs:
+        if spec['id'] == 'landUse':
+            spec['help'] = (
+                spec['help'].rstrip('.') + '. Regrowth and restoration net into this '
+                'figure; engineered removal has its own slider.')
     for spec in inputs:
         if spec['id'] == 'co2PerEnergy':
             spec['help'] = (

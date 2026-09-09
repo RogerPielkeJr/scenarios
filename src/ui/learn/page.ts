@@ -92,19 +92,33 @@ function proseBlock(root: Document, block: ProseBlock): HTMLElement {
   return section;
 }
 
+const NUMBER_WORDS: Readonly<Record<number, string>> = Object.freeze({
+  2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine',
+});
+
 /** The seven markers' own value for this page's factor. */
 function markerTable(root: Document, spec: LearnPageSpec): HTMLTableElement {
   const table = element(root, 'table', 'kaya markers-table');
   table.id = 'markers-table';
   const input = SPEC_BY_ID[spec.input];
-  const rows = MARKERS.map((marker) => {
-    const value = markerValueFor(marker, spec.input);
+  const values = MARKERS.map((marker) => markerValueFor(marker, spec.input));
+  const rows = MARKERS.map((marker, index) => {
+    const value = values[index] ?? null;
     return `<tr><th scope="row"><span class="swatch" style="background:${marker.color}"></span>`
       + `CMIP7 ${marker.label}</th>`
       + `<td>${value === null ? '—' : formatInput(spec.input, value)}</td>`
       + `<td class="units">${input.units}</td></tr>`;
   }).join('');
-  table.innerHTML = '<thead><tr><th scope="col">Scenario</th>'
+  // Timing and engineered removal are the two controls no marker publishes a
+  // value for. A column of dashes reads as a fault rather than as a fact, so
+  // the table says which it is; the page's own prose gives the derived figures.
+  const caption = values.every((value) => value === null)
+    ? '<caption>No marker publishes a value for this control. What each CMIP7 preset '
+      + 'puts on the slider is derived from that marker’s CO₂ path, and the reading '
+      + 'above gives the figures.</caption>'
+    : '';
+  table.innerHTML = caption
+    + '<thead><tr><th scope="col">Scenario</th>'
     + '<th scope="col">Assumes</th><th scope="col">Units</th></tr></thead>'
     + `<tbody>${rows}</tbody>`;
   return table;
@@ -148,7 +162,10 @@ function siblingNav(root: Document, slug: string, scenario: Scenario): HTMLEleme
   const nav = element(root, 'nav', 'siblings banded');
   nav.setAttribute('aria-label', 'The other assumptions');
   const left = element(root, 'div', 'band-left');
-  left.appendChild(element(root, 'h2', undefined, 'The other five'));
+  // Derived, because this heading said "five" from the day six pages existed
+  // and stayed at five when timing and removal took the count to eight.
+  const others = LEARN_ENTRIES.filter((entry) => entry.slug !== slug).length;
+  left.appendChild(element(root, 'h2', undefined, `The other ${NUMBER_WORDS[others] ?? others}`));
   const body = element(root, 'div', 'band-right');
   const list = element(root, 'ul', 'sibling-list');
   for (const entry of LEARN_ENTRIES) {

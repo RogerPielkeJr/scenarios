@@ -108,7 +108,8 @@ test('no internal link anywhere drops the scenario', async ({ page }) => {
   const bare: string[] = [];
   const pages = ['/', '/learn/', '/learn/population/', '/learn/income/',
     '/learn/energy-intensity/', '/learn/carbon-intensity/', '/learn/land-use/',
-    '/learn/methane/', '/library.html', '/bibliography.html'];
+    '/learn/methane/', '/learn/timing/', '/learn/removal/',
+    '/library.html', '/bibliography.html'];
   for (const path of pages) {
     await page.goto(path === '/' ? `/#${query}` : `${path}?${query}`);
     await page.waitForFunction(() => document.querySelectorAll('a[href]').length > 3);
@@ -241,7 +242,7 @@ test('the theme toggle overrides the system setting', async ({ page }) => {
 });
 
 const LIVE_SLUGS = ['population', 'energy-intensity', 'carbon-intensity',
-  'income', 'methane', 'land-use'];
+  'income', 'methane', 'land-use', 'removal'];
 
 for (const slug of LIVE_SLUGS) {
   for (const breakpoint of BREAKPOINTS) {
@@ -250,7 +251,11 @@ for (const slug of LIVE_SLUGS) {
         await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
         await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
         await page.goto(`/learn/${slug}/`);
-        await page.waitForSelector('#learn-chart path');
+        // The reader's own series, attached rather than visible: on the
+        // removal page it opens flat on the axis, because capture and storage
+        // starts at no effect, and a horizontal path has no visible box.
+        await page.waitForSelector('#learn-chart path[data-series="reader"]',
+          { state: 'attached' });
         await page.evaluate(() => document.fonts.ready);
         await expect(page).toHaveScreenshot(`learn-${slug}-${breakpoint.name}-${theme}.png`,
           { fullPage: true });

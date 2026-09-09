@@ -119,7 +119,8 @@ export const LAND_USE_PAGE: LearnPageSpec = {
   definition: {
     quantity: 'Net CO₂ from land use, land-use change and forestry in 2100',
     units: 'GtCO₂ a year; a negative value removes carbon from the air',
-    place: 'Added on top of the four factors that multiply',
+    place: 'Added on top of the four factors that multiply, with land removal already netted '
+      + 'in and engineered removal on its own slider',
     today: `${gt(BASE.landUseGt)} in the tool’s base year`,
     paragraphs: [
       'This term nets two large flows against each other. Clearing forest for cropland and '
@@ -255,8 +256,9 @@ export const LAND_USE_PAGE: LearnPageSpec = {
       + `stays a source. VERY LOW assumes ${signedGt(VERY_LOW?.kaya.landUse ?? 0)}.`,
       `A sink of ${signedGt(MEDIUM_LOW?.kaya.landUse ?? 0)} asks this term to move by `
       + `${gt(BASE.landUseGt - (MEDIUM_LOW?.kaya.landUse ?? 0))} from where it stands, which `
-      + 'exceeds the entire gross deforestation flux. Reaching it requires the removals as '
-      + 'well as the halt.',
+      + 'exceeds the entire gross deforestation flux. Reaching it takes restoration at scale '
+      + 'as well as the halt, and the markers that go further still lean on the engineered '
+      + 'removal this tool keeps on a separate slider.',
       'The tool draws a straight line from today to whatever you set for 2100, because the '
       + 'markers publish their land-use assumption as a 2100 value rather than a path. A real '
       + 'scenario would bend.',
@@ -265,10 +267,12 @@ export const LAND_USE_PAGE: LearnPageSpec = {
 
   builder: {
     heading: 'Build your value',
-    note: 'Three flows and a removal, netted.',
+    note: 'Three flows, netted.',
     paragraphs: [
-      'Set what the world clears, what regrows, how much land comes back into forest and how '
-      + 'much carbon engineering removes. The builder nets them into a single 2100 flux.',
+      'Set what the world clears, what regrows and how much land comes back into forest. The '
+      + 'builder nets the three into a single 2100 flux. Machinery is not among them: capture '
+      + 'and storage has a slider of its own, and setting it here as well would take the same '
+      + 'tonnes out twice.',
       `The restoration arithmetic multiplies area by rate: a million hectares taking up `
       + `${C.growthRates.matureTropical} tonnes of CO₂ a hectare each year removes `
       + `${(C.growthRates.matureTropical / 1000).toFixed(3)} GtCO₂ a year. Reaching a gigatonne `

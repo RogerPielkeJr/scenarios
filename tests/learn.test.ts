@@ -9,10 +9,16 @@ import { CARBON_INTENSITY_PAGE } from '../src/learn/carbon_intensity.js';
 import { INCOME_PAGE } from '../src/learn/income.js';
 import { METHANE_PAGE } from '../src/learn/methane.js';
 import { LAND_USE_PAGE } from '../src/learn/land_use.js';
+import { TIMING_PAGE } from '../src/learn/timing.js';
+import { REMOVAL_PAGE } from '../src/learn/removal.js';
 import { LEARN_ENTRIES } from '../src/learn/registry.js';
 import { decodeScenario, encodeScenario, type Scenario } from '../src/state.js';
 import { INPUT_IDS } from '../src/model/types.js';
 import populationData from '../src/data/learn_population.json';
+import landUseData from '../src/data/learn_land_use.json';
+import removalData from '../src/data/learn_removal.json';
+import presets from '../src/data/presets.json';
+import { MARKER_BY_ID } from '../src/model/markers.js';
 
 const HTML = readFileSync(resolve(process.cwd(), 'learn/population/index.html'), 'utf8');
 
@@ -40,8 +46,19 @@ function loadPage(search: string): void {
 
 const LIVE_PAGES = [
   POPULATION_PAGE, ENERGY_INTENSITY_PAGE, CARBON_INTENSITY_PAGE, INCOME_PAGE,
-  METHANE_PAGE, LAND_USE_PAGE,
+  METHANE_PAGE, LAND_USE_PAGE, REMOVAL_PAGE,
 ];
+
+// The timing page is not in that list, and the two invariants it misses say
+// why: its figures draw the record alone, so moving the builder redraws
+// nothing and the reader's scenario name appears on no series. Every other
+// page puts the reader's own value on its chart. Left as found rather than
+// fixed here, because deciding what curve the reader's midpoint share draws on
+// a 1965-2024 axis is a question about that page rather than about this one.
+it('leaves the timing page out of the live set, and says what it misses', () => {
+  expect(LIVE_PAGES).not.toContain(TIMING_PAGE);
+  expect(TIMING_PAGE.builder.modes[0]?.parts).toHaveLength(1);
+});
 
 /** Every live page has to render, draw and hand back a value. */
 describe.each(LIVE_PAGES.map((page) => [page.title, page] as const))('%s', (_title, page) => {
@@ -277,6 +294,75 @@ describe('the population page', () => {
       expect(source.vintage, source.title).not.toBe('');
       expect(source.used, source.title).not.toBe('');
     }
+  });
+});
+
+// The land use term is net CO2 from land use, land-use change and forestry, so
+// regrowth and restoration are inside it already; the removal term is what
+// stores carbon outside that account. A control that crossed the line would let
+// a reader set the same carbon on both pages and have it subtracted twice,
+// which is what the removal builder did until 2026-09-09. See "Where removal is
+// counted" in METHODS.md.
+describe('land use and removal do not count the same carbon twice', () => {
+  const LAND_WORDS = /forest|soil|planting|restor|regrowth|land|peat|hectare/i;
+  const MACHINE_WORDS = /engineer|capture|storage|direct air|bioenergy|beccs|biochar/i;
+
+  function parts(page: typeof LAND_USE_PAGE) {
+    return page.builder.modes.flatMap((mode) => mode.parts);
+  }
+
+  it('gives the land use builder no control over engineered removal', () => {
+    for (const part of parts(LAND_USE_PAGE)) {
+      expect(part.label, part.id).not.toMatch(MACHINE_WORDS);
+      expect(part.id, part.id).not.toMatch(MACHINE_WORDS);
+    }
+  });
+
+  it('gives the removal builder no control over land', () => {
+    for (const part of parts(REMOVAL_PAGE)) {
+      expect(part.label, part.id).not.toMatch(LAND_WORDS);
+      expect(part.id, part.id).not.toMatch(LAND_WORDS);
+    }
+  });
+
+  it('hands back exactly what its one control says, on the removal page', () => {
+    const mode = REMOVAL_PAGE.builder.modes[0];
+    if (mode === undefined) throw new Error('the removal builder has no modes');
+    expect(mode.parts).toHaveLength(1);
+    for (const value of [0, 3.5, 11, 25]) {
+      expect(mode.combine({ novel: value }).value).toBe(value);
+    }
+  });
+
+  it('nets three land flows and subtracts nothing else, on the land use page', () => {
+    const mode = LAND_USE_PAGE.builder.modes[0];
+    if (mode === undefined) throw new Error('the land use builder has no modes');
+    expect(mode.parts.map((part) => part.id))
+      .toEqual(['deforestation', 'regrowth', 'area', 'rate']);
+    // Every flow at today's level and no restoration returns today's flux,
+    // which it cannot do if a fourth term is subtracted off it.
+    expect(mode.combine({ deforestation: 100, regrowth: 100, area: 0, rate: 8 }).value)
+      .toBeCloseTo(landUseData.constants.decomposition.net, 6);
+  });
+
+  // Each marker's removal is fitted with that marker's own land use already in
+  // place, so it is the removal the published path needs BEYOND the land, not
+  // the marker's whole removal. The two deep markers make the point: both
+  // assume a large land sink and still need more on top.
+  it('reads each marker tick as removal beyond that marker\'s own land sink', () => {
+    for (const id of ['ML', 'VL']) {
+      const fitted = removalData.markers.find((m) => m.id === id);
+      const marker = MARKER_BY_ID[id];
+      expect(fitted?.removals, id).toBeGreaterThan(0);
+      expect(marker?.kaya.landUse, id).toBeLessThan(0);
+    }
+    // Loading a preset puts both on the sliders at once, and they stay apart.
+    // The preset snaps to the slider's 0.1 step, so VERY LOW's -4.71 of land
+    // arrives as -4.7; one decimal is the most a preset can carry.
+    const preset = presets.presets.find((p) => p.id === 'cmip7-very-low');
+    expect(preset?.inputs.landUse).toBeCloseTo(MARKER_BY_ID['VL']?.kaya.landUse ?? 0, 1);
+    expect(preset?.inputs.removals)
+      .toBeCloseTo(removalData.markers.find((m) => m.id === 'VL')?.removals ?? 0, 6);
   });
 });
 

@@ -121,10 +121,19 @@ has done, and hands back a value the reader built rather than guessed:
 - **CO₂ per unit of energy** builds a 2100 fuel mix out of seven shares, burns
   it against the IPCC emission factors, adds the industrial CO₂ that no fuel
   switch touches, and takes the rate that lands there.
-- **Land use** nets four flows — deforestation, other transitions and peat,
-  existing regrowth, restored area — plus engineered removal.
+- **Land use** nets three flows — deforestation with other transitions and
+  peat, existing regrowth, and newly restored area at a sequestration rate.
+  Every land-based removal sits inside this net, which is why the page carries
+  no engineered-removal control.
 - **Methane** sets one control per source, scaled so today's five sources
   reproduce the 380 Mt the slider starts from.
+- **When the improvement arrives** asks the record the question the slider
+  asks, and the two technology factors answer it in opposite directions: energy
+  per dollar banked 26% of its improvement by the midpoint, the fuel mix 79%.
+- **Engineered CO₂ removal** sets what capture and storage takes back in 2100,
+  and reports the sustained growth from today's 0.002 GtCO₂ a year that the
+  level implies. Forests and soils belong to the land use page, so no tonne is
+  set in both places.
 
 A page shows the arithmetic at every step, not just the answer. **Use in my
 scenario** carries the value back to the builder, which names it, scrolls to
@@ -165,9 +174,10 @@ list.
 Stated in full in **Methods**, and worth having up front:
 
 - Nothing engineered removal does can come out of the four Kaya factors, which
-  stay positive whenever there are people, income and energy. The land use
-  slider carries the only sink, and it stands in for land and engineered
-  removal together.
+  stay positive whenever there are people, income and energy. It is an additive
+  term on a slider of its own, kept apart from the land use sink so that no
+  tonne is subtracted twice, and it ramps on one fixed shape that no control
+  bends.
 - No nitrous oxide, no fluorinated gases, no aerosols as a term of their own.
 - No carbon cycle feedbacks that depend on the path rather than the total.
 - One warming number, not a range. The FaIR ensemble behind the fit spans well

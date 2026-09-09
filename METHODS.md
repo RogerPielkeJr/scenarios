@@ -160,6 +160,39 @@ scenario the six could not.
 Both sit at no effect by default, so every result the model produced before they
 existed is unchanged.
 
+### Where removal is counted
+
+Two of the eight controls can take carbon out of the air, and they must not take
+the same tonne out twice.
+
+**Land use** is net CO₂ from land use, land-use change and forestry, on the
+Global Carbon Budget's definition. That number is already a net: 6.23 GtCO₂ a
+year of gross deforestation and 2.20 of other transitions and peat, less 4.40 of
+regrowth on land already recovering, giving the 3.83 the model starts from. Every
+conventional removal — planting, restoration, soil carbon, durable wood products
+— lands inside it, which is what lets this one slider reach a sink of 10 GtCO₂ a
+year on its own.
+
+**Engineered removal** is the removal that stores carbon outside that account:
+bioenergy with carbon capture, direct air capture, biochar, enhanced weathering.
+Bioenergy with capture competes for the same hectares, but the tonnes it stores
+go underground rather than into standing biomass, so the land-use flux does not
+measure them and adding them here counts them once.
+
+The learn pages hold the same line. The land use builder nets three flows and
+carries no removal control; the removal builder has one control and carries no
+forest control; each page's prose points at the other.
+
+One consequence for the CMIP7 ticks. `derive_timing` in
+`scripts/build_carried_data.py` fits each marker's removal **with that marker's
+own land use already in place**, so the fitted figure is what the published path
+needs beyond the land, not the marker's whole removal. MEDIUM-to-LOW assumes a
+land sink of 8.79 GtCO₂ a year and needs 5.5 on top of it; VERY LOW assumes 4.71
+and needs 11.0. Reading either as that scenario's total removal would count its
+forests twice. HIGH's 1.5 is not removal at all: a constant rate overshoots
+HIGH's published path, ending 2100 at 56.0 against the marker's 55.0, and the fit
+takes the difference off on this slider for want of anywhere else.
+
 ## Warming
 
 Warming in 2100 above 1850 to 1900:
@@ -397,21 +430,19 @@ ignores when the methane is emitted.
 
 ### The land use builder
 
-Four flows netted into one 2100 figure:
+Three flows netted into one 2100 figure:
 
     net = (deforestation + other transitions and peat) x scale
         - existing regrowth x scale
         - restored area x sequestration rate
-        - engineered removal
 
 with today's flows from the Global Carbon Budget: 6.23 GtCO₂ of gross
 deforestation, 2.20 of other transitions and peat, and 4.40 of regrowth. The
 restoration term is a straight area-times-rate product, in millions of hectares
 times tonnes of CO₂ a hectare a year, divided by a thousand to reach GtCO₂.
 
-Engineered removal sits on this control because a product of four positive
-factors cannot go below zero. Every marker that reaches net negative CO₂ does
-it through terms that land on this line.
+Engineered removal is not a fourth term here. It has its own slider, and the
+boundary between the two is set out under "Where removal is counted" above.
 
 ### The timing builder
 
@@ -425,18 +456,23 @@ both from series this site already carries, so the page adds no new download.
 
 ### The removal builder
 
-Two controls, added: what forests and soils take back in 2100, and what capture
-and storage takes back beside them. `scripts/build_removal.py` parses the State
-of Carbon Dioxide Removal executive summary rather than restating it, and fails
-loudly if the wording it matches on changes. Removal runs at 2.2 GtCO2 a year
-today, 5% of gross emissions, of which capture and storage is 0.002 GtCO2 a
-year, growing 40% a year against assessed pathways that scale it past 3.5 GtCO2
-a year by 2050.
+One control: what capture and storage takes back in 2100, on the same range as
+the slider it feeds. `scripts/build_removal.py` parses the State of Carbon
+Dioxide Removal executive summary rather than restating it, and fails loudly if
+the wording it matches on changes. Removal runs at 2.2 GtCO2 a year today, 5% of
+gross emissions, of which capture and storage is 0.002 GtCO2 a year, growing 40%
+a year against assessed pathways that scale it past 3.5 GtCO2 a year by 2050.
 
-Engineered removal used to sit on the land use slider, for want of anywhere
-else. It has its own control now, so the land use builder covers land alone and
-the two no longer overlap; before that change a reader could set removal in both
-places and count it twice.
+The builder reports the sustained growth from today's 0.002 GtCO2 a year that
+the level implies, because that is the claim a 2100 level makes. Reaching VERY
+LOW's 11.0 takes 12.2% a year for seventy-five years; the 3.5 the assessed
+pathways reach by 2050 takes 34.8% a year for twenty-five, close to the rate
+novel removal grows at now.
+
+The builder had a second control, for what forests and soils take back, until
+2026-09-09. It double counted: the land-use term nets regrowth and restoration
+against clearing already, so a reader could set the same carbon on both pages
+and subtract it twice. Forests stay on the land use page, machinery stays here.
 
 ## What a CMIP7 preset does and does not reproduce
 
@@ -545,13 +581,13 @@ CMIP7 preset note reports on the front page.
 
 ## What the tool does not represent
 
-**Engineered carbon removal.** The four factors multiply to a positive number
-whenever there are people, income and energy. Nothing in them can go below zero,
-so a scenario that removes more carbon than it emits cannot be built here. Five
-of the seven markers reach net negative CO₂, VERY LOW from 2050 and HIGH-to-LOW
-only in 2100, and the low ones rely on it.
-The land use slider reaches −10 GtCO₂ a year, which is the only sink the tool
-has, and it stands in for land and engineered removal together.
+**A removal path with a shape of its own.** Engineered removal has a slider now,
+so a scenario that removes more carbon than it emits can be built here: five of
+the seven markers reach net negative CO₂, VERY LOW from 2050 and HIGH-to-LOW
+only in 2100, and the low ones rely on it. What the tool does not represent is
+the route. Removal ramps as the square of elapsed time for every scenario, which
+is a shape borrowed from how the markers deploy it rather than a shape any
+marker publishes, and no control bends it.
 
 **Gases other than CO₂ and methane.** No nitrous oxide, no fluorinated gases.
 
