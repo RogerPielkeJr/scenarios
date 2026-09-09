@@ -170,6 +170,8 @@ h1 {
 .lead-in p { margin: 0 0 8px; }
 .lead-in p:last-child { margin-bottom: 0; color: var(--dim); }
 .lead-in-methodology { margin-top: 10px; }
+.lead-in-note { margin-top: 10px; color: var(--dim); }
+.lead-in-note b { color: var(--ink); }
 .methodology-link { color: var(--navy); font-weight: 600; text-underline-offset: 3px; }
 
 /* Shown only when scripting is off, where most of each page is empty. */
