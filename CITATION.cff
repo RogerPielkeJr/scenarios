@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Build Your Own Climate Scenario"
+abstract: "An interactive Kaya-identity scenario builder with emissions and temperature outcomes."
+type: software
+authors:
+  - family-names: "Pielke"
+    given-names: "Roger"
+    name-suffix: "Jr."
+url: "https://scenarios.thehonestbroker.org"
+repository-code: "https://github.com/RogerPielkeJr/scenarios"
+license: MIT
+year: 2026

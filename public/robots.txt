@@ -1,3 +1,8 @@
+# Crawling for search indexing, citation and link discovery is welcome.
+# Reuse terms: https://thehonestbroker.org/terms/
+# Text and data mining rights are reserved under Art. 4(3) of EU Directive
+# 2019/790 and equivalent provisions elsewhere. The machine-readable form of
+# that reservation lives at /.well-known/tdmrep.json (W3C TDMRep).
 User-agent: *
 Allow: /
 

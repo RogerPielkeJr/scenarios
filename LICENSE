@@ -1,0 +1,58 @@
+Build Your Own Climate Scenario -- licensing
+======================================================================
+
+This repository holds three kinds of material, and each carries its own terms.
+The full text of the terms lives at https://thehonestbroker.org/terms/
+
+1. CODE -- the build scripts, analysis pipeline and site source.
+   MIT licence, reproduced in full below.
+
+2. WRITING AND FIGURES -- the page copy, the explanatory text and the chart
+   designs published at https://scenarios.thehonestbroker.org
+   Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)
+   https://creativecommons.org/licenses/by-nd/4.0/
+   Copy and redistribute them, commercially included, with credit and a link
+   back. Do not distribute an altered version.
+
+3. DERIVED DATA -- the JSON, CSV and spreadsheet series this repository
+   produces and publishes.
+   Creative Commons Attribution 4.0 International (CC BY 4.0)
+   https://creativecommons.org/licenses/by/4.0/
+   Use, adapt and build on them, commercially included, with a citation.
+
+NOT COVERED. The upstream observations are not mine to license. Most originate
+with US federal agencies and carry no copyright under 17 U.S.C. sec. 105;
+ERA5 and other Copernicus products arrive under the Copernicus licence, which
+travels with the data. See the project's methodology or sources page for the
+per-dataset terms.
+
+TEXT AND DATA MINING. Rights are reserved under Art. 4(3) of EU Directive
+2019/790 and the equivalent provisions elsewhere. Training a machine-learning
+model on this material needs written permission: roger.pielke@aei.org
+
+TRADEMARK. "The Honest Broker" and the associated logo sit outside every
+licence above. No Creative Commons or MIT licence grants trademark rights.
+
+======================================================================
+
+MIT License
+
+Copyright (c) 2026 Roger Pielke Jr.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
