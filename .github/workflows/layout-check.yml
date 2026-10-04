@@ -1,0 +1,53 @@
+name: Layout check
+
+# Builds the site and runs tools/layout-check/check_layout.js against dist/: every
+# page at four widths, every slider at its minimum and maximum, each preset and the
+# theme toggle clicked, failing on overlapping chart labels, chart text past the
+# chart edge, sideways page scrolling, or script errors. Screenshots of failing
+# states are attached to the run as the "layout-failures" artifact. Unlike the
+# committed screenshot baselines, it compares nothing against images, so it runs
+# the same on any machine.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            tools/layout-check/package-lock.json
+      - name: Build the site
+        run: |
+          npm ci
+          npm run build
+      - name: Install Playwright
+        working-directory: tools/layout-check
+        # Not --with-deps first, for the same reason as deploy.yml's browser job.
+        run: |
+          npm ci
+          npx playwright install chromium || npx playwright install --with-deps chromium
+      - name: Check page layouts
+        run: |
+          (cd dist && python3 -m http.server 8765 --bind 127.0.0.1 >/dev/null 2>&1 &)
+          sleep 2
+          node tools/layout-check/check_layout.js --root dist --shots layout-failures
+      - name: Upload screenshots of failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: layout-failures
+          path: layout-failures
+          if-no-files-found: ignore

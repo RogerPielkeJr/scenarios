@@ -442,5 +442,9 @@ export function mountLearnPage(spec: LearnPageSpec, root: Document = document): 
   if (themeButton !== null && themeLabel !== null) installThemeToggle(themeButton, themeLabel);
 
   render();
+  // The charts size their margins to the labels as printed. Drawn before the
+  // web font arrives, they measured the fallback face, so draw again once the
+  // real one is in.
+  void root.fonts?.ready.then(() => { render(); });
   return { scenario, builder, chart, render, lastReport: () => report };
 }

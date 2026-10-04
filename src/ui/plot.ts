@@ -6,6 +6,7 @@
  * or more projections, an uncertainty band, the reader's own curve and the
  * CMIP7 markers as points at 2100.
  */
+import { stackGap, textWidth } from './measure.js';
 import { spreadLabels } from './ticks.js';
 import type { Column, FigureData } from './figure.js';
 
@@ -140,6 +141,14 @@ const TYPE = {
 } as const;
 /** Roughly the width of one character of `endLabel` sans, for the strip spread. */
 const END_LABEL_CHAR = 8.6;
+/** Roughly the width of one character of the axis title and divider label. */
+const LABEL_CHAR_EM = 0.56;
+/*
+ * How far an end label's centre may sit from the top and the foot of the
+ * figure: its baseline runs 5 below the centre, and the face reaches about
+ * 0.96 of its size above the baseline and 0.28 below it.
+ */
+const END_LABEL_REACH = 11;
 const SANS = "'IBM Plex Sans',system-ui,sans-serif";
 const MONO = "'IBM Plex Mono',ui-monospace,monospace";
 
@@ -162,13 +171,17 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
   // End labels sit outside the plot, so the gutter has to hold the longest of
   // them. A page can ask for more room than that, never for less: at the type
   // size above, "Your rate" on the income page overran a fixed 74 and printed
-  // past the edge of the figure.
+  // past the edge of the figure. Each label is measured in the live figure as
+  // well as estimated, so a wider fallback face still fits.
+  const endStyle = (weight: number) => ({ size: TYPE.endLabel, weight, family: SANS });
   const labelled = [
-    ...spec.series.filter((series) => series.labelAtEnd === true).map((s) => s.label),
-    ...(spec.points ?? []).map((point) => point.label),
-  ].filter((label) => label !== '');
-  const needed = Math.max(0, ...labelled.map((label) => label.length))
-    * END_LABEL_CHAR + 16;
+    ...spec.series.filter((series) => series.labelAtEnd === true)
+      .map((s) => ({ text: s.label, weight: 700 })),
+    ...(spec.points ?? []).map((point) => ({ text: point.label, weight: 600 })),
+  ].filter((label) => label.text !== '');
+  const needed = Math.max(0, ...labelled.map((label) => textWidth(
+    svg, label.text, endStyle(label.weight), label.text.length * END_LABEL_CHAR,
+  ))) + 16;
   const right = VIEW.width - Math.max(spec.rightGutter ?? 74, needed);
   const values: number[] = [];
   for (const series of spec.series) values.push(...series.points.map((p) => p.value));
@@ -244,8 +257,20 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
       + `font-size="${TYPE.axisNumber}" font-weight="500" fill="var(--dim)">`
       + `${format(value, decimals)}</text>`;
   }
-  markup += `<text x="0" y="${PLOT.top - 18}" text-anchor="start" font-family="${SANS}" `
-    + `font-size="${TYPE.axisLabel}" font-weight="600" fill="var(--dim)">`
+  // The axis title and the divider's label share the strip above the plot.
+  // A long title -- "dollars per person, log scale" on the income page --
+  // reaches the divider, so the two then take a line each: the title rises
+  // and the divider's label drops to the top gridline.
+  const dividerX = spec.divider == null ? null : xFor(spec.divider.year);
+  const titleRight = textWidth(svg, spec.yLabel,
+    { size: TYPE.axisLabel, weight: 600, family: SANS },
+    spec.yLabel.length * TYPE.axisLabel * LABEL_CHAR_EM);
+  const dividerHalf = spec.divider == null ? 0 : textWidth(svg, spec.divider.label,
+    { size: TYPE.dividerLabel, weight: 600, family: SANS },
+    spec.divider.label.length * TYPE.dividerLabel * LABEL_CHAR_EM) / 2;
+  const stacked = dividerX !== null && titleRight + 6 > dividerX - dividerHalf;
+  markup += `<text x="0" y="${PLOT.top - (stacked ? 24 : 18)}" text-anchor="start" `
+    + `font-family="${SANS}" font-size="${TYPE.axisLabel}" font-weight="600" fill="var(--dim)">`
     + `${escapeText(spec.yLabel)}</text>`;
 
   spec.xTicks.forEach((year, index) => {
@@ -291,7 +316,7 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
     const x = xFor(spec.divider.year).toFixed(1);
     markup += `<line x1="${x}" x2="${x}" y1="${PLOT.top}" y2="${PLOT.bottom}" `
       + `stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 4"/>`
-      + `<text x="${x}" y="${PLOT.top - 6}" text-anchor="middle" font-family="${SANS}" `
+      + `<text x="${x}" y="${PLOT.top - (stacked ? 4 : 6)}" text-anchor="middle" font-family="${SANS}" `
       + `font-size="${TYPE.dividerLabel}" font-weight="600" fill="var(--dim)">`
       + `${escapeText(spec.divider.label)}</text>`;
   }
@@ -327,7 +352,9 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
       at: yFor(point.value),
     });
   }
-  for (const placed of spreadLabels(ends, LABEL_GAP)) {
+  const reach = { min: END_LABEL_REACH, max: VIEW.height - END_LABEL_REACH };
+  const gap = stackGap(svg, endStyle(700), LABEL_GAP);
+  for (const placed of spreadLabels(ends, gap, undefined, reach)) {
     const { value, at, anchor, moved } = placed;
     const leader = moved
       ? `<line x1="${value.x.toFixed(1)}" x2="${(value.x + 7).toFixed(1)}" `
