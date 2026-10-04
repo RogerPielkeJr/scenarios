@@ -23,27 +23,62 @@ export interface TextStyle {
 }
 
 /**
+ * Lays a hidden probe of `text` into the SVG, reads it with `read`, and takes
+ * it out again. Returns 0 wherever the browser cannot say.
+ */
+function probe(
+  svg: SVGSVGElement, text: string, style: TextStyle,
+  read: (node: SVGTextElement) => number,
+): number {
+  const node = svg.ownerDocument.createElementNS(SVG_NS, 'text') as SVGTextElement;
+  if (typeof node.getComputedTextLength !== 'function' || typeof node.getBBox !== 'function') {
+    return 0;
+  }
+  node.setAttribute('font-family', style.family);
+  node.setAttribute('font-size', String(style.size));
+  node.setAttribute('font-weight', String(style.weight));
+  node.setAttribute('visibility', 'hidden');
+  node.textContent = text;
+  svg.appendChild(node);
+  let value = 0;
+  try {
+    value = read(node);
+  } catch {
+    value = 0;
+  }
+  node.remove();
+  return Number.isFinite(value) ? value : 0;
+}
+
+/**
  * The width of `text` in the SVG's own units, or 0 where the browser cannot
  * say: a detached or hidden SVG, or a DOM without layout.
  */
 export function measureText(svg: SVGSVGElement, text: string, style: TextStyle): number {
-  const doc = svg.ownerDocument;
-  const probe = doc.createElementNS(SVG_NS, 'text');
-  if (typeof (probe as SVGTextElement).getComputedTextLength !== 'function') return 0;
-  probe.setAttribute('font-family', style.family);
-  probe.setAttribute('font-size', String(style.size));
-  probe.setAttribute('font-weight', String(style.weight));
-  probe.setAttribute('visibility', 'hidden');
-  probe.textContent = text;
-  svg.appendChild(probe);
-  let width = 0;
-  try {
-    width = (probe as SVGTextElement).getComputedTextLength();
-  } catch {
-    width = 0;
-  }
-  probe.remove();
-  return Number.isFinite(width) ? width : 0;
+  return probe(svg, text, style, (node) => node.getComputedTextLength());
+}
+
+/*
+ * IBM Plex Sans reaches 1.025 of its size above the baseline and 0.275 below,
+ * so a line of it stands 1.3 of its size tall. The browser's box for a text
+ * runs that full height whatever the letters, and two boxes stacked closer
+ * than that touch.
+ */
+const LINE_HEIGHT_EM = 1.3;
+
+/**
+ * How far apart two stacked lines of text have to sit so their boxes clear:
+ * the face's own height as measured in the live SVG, or 1.3 of the size where
+ * nothing can be measured, plus a unit of air. Never less than `minimum`.
+ *
+ * The end labels used to stack on a fixed gap of 18 units for 15-unit text,
+ * which clears DejaVu Sans (17.3 tall) but not IBM Plex Sans (19.5), so with
+ * the real web font every crowded stack of scenario names overlapped.
+ */
+export function stackGap(svg: SVGSVGElement, style: TextStyle, minimum: number): number {
+  const measured = probe(svg, 'Hg', style, (node) => node.getBBox().height);
+  const height = measured > 0 ? measured : style.size * LINE_HEIGHT_EM;
+  return Math.max(minimum, height + 1);
 }
 
 /** The wider of the estimate and the measured width plus slack. */

@@ -6,7 +6,7 @@
  * or more projections, an uncertainty band, the reader's own curve and the
  * CMIP7 markers as points at 2100.
  */
-import { textWidth } from './measure.js';
+import { stackGap, textWidth } from './measure.js';
 import { spreadLabels } from './ticks.js';
 import type { Column, FigureData } from './figure.js';
 
@@ -353,7 +353,8 @@ export function renderPlot(svg: SVGSVGElement, spec: PlotSpec): void {
     });
   }
   const reach = { min: END_LABEL_REACH, max: VIEW.height - END_LABEL_REACH };
-  for (const placed of spreadLabels(ends, LABEL_GAP, undefined, reach)) {
+  const gap = stackGap(svg, endStyle(700), LABEL_GAP);
+  for (const placed of spreadLabels(ends, gap, undefined, reach)) {
     const { value, at, anchor, moved } = placed;
     const leader = moved
       ? `<line x1="${value.x.toFixed(1)}" x2="${(value.x + 7).toFixed(1)}" `

@@ -1,7 +1,7 @@
 import { BASE_YEAR, END_YEAR } from '../model/config.js';
 import { MARKERS, MARKER_YEARS } from '../model/markers.js';
 import { at } from '../model/types.js';
-import { textWidth } from './measure.js';
+import { stackGap, textWidth } from './measure.js';
 import { spreadLabels } from './ticks.js';
 
 // Height leaves room for the year labels below the plot and nothing more.
@@ -176,13 +176,15 @@ function markerPaths(yFor: (v: number) => number, highlight: string | null): str
 }
 
 /** Right-edge scenario labels, pushed apart and given leader lines. */
-function markerLabels(yFor: (v: number) => number, highlight: string | null): string {
+function markerLabels(
+  svg: SVGSVGElement, yFor: (v: number) => number, highlight: string | null,
+): string {
   const placed = spreadLabels(
     MARKERS.map((marker) => ({
       value: marker,
       at: yFor(at(marker.co2Gt, marker.co2Gt.length - 1)),
     })),
-    LABEL_GAP,
+    stackGap(svg, { size: TYPE.markerLabel, weight: 700, family: SANS }, LABEL_GAP),
     undefined,
     { min: LABEL_REACH, max: VIEW.height - LABEL_REACH },
   );
@@ -448,7 +450,7 @@ export function renderChart(
     + `fill="var(--dim)">GtCO₂/yr</text>`
     + yearLabels()
     + markerPaths(yFor, highlight)
-    + markerLabels(yFor, highlight)
+    + markerLabels(svg, yFor, highlight)
     + userPath(svg, path, yFor, scale, name);
 }
 
