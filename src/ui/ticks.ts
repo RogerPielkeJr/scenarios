@@ -94,20 +94,48 @@ export interface SpreadResult<T> {
   moved: boolean;
 }
 
+/** The room the labels have to stay inside, along the same axis. */
+export interface SpreadBounds {
+  min?: number;
+  max?: number;
+}
+
 /**
  * Pushes labels apart along a vertical axis, keeping their order, so that
  * none is closer than `minGap` to the one above it. Labels that move get a
  * leader line back to what they label.
+ *
+ * Pushing only ever runs downward, so a crowd of labels near the foot of a
+ * chart used to spill out of the bottom of the figure. Given `bounds`, a
+ * label pushed past `max` drags the ones above it back up, and one above
+ * `min` comes down to it. When the labels cannot fit at all, the gap wins
+ * over `max`, because two names printed on top of each other read as neither.
  */
 export function spreadLabels<T>(
   items: readonly SpreadItem<T>[],
   minGap: number,
   moveThreshold = 1.5,
+  bounds: SpreadBounds = {},
 ): SpreadResult<T>[] {
   const sorted = [...items].sort((a, b) => a.at - b.at);
+  const low = bounds.min ?? Number.NEGATIVE_INFINITY;
+  const high = bounds.max ?? Number.POSITIVE_INFINITY;
+  const spots: number[] = [];
   let previous = Number.NEGATIVE_INFINITY;
-  return sorted.map((item) => {
-    const at = Math.max(item.at, previous + minGap);
+  for (const item of sorted) {
+    const at = Math.max(item.at, previous + minGap, low);
+    spots.push(at);
+    previous = at;
+  }
+  let next = Number.POSITIVE_INFINITY;
+  for (let index = spots.length - 1; index >= 0; index -= 1) {
+    const at = Math.min(spots[index] ?? 0, next - minGap, high);
+    spots[index] = at;
+    next = at;
+  }
+  previous = Number.NEGATIVE_INFINITY;
+  return sorted.map((item, index) => {
+    const at = Math.max(spots[index] ?? item.at, previous + minGap, low);
     previous = at;
     return {
       value: item.value,

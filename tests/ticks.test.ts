@@ -75,4 +75,21 @@ describe('spreadLabels', () => {
     const result = spreadLabels([{ value: 'a', at: 10 }, { value: 'b', at: 11 }], 13);
     expect(result.map((r) => r.anchor)).toEqual([10, 11]);
   });
+
+  it('pulls a crowd at the foot back inside its bounds', () => {
+    const result = spreadLabels(
+      [{ value: 'a', at: 90 }, { value: 'b', at: 95 }, { value: 'c', at: 98 }], 13,
+      undefined, { min: 0, max: 100 },
+    );
+    expect(result.map((r) => r.at)).toEqual([74, 87, 100]);
+    expect(result.map((r) => r.moved)).toEqual([true, true, true]);
+  });
+
+  it('keeps the gap when the labels cannot fit their bounds', () => {
+    const result = spreadLabels(
+      [{ value: 'a', at: 5 }, { value: 'b', at: 6 }, { value: 'c', at: 7 }], 13,
+      undefined, { min: 0, max: 20 },
+    );
+    expect(result.map((r) => r.at)).toEqual([0, 13, 26]);
+  });
 });

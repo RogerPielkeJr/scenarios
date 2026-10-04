@@ -305,6 +305,10 @@ export function mountApp(root: Document = document): App {
   }
 
   render();
+  // The charts size their margins to the labels as printed. Drawn before the
+  // web font arrives, they measured the fallback face, so draw again once the
+  // real one is in.
+  void root.fonts?.ready.then(() => { render(); });
 
   // A value arriving from a Learn More builder: say so, then take the marker
   // out of the address bar so a copied link opens clean.

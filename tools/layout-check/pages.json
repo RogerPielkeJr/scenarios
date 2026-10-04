@@ -1,0 +1,5 @@
+{
+  "widths": [1360, 1024, 768, 390],
+  "discover": { "groupLimit": 30 },
+  "defaults": { "clickEach": "button[aria-pressed], button[aria-haspopup]" }
+}

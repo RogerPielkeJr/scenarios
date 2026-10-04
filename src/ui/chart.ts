@@ -1,6 +1,7 @@
 import { BASE_YEAR, END_YEAR } from '../model/config.js';
 import { MARKERS, MARKER_YEARS } from '../model/markers.js';
 import { at } from '../model/types.js';
+import { textWidth } from './measure.js';
 import { spreadLabels } from './ticks.js';
 
 // Height leaves room for the year labels below the plot and nothing more.
@@ -11,6 +12,13 @@ const VIEW = { width: 660, height: 392 };
 // otherwise prints on top of the topmost number.
 const PLOT = { left: 56, right: 588, top: 40, bottom: 350 };
 const LABEL_GAP = 19;
+/**
+ * How far a scenario label's centre may sit from the top and the foot of the
+ * figure. Its baseline runs 5 below the centre and the face reaches about
+ * 0.96 of its size above that and 0.28 below, so with every slider at its
+ * maximum the lowest of the stacked names used to print off the bottom.
+ */
+const LABEL_REACH = 11;
 
 /*
  * Type on the chart, in viewBox units.
@@ -175,6 +183,8 @@ function markerLabels(yFor: (v: number) => number, highlight: string | null): st
       at: yFor(at(marker.co2Gt, marker.co2Gt.length - 1)),
     })),
     LABEL_GAP,
+    undefined,
+    { min: LABEL_REACH, max: VIEW.height - LABEL_REACH },
   );
   return placed.map(({ value: marker, anchor, at: y, moved }) => {
     const leader = moved
@@ -298,11 +308,15 @@ const ACCEPTABLE_DRIFT = 60;
 const TIE_MARGIN = 2;
 
 function placeUserLabel(
-  path: DrawablePath, yFor: (v: number) => number, scale: Scale, text: string,
+  svg: SVGSVGElement, path: DrawablePath, yFor: (v: number) => number, scale: Scale,
+  text: string,
 ): { x: number; y: number; connector: number | null } {
   const half = TYPE.userLabel * CAP_RATIO;
   const need = half + 2;
-  const width = labelWidth(text);
+  // Measured where the browser can, so a face wider than the estimate still
+  // keeps the label inside the plot.
+  const width = textWidth(svg, text,
+    { size: TYPE.userLabel, weight: 700, family: SANS }, labelWidth(text));
 
   const userPoints = path.points.map((point) => ({
     x: xFor(point.year), y: yFor(point.co2Gt),
@@ -367,8 +381,11 @@ function placeUserLabel(
   // rather than as that line's name. Sliding the label back along the line
   // finds a stretch with room beside it. Tried only when the right edge fails,
   // so the ordinary case still costs one pass.
+  // The slide stops where the label's left end would reach the axis numbers:
+  // "CMIP7 MEDIUM-to-LOW reconstructed", slid back 200, printed over "60".
   if (best.drift > ACCEPTABLE_DRIFT) {
     for (let back = 40; back <= 200; back += 40) {
+      if (edge - back - width < PLOT.left) break;
       const candidate = placeAt(edge - back);
       if (candidate.fromLines >= best.fromLines && candidate.drift < best.drift) {
         best = candidate;
@@ -384,12 +401,12 @@ function placeUserLabel(
 }
 
 function userPath(
-  path: DrawablePath, yFor: (v: number) => number, scale: Scale, name: string,
+  svg: SVGSVGElement, path: DrawablePath, yFor: (v: number) => number, scale: Scale, name: string,
 ): string {
   const d = path.points.map((point, index) => `${index === 0 ? 'M' : 'L'}`
     + `${xFor(point.year).toFixed(1)},${yFor(point.co2Gt).toFixed(1)}`).join('');
   const text = shorten(name);
-  const place = placeUserLabel(path, yFor, scale, text);
+  const place = placeUserLabel(svg, path, yFor, scale, text);
   const tie = place.connector === null ? '' : (() => {
     const x = place.x - 4;
     const from = place.y > place.connector ? place.y - TYPE.userLabel : place.y + 4;
@@ -432,7 +449,7 @@ export function renderChart(
     + yearLabels()
     + markerPaths(yFor, highlight)
     + markerLabels(yFor, highlight)
-    + userPath(path, yFor, scale, name);
+    + userPath(svg, path, yFor, scale, name);
 }
 
 export const CHART_GEOMETRY = {
