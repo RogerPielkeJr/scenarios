@@ -1,6 +1,8 @@
 {
   "name": "layout-check",
   "private": true,
-  "description": "Layout stress test for the built site in dist (see check_layout.js)",
-  "dependencies": { "playwright": "1.56.1" }
+  "description": "Layout stress test for the built site in web/dist (see check_layout.js)",
+  "dependencies": {
+    "playwright": "1.63.0"
+  }
 }

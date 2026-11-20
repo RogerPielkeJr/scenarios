@@ -38,7 +38,8 @@ export function buildScale(root: Document, ticks: readonly Tick[]): HTMLDivEleme
     label.className = `label label-row${tick.row}${edge}`;
     label.textContent = tick.label;
     label.style.left = `${tick.position}%`;
-    label.style.color = tick.color;
+    // the mark keeps the scenario colour; its label mixes it toward the body text so it passes 4.5:1 in both themes
+    label.style.color = `color-mix(in srgb, ${tick.color} 60%, var(--ink))`;
     scale.appendChild(label);
   }
   return scale;

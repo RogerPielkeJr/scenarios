@@ -152,7 +152,7 @@ h1 {
 
 .eyebrow {
   font-family: var(--sans);
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--dim);
   margin: 0 0 8px;
@@ -239,10 +239,10 @@ a.ghost-strong:hover { background: var(--ink); border-color: var(--ink); }
   border: 1px solid var(--rule);
 }
 @media (max-width: 420px) { .legend { grid-template-columns: minmax(0, 1fr); } }
-.legend .legend-intro { grid-column: 1 / -1; color: var(--dim); font-family: var(--sans); font-size: 15.5px; margin-bottom: 3px; }
-.legend-item { display: flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 15.5px; color: var(--dim); }
+.legend .legend-intro { grid-column: 1 / -1; color: var(--dim); font-family: var(--sans); font-size: 16px; margin-bottom: 3px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 16px; color: var(--dim); }
 .legend-item .swatch { width: 15px; height: 3px; border-radius: 2px; flex: none; }
-.legend-item b { font-weight: 600; font-size: 15px; letter-spacing: 0.02em; }
+.legend-item b { font-weight: 600; font-size: 16px; letter-spacing: 0.02em; }
 .legend-item.is-you { color: var(--ink); }
 .legend-item.is-you .swatch { height: 4px; }
 
@@ -297,7 +297,7 @@ a.ghost-strong:hover { background: var(--ink); border-color: var(--ink); }
 .handoff-dismiss {
   flex: none;
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--dim);
   background: none;
   border: 0;
@@ -327,7 +327,7 @@ input[type='range'] {
 .scale .label {
   position: absolute;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1;
   color: var(--dim);
   transform: translateX(-50%);
@@ -354,7 +354,7 @@ input[type='range'] {
 .naming label {
   display: block;
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--dim);
   margin-bottom: 4px;
 }
@@ -377,13 +377,20 @@ input[type='range'] {
 .naming input:focus { outline: none; border-color: var(--navy); background: var(--panel); }
 .naming-hint {
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--dim);
   margin: 5px 0 0;
 }
 .naming input:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 
 .chart-figure { margin: 0; }
+
+/* Phones: a chart (660-680 units wide) keeps a 640px minimum width and scrolls sideways inside its figure, like a
+   wide table, so its 14-15 unit labels read at 13px or more and the chart's own layout places them. */
+@media (max-width: 700px) {
+  .chart-figure { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .chart-figure > svg { min-width: 640px; }
+}
 
 /* The mark, the source and the credit, under every figure and every table.
    The same three things the downloaded PNG carries. */
@@ -405,14 +412,14 @@ input[type='range'] {
 .credit-data,
 .credit {
   font-family: var(--sans);
-  font-size: 13.5px;
+  font-size: 16px;
   line-height: 1.45;
   color: var(--dim);
   display: block;
 }
 .credit { font-style: italic; }
 svg { width: 100%; height: auto; display: block; overflow: visible; }
-.caption { font-family: var(--sans); font-size: 15.5px; color: var(--dim); margin-top: 10px; }
+.caption { font-family: var(--sans); font-size: 16px; color: var(--dim); margin-top: 10px; }
 
 .stats {
   display: grid;
@@ -425,7 +432,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 @media (max-width: 560px) { .stats { grid-template-columns: 1fr; } }
 
 .stat { background: var(--panel); padding: 15px 16px; }
-.stat-key { font-family: var(--sans); font-size: 15.5px; color: var(--dim); margin-bottom: 5px; }
+.stat-key { font-family: var(--sans); font-size: 16px; color: var(--dim); margin-bottom: 5px; }
 .stat-value {
   font-family: var(--mono);
   font-size: clamp(27px, 2.7vw, 33px);
@@ -435,7 +442,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 }
 .stat-value-text { font-family: var(--serif); font-size: 24.5px; }
 .stat-note { font-size: 16px; color: var(--dim); margin-top: 3px; }
-.stat-error { color: var(--scenario-high); font-family: var(--sans); font-size: 15px; }
+.stat-error { color: var(--scenario-high); font-family: var(--sans); font-size: 16px; }
 
 /* The 404 page's list of places to go. */
 .notfound-list { margin: 0; padding-left: 20px; }
@@ -471,7 +478,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 
 .strip-name {
   font-family: var(--sans);
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--ink);
   white-space: nowrap;
@@ -488,7 +495,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
   letter-spacing: -0.02em;
   color: var(--ink);
 }
-.strip-key { font-family: var(--sans); font-size: 14px; color: var(--dim); }
+.strip-key { font-family: var(--sans); font-size: 16px; color: var(--dim); }
 
 /* Pushed to the far end, and never squeezed by a long scenario name. */
 #strip-jump { margin-left: auto; flex: none; }
@@ -501,7 +508,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 @media (max-width: 700px) {
   .strip-name { display: none; }
   .strip-value { font-size: 18px; }
-  .strip-key { font-size: 13px; }
+  .strip-key { font-size: 16px; }
 }
 
 /* Measured, not guessed. With the long button label and both keys the strip
@@ -522,7 +529,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .scroll-x { overflow-x: auto; margin-top: 22px; }
 .kaya { width: 100%; min-width: 460px; border-collapse: collapse; font-size: 17px; }
 .kaya th {
-  font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--dim);
+  font-family: var(--sans); font-size: 16px; font-weight: 600; color: var(--dim);
   text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--rule);
 }
 .kaya th:first-child { text-align: left; }
@@ -537,7 +544,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .kaya .yours { font-weight: 600; color: var(--you); }
 
 .actions { margin-top: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.action-message { font-family: var(--sans); font-size: 15.5px; color: var(--dim); }
+.action-message { font-family: var(--sans); font-size: 16px; color: var(--dim); }
 
 .notes {
   font-size: 17px;
@@ -556,7 +563,7 @@ svg { width: 100%; height: auto; display: block; overflow: visible; }
 .learn-banner-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .learn-chip {
   font-family: var(--sans);
-  font-size: 14.5px;
+  font-size: 16px;
   line-height: 1;
   padding: 8px 12px;
   border: 1px solid var(--rule);
@@ -571,15 +578,16 @@ a.learn-chip:hover, a.learn-chip:focus-visible {
   background: var(--accent-wash);
 }
 .learn-chip-here {
-  border-color: var(--accent);
-  background: var(--accent);
+  /* --accent-ink equals --accent in light mode and is the lighter mix in dark mode, where panel text on --accent fell to 2.9:1 */
+  border-color: var(--accent-ink);
+  background: var(--accent-ink);
   color: var(--panel);
   font-weight: 600;
 }
 .learn-chip-soon { color: var(--dim); border-style: dashed; }
 .learn-chip-index { font-style: italic; color: var(--dim); }
 @media (max-width: 620px) {
-  .learn-chip { font-size: 13.5px; padding: 7px 10px; }
+  .learn-chip { font-size: 16px; padding: 7px 10px; }
 }
 
 /* --- the bibliography page ---------------------------------------------- */
@@ -645,16 +653,16 @@ a.learn-chip:hover, a.learn-chip:focus-visible {
      sit 6px below the second where the first sat 4px above it. */
   margin: 0;
   font-family: var(--sans);
-  font-size: 14.5px;
+  font-size: 16px;
   color: var(--dim);
 }
-.footnote { margin: 18px 0 0; font-size: 15.5px; color: var(--dim); font-style: italic; }
+.footnote { margin: 18px 0 0; font-size: 16px; color: var(--dim); font-style: italic; }
 /* The marker in the standfirst, and the note it points at under the name box.
    The note carries the arithmetic behind the scenario count, which is too long
    to sit inside the opening sentence. */
 .fnref { text-decoration: none; color: inherit; }
 .fnref:hover sup, .fnref:focus-visible sup { text-decoration: underline; }
-#scenario-arithmetic { margin: 16px 0 0; font-size: 14.5px; line-height: 1.5; }
+#scenario-arithmetic { margin: 16px 0 0; font-size: 16px; line-height: 1.5; }
 #scenario-arithmetic sup { font-style: normal; margin-right: 2px; }
 
 footer {
@@ -669,7 +677,7 @@ footer p { margin: 0 0 6px; }
 footer p:last-child { margin-bottom: 0; }
 /* The standing notice: present on every page, and still legible as a note
    rather than as a second credit line. */
-.wip { font-family: var(--sans); font-size: 15px; }
+.wip { font-family: var(--sans); font-size: 16px; }
 .feedback { font-weight: 600; color: var(--navy); text-underline-offset: 3px; }
 a.feedback { text-decoration: underline; }
 
@@ -708,7 +716,7 @@ a.feedback { text-decoration: underline; }
 
 .kicker {
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -737,7 +745,7 @@ a.feedback { text-decoration: underline; }
 .definition-grid > div { background: var(--panel); padding: 12px 14px; }
 .definition-grid dt {
   font-family: var(--sans);
-  font-size: 13.5px;
+  font-size: 16px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--dim);
@@ -785,12 +793,12 @@ a.feedback { text-decoration: underline; }
 .identity .op { font-family: var(--mono); font-size: 16px; color: var(--dim); }
 .identity .identity-result {
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--ink);
 }
 .identity-aside { margin: 12px 0 0; font-size: 17px; color: var(--dim); }
-.identity-aside .factor { font-size: 14px; padding: 3px 7px; }
+.identity-aside .factor { font-size: 16px; padding: 3px 7px; }
 
 /* --- the builder --------------------------------------------------------- */
 .builder { margin-top: 22px; }
@@ -844,7 +852,7 @@ a.feedback { text-decoration: underline; }
 }
 .builder-result-key {
   font-family: var(--sans);
-  font-size: 13.5px;
+  font-size: 16px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--dim);
@@ -923,7 +931,7 @@ a.feedback { text-decoration: underline; }
 .forthcoming { font-family: var(--sans); font-size: 21px; font-weight: 600; color: var(--dim); }
 .forthcoming-tag {
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 16px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--dim);
@@ -1006,7 +1014,7 @@ a.feedback { text-decoration: underline; }
 }
 .figure-download {
   font-family: var(--mono);
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: 0.04em;
   padding: 6px 12px;
 }
@@ -1057,7 +1065,7 @@ a.feedback { text-decoration: underline; }
 .library-date {
   margin: 0;
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
